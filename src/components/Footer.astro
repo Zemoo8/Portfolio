@@ -1,0 +1,40 @@
+---
+import { locales, localeMeta, path, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { profile } from '../content/profile';
+
+interface Props { lang: Locale; route: string }
+const { lang, route } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap foot__grid">
+    <p class="foot__sign display">{tr(profile.name, lang)}</p>
+    <ul class="foot__links">
+      <li><a class="link-u" href={profile.links.github} rel="me noopener" target="_blank">GitHub</a></li>
+      <li><a class="link-u" href={profile.links.linkedin} rel="me noopener" target="_blank">LinkedIn</a></li>
+      <li><a class="link-u" href={`mailto:${profile.email}`}>{tr(ui.contact.email, lang)}</a></li>
+    </ul>
+    <ul class="foot__langs" aria-label={tr(ui.nav.language, lang)}>
+      {locales.map((l) => (
+        <li><a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>{localeMeta[l].name}</a></li>
+      ))}
+    </ul>
+    <div class="foot__base mono">
+      <span>© {year} · {tr(ui.footer.rights, lang)}</span>
+      <a class="link-u" href="#main">{tr(ui.footer.top, lang)} <span class="arrow" aria-hidden="true" style="transform:rotate(-90deg)">→</span></a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .foot { margin-block-start: var(--section); border-block-start: 1px solid var(--line); padding-block: 3.5rem 2rem; }
+  .foot__grid { display: grid; grid-template-columns: 1fr auto auto; gap: 2rem 4rem; align-items: start; }
+  .foot__sign { font-size: var(--step-3); }
+  .foot__links, .foot__langs { display: grid; gap: 0.5rem; font-size: var(--step--1); }
+  .foot__langs a { color: var(--muted); }
+  .foot__langs a[aria-current='true'] { color: var(--paper); }
+  .foot__base { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-block-start: 2rem; border-block-start: 1px solid var(--line); }
+  @media (max-width: 720px) { .foot__grid { grid-template-columns: 1fr 1fr; } .foot__sign { grid-column: 1 / -1; } }
+</style>

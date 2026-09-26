@@ -1,0 +1,96 @@
+---
+import ProjectRow from '../components/ProjectRow.astro';
+import { tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { projects } from '../content/projects';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const lead = projects.filter((p) => p.size === 'lead');
+const major = projects.filter((p) => p.size === 'major');
+const minor = projects.filter((p) => p.size === 'minor');
+---
+
+<section id="work" class="section work wrap" aria-labelledby="work-title">
+  <header class="section-head">
+    <p class="kicker" data-reveal>{tr(ui.work.kicker, lang)}</p>
+    <h2 id="work-title" class="display" data-lines>{tr(ui.work.title, lang)}</h2>
+  </header>
+
+  <div class="work__lead">
+    {lead.map((p, i) => <ProjectRow project={p} lang={lang} flip={i % 2 === 1} />)}
+  </div>
+  <div class="work__major">
+    {major.map((p, i) => <ProjectRow project={p} lang={lang} flip={i % 2 === 1} />)}
+  </div>
+  <div class="work__minor">
+    {minor.map((p) => <ProjectRow project={p} lang={lang} />)}
+  </div>
+
+  <div class="cursor" aria-hidden="true" data-cursor-el><span></span></div>
+</section>
+
+<style>
+  .work__lead { display: grid; gap: clamp(7rem, 5rem + 8vw, 13rem); }
+  .work__major { display: grid; gap: clamp(5rem, 3rem + 6vw, 9rem); margin-block-start: clamp(7rem, 5rem + 8vw, 13rem); }
+  .work__minor {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--gutter) * 1.5);
+    margin-block-start: clamp(6rem, 4rem + 6vw, 10rem);
+    padding-block-start: 3rem;
+    border-block-start: 1px solid var(--line);
+  }
+  @media (max-width: 760px) { .work__minor { grid-template-columns: 1fr; gap: 4.5rem; } }
+
+  .cursor {
+    position: fixed;
+    inset: 0 auto auto 0;
+    z-index: 40;
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    inline-size: 6.5rem;
+    block-size: 6.5rem;
+    margin: -3.25rem 0 0 -3.25rem;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    line-height: 1.2;
+    padding: 0.8rem;
+    scale: 0;
+    transition: scale 0.45s var(--ease-out);
+  }
+  :lang(ar) .cursor { font-family: var(--font-arabic); text-transform: none; font-size: 0.85rem; }
+  .cursor.is-on { scale: 1; }
+</style>
+
+<script>
+  // Cursor label over project media (fine pointers only; purely decorative —
+  // every project also has a visible, keyboard-reachable "Open case study" link).
+  const el = document.querySelector<HTMLElement>('[data-cursor-el]');
+  if (el && matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const label = el.querySelector('span')!;
+    let x = 0, y = 0, cx = 0, cy = 0, on = false;
+    const loop = () => {
+      cx += (x - cx) * 0.18;
+      cy += (y - cy) * 0.18;
+      el.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
+      if (on || Math.abs(x - cx) > 0.5) requestAnimationFrame(loop);
+    };
+    document.querySelectorAll<HTMLElement>('[data-cursor]').forEach((t) => {
+      t.addEventListener('pointerenter', (e) => {
+        label.textContent = t.dataset.cursor!;
+        x = cx = e.clientX; y = cy = e.clientY;
+        on = true; el.classList.add('is-on'); requestAnimationFrame(loop);
+      });
+      t.addEventListener('pointermove', (e) => { x = e.clientX; y = e.clientY; });
+      t.addEventListener('pointerleave', () => { on = false; el.classList.remove('is-on'); });
+    });
+  }
+</script>

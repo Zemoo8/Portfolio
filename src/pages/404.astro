@@ -1,0 +1,25 @@
+---
+import Base from '../layouts/Base.astro';
+import { path, tr } from '../i18n/config';
+import { ui } from '../i18n/ui';
+const lang = 'en' as const;
+---
+
+<Base lang={lang} title="404 — Ahmed Baghouli" description={tr(ui.notFound.title, lang)} noindex>
+  <section class="nf wrap">
+    <p class="kicker">404</p>
+    <h1 class="display">{ui.notFound.title.en}<br /><span lang="fr">{ui.notFound.title.fr}</span><br /><span lang="ar" dir="rtl">{ui.notFound.title.ar}</span></h1>
+    <p class="nf__links">
+      <a class="btn" href={path('en')}>{ui.notFound.back.en}</a>
+      <a class="btn" href={path('fr')} lang="fr">{ui.notFound.back.fr}</a>
+      <a class="btn" href={path('ar')} lang="ar">{ui.notFound.back.ar}</a>
+    </p>
+  </section>
+</Base>
+
+<style>
+  .nf { min-block-size: 80vh; display: grid; align-content: center; gap: 2rem; padding-block: 8rem 2rem; }
+  .nf h1 { font-size: var(--step-4); }
+  .nf h1 [lang='ar'] { font-family: var(--font-arabic); font-size: 0.7em; }
+  .nf__links { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+</style>

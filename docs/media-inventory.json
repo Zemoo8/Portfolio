@@ -1,0 +1,498 @@
+[
+ {
+  "file": "media/intros/intro-ar-poster.webp",
+  "kb": 37,
+  "width": 1080,
+  "height": 1350,
+  "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-en-poster.webp",
+  "kb": 37,
+  "width": 1080,
+  "height": 1350,
+  "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-fr-poster.webp",
+  "kb": 37,
+  "width": 1080,
+  "height": 1350,
+  "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/profile/portrait-color.webp",
+  "kb": 33,
+  "width": 432,
+  "height": 577,
+  "source": "Face Picture.png, cut out (edge flood-fill mask), monochrome + colour"
+ },
+ {
+  "file": "media/profile/portrait.webp",
+  "kb": 29,
+  "width": 432,
+  "height": 577,
+  "source": "Face Picture.png, cut out (edge flood-fill mask), monochrome + colour"
+ },
+ {
+  "file": "media/projects/aieyes/dashboard-auth-mobile.webp",
+  "kb": 38,
+  "width": 780,
+  "height": 1688,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/aieyes/dashboard-auth.webp",
+  "kb": 32,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/bubbleberry/hero.webp",
+  "kb": 34,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/caffeine/hero.webp",
+  "kb": 54,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/cheezy/ad-cheesecake.webp",
+  "kb": 54,
+  "width": 900,
+  "height": 1125,
+  "source": "From cheezy/ads/approved (client-approved creatives)"
+ },
+ {
+  "file": "media/projects/cheezy/ad-matcha.webp",
+  "kb": 38,
+  "width": 900,
+  "height": 1600,
+  "source": "From cheezy/ads/approved (client-approved creatives)"
+ },
+ {
+  "file": "media/projects/cheezy/ad-menu.webp",
+  "kb": 50,
+  "width": 900,
+  "height": 1273,
+  "source": "From cheezy/ads/approved (client-approved creatives)"
+ },
+ {
+  "file": "media/projects/cheezy/app-mobile-poster.webp",
+  "kb": 65,
+  "width": 720,
+  "height": 1558,
+  "source": "Recorded from cheezy-app-demo.vercel.app (onboarding → shop choice → home)"
+ },
+ {
+  "file": "media/projects/cheezy/app-mobile.mp4",
+  "kb": 763,
+  "width": 720,
+  "height": 1558,
+  "duration": 10.9,
+  "source": "Recorded from cheezy-app-demo.vercel.app (onboarding → shop choice → home)"
+ },
+ {
+  "file": "media/projects/cheezy/app-mobile.webm",
+  "kb": 476,
+  "width": 720,
+  "height": 1558,
+  "duration": 10.9,
+  "source": "Recorded from cheezy-app-demo.vercel.app (onboarding → shop choice → home)"
+ },
+ {
+  "file": "media/projects/cheezy/film-app-poster.webp",
+  "kb": 27,
+  "width": 1600,
+  "height": 900,
+  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film-II.mp4 (Ahmed's own launch film for the client)"
+ },
+ {
+  "file": "media/projects/cheezy/film-app.mp4",
+  "kb": 2264,
+  "width": 1600,
+  "height": 900,
+  "duration": 37,
+  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film-II.mp4 (Ahmed's own launch film for the client)"
+ },
+ {
+  "file": "media/projects/cheezy/film-app.webm",
+  "kb": 1146,
+  "width": 1600,
+  "height": 900,
+  "duration": 37,
+  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film-II.mp4 (Ahmed's own launch film for the client)"
+ },
+ {
+  "file": "media/projects/cheezy/hero.webp",
+  "kb": 96,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/cheezy/item.webp",
+  "kb": 51,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/cheezy/menu.webp",
+  "kb": 74,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/cheezy/ordering.webp",
+  "kb": 76,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/cheezy/shop-picker.webp",
+  "kb": 33,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/cheezy/showcase-desktop-poster.webp",
+  "kb": 88,
+  "width": 1600,
+  "height": 1000,
+  "source": "Recorded from www.cheezy.store (CDP screencast, scripted: home → ordering section → story → Menu → shop picker → menu → Cappuccino sheet)"
+ },
+ {
+  "file": "media/projects/cheezy/showcase-desktop.mp4",
+  "kb": 2219,
+  "width": 1600,
+  "height": 1000,
+  "duration": 19.6,
+  "source": "Recorded from www.cheezy.store (CDP screencast, scripted: home → ordering section → story → Menu → shop picker → menu → Cappuccino sheet)"
+ },
+ {
+  "file": "media/projects/cheezy/showcase-desktop.webm",
+  "kb": 1588,
+  "width": 1600,
+  "height": 1000,
+  "duration": 19.6,
+  "source": "Recorded from www.cheezy.store (CDP screencast, scripted: home → ordering section → story → Menu → shop picker → menu → Cappuccino sheet)"
+ },
+ {
+  "file": "media/projects/cheezy/showcase-mobile-poster.webp",
+  "kb": 67,
+  "width": 720,
+  "height": 1558,
+  "source": "Recorded from www.cheezy.store at 390×844 (iPhone 13 profile)"
+ },
+ {
+  "file": "media/projects/cheezy/showcase-mobile.mp4",
+  "kb": 2145,
+  "width": 720,
+  "height": 1558,
+  "duration": 9.3,
+  "source": "Recorded from www.cheezy.store at 390×844 (iPhone 13 profile)"
+ },
+ {
+  "file": "media/projects/cheezy/showcase-mobile.webm",
+  "kb": 1030,
+  "width": 720,
+  "height": 1558,
+  "duration": 9.3,
+  "source": "Recorded from www.cheezy.store at 390×844 (iPhone 13 profile)"
+ },
+ {
+  "file": "media/projects/radar/fig-accuracy.webp",
+  "kb": 65,
+  "width": 1920,
+  "height": 696,
+  "source": "Copied from math.project/results (matplotlib output of the project)"
+ },
+ {
+  "file": "media/projects/radar/fig-engagement.webp",
+  "kb": 68,
+  "width": 1913,
+  "height": 1199,
+  "source": "Copied from math.project/results (matplotlib output of the project)"
+ },
+ {
+  "file": "media/projects/radar/fig-imm-modes.webp",
+  "kb": 37,
+  "width": 1746,
+  "height": 684,
+  "source": "Copied from math.project/results (matplotlib output of the project)"
+ },
+ {
+  "file": "media/projects/radar/fig-sweeps.webp",
+  "kb": 40,
+  "width": 1920,
+  "height": 699,
+  "source": "Copied from math.project/results (matplotlib output of the project)"
+ },
+ {
+  "file": "media/projects/radar/showcase-desktop-poster.webp",
+  "kb": 54,
+  "width": 1600,
+  "height": 1000,
+  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+ },
+ {
+  "file": "media/projects/radar/showcase-desktop.mp4",
+  "kb": 2537,
+  "width": 1440,
+  "height": 900,
+  "duration": 16.3,
+  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+ },
+ {
+  "file": "media/projects/radar/showcase-desktop.webm",
+  "kb": 1763,
+  "width": 1440,
+  "height": 900,
+  "duration": 16.3,
+  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+ },
+ {
+  "file": "media/projects/sandy/chat.webp",
+  "kb": 49,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/sandy/sidebar.webp",
+  "kb": 60,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/scraping/charts.webp",
+  "kb": 46,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/scraping/hero.webp",
+  "kb": 49,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/scraping/kpis.webp",
+  "kb": 34,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/scraping/prediction.webp",
+  "kb": 57,
+  "width": 1920,
+  "height": 1200,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/scraping/showcase-desktop-poster.webp",
+  "kb": 41,
+  "width": 1600,
+  "height": 1000,
+  "source": "Recorded from the local Flask + React app (home narrative → dashboard → prediction)"
+ },
+ {
+  "file": "media/projects/scraping/showcase-desktop.mp4",
+  "kb": 2416,
+  "width": 1600,
+  "height": 1000,
+  "duration": 21.1,
+  "source": "Recorded from the local Flask + React app (home narrative → dashboard → prediction)"
+ },
+ {
+  "file": "media/projects/scraping/showcase-desktop.webm",
+  "kb": 1593,
+  "width": 1600,
+  "height": 1000,
+  "duration": 21.1,
+  "source": "Recorded from the local Flask + React app (home narrative → dashboard → prediction)"
+ },
+ {
+  "file": "media/projects/subway-runner/gameplay.webp",
+  "kb": 53,
+  "width": 1600,
+  "height": 1000,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/subway-runner/showcase-desktop-poster.webp",
+  "kb": 59,
+  "width": 1600,
+  "height": 1000,
+  "source": "WebGL build of a temporary copy of SubwayRunner; two real gameplay takes joined with a 0.6 s crossfade"
+ },
+ {
+  "file": "media/projects/subway-runner/showcase-desktop.mp4",
+  "kb": 2846,
+  "width": 1440,
+  "height": 900,
+  "duration": 9.8,
+  "source": "WebGL build of a temporary copy of SubwayRunner; two real gameplay takes joined with a 0.6 s crossfade"
+ },
+ {
+  "file": "og/aegis-radar-ar.jpg",
+  "kb": 45,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/aegis-radar-en.jpg",
+  "kb": 47,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/aegis-radar-fr.jpg",
+  "kb": 48,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/ai-eyes-ar.jpg",
+  "kb": 46,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/ai-eyes-en.jpg",
+  "kb": 48,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/ai-eyes-fr.jpg",
+  "kb": 50,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/books-intelligence-ar.jpg",
+  "kb": 64,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/books-intelligence-en.jpg",
+  "kb": 71,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/books-intelligence-fr.jpg",
+  "kb": 73,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/cheezy-ar.jpg",
+  "kb": 65,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/cheezy-en.jpg",
+  "kb": 68,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/cheezy-fr.jpg",
+  "kb": 71,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/default-ar.jpg",
+  "kb": 48,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/default-en.jpg",
+  "kb": 57,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/default-fr.jpg",
+  "kb": 59,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/sandy-ai-lab-ar.jpg",
+  "kb": 62,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/sandy-ai-lab-en.jpg",
+  "kb": 62,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/sandy-ai-lab-fr.jpg",
+  "kb": 65,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/subway-runner-ar.jpg",
+  "kb": 60,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/subway-runner-en.jpg",
+  "kb": 58,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/subway-runner-fr.jpg",
+  "kb": 59,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ }
+]

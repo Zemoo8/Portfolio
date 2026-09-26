@@ -1,0 +1,30 @@
+---
+import { still } from '../lib/media';
+
+interface Props {
+  src: string;
+  alt: string;
+  sizes?: string;
+  eager?: boolean;
+  class?: string;
+  fit?: 'cover' | 'contain';
+  figure?: boolean;
+  ratio?: string;
+}
+const { src, alt, sizes = '(max-width: 900px) 100vw, 60vw', eager = false, class: cls = '', fit = 'cover', figure = false, ratio } = Astro.props;
+const s = still(src);
+---
+
+<div class:list={['media', fit === 'contain' && 'media--contain', figure && 'media--figure', cls]} style={ratio ? `aspect-ratio:${ratio}` : `aspect-ratio:${s.width}/${s.height}`}>
+  <img
+    src={s.src}
+    srcset={s.srcset}
+    sizes={sizes}
+    width={s.width}
+    height={s.height}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={eager ? 'high' : 'auto'}
+  />
+</div>

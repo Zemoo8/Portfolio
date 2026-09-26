@@ -1,0 +1,94 @@
+{
+ "aieyes/dashboard-auth-mobile": [
+  780,
+  1688
+ ],
+ "aieyes/dashboard-auth": [
+  1920,
+  1200
+ ],
+ "bubbleberry/hero": [
+  1920,
+  1200
+ ],
+ "caffeine/hero": [
+  1920,
+  1200
+ ],
+ "cheezy/hero": [
+  1920,
+  1200
+ ],
+ "cheezy/item": [
+  1920,
+  1200
+ ],
+ "cheezy/menu": [
+  1920,
+  1200
+ ],
+ "cheezy/ordering": [
+  1920,
+  1200
+ ],
+ "cheezy/shop-picker": [
+  1920,
+  1200
+ ],
+ "sandy/chat": [
+  1920,
+  1200
+ ],
+ "sandy/sidebar": [
+  1920,
+  1200
+ ],
+ "scraping/charts": [
+  1920,
+  1200
+ ],
+ "scraping/hero": [
+  1920,
+  1200
+ ],
+ "scraping/kpis": [
+  1920,
+  1200
+ ],
+ "scraping/prediction": [
+  1920,
+  1200
+ ],
+ "subway-runner/gameplay": [
+  1600,
+  1000
+ ],
+ "radar/fig-engagement": [
+  1913,
+  1199
+ ],
+ "radar/fig-accuracy": [
+  1920,
+  696
+ ],
+ "radar/fig-imm-modes": [
+  1746,
+  684
+ ],
+ "radar/fig-sweeps": [
+  1920,
+  699
+ ],
+ "cheezy/ad-cheesecake": [
+  900,
+  1125
+ ],
+ "cheezy/ad-matcha": [
+  900,
+  1600
+ ],
+ "cheezy/ad-menu": [
+  900,
+  1273
+ ]
+}

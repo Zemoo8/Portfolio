@@ -1,0 +1,124 @@
+---
+import IntroFilm from '../components/IntroFilm.astro';
+import { path, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { profile } from '../content/profile';
+import { projects } from '../content/projects';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const leads = projects.slice(0, 3);
+---
+
+<section class="hero wrap" aria-labelledby="hero-name">
+  <div class="hero__top">
+    <p class="kicker">{tr(profile.role, lang)}</p>
+    <p class="mono hero__loc">{tr(ui.hero.based, lang)}</p>
+  </div>
+
+  <h1 id="hero-name" class="hero__name display">
+    <span class="line-mask" data-onload><span class="hero__first">{tr(profile.firstName, lang)}</span></span>
+    <span class="line-mask" data-onload style="--i:1"><span class="hero__last"><em>{tr(profile.lastName, lang)}</em></span></span>
+  </h1>
+
+  <div class="hero__body">
+    <p class="hero__statement">{tr(profile.statement, lang)}</p>
+
+    <div class="hero__film">
+      <IntroFilm lang={lang} />
+    </div>
+  </div>
+
+  <nav class="hero__index" aria-label={tr(ui.hero.selected, lang)}>
+    <span class="mono">{tr(ui.hero.selected, lang)}</span>
+    <ol>
+      {leads.map((p) => (
+        <li>
+          <a href={path(lang, `work/${p.slug}`)}>
+            <span class="mono">{p.index}</span>
+            <span class="hero__index-title">{p.title}</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <a class="hero__scroll mono" href="#work">
+      <span>{tr(ui.hero.scroll, lang)}</span>
+      <i aria-hidden="true"></i>
+    </a>
+  </nav>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    grid-template-areas:
+      'top top'
+      'name film'
+      'body film'
+      'index index';
+    grid-template-rows: auto auto 1fr auto;
+    column-gap: calc(var(--gutter) * 1.5);
+    row-gap: clamp(1.2rem, 2vw, 2rem);
+    min-block-size: 100svh;
+    padding-block: 6.5rem 2rem;
+  }
+  .hero__top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .hero__name {
+    grid-area: name;
+    align-self: end;
+    font-size: clamp(4rem, 1.2rem + 10.4vw, 13.5rem);
+    line-height: 0.84;
+    letter-spacing: -0.035em;
+    margin-inline-start: -0.04em;
+  }
+  .hero__name .line-mask { padding-block-end: 0.2em; margin-block-end: -0.2em; }
+  :lang(ar) .hero__name { font-size: clamp(3.6rem, 1.5rem + 8vw, 10rem); line-height: 1.12; font-weight: 500; letter-spacing: 0; }
+  .hero__last { padding-inline-start: 0.7em; }
+  :lang(ar) .hero__last em { font-weight: 300; }
+  .hero__name .line-mask > span { display: block; }
+
+  .hero__body { display: contents; }
+  .hero__statement { grid-area: body; align-self: start; font-size: var(--step-1); line-height: 1.45; max-inline-size: 31rem; color: var(--paper-2); margin-block-start: 1rem; }
+  :lang(ar) .hero__statement { line-height: 1.85; }
+  .hero__film { grid-area: film; align-self: end; }
+  .hero__film :global(.intro__stage) { aspect-ratio: 4 / 5; inline-size: min(100%, calc(66svh * 4 / 5)); margin-inline-start: auto; }
+  .hero__film :global(.intro__bar) { inline-size: min(100%, calc(66svh * 4 / 5)); margin-inline-start: auto; }
+
+  .hero__index {
+    grid-area: index;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1.5rem 2.5rem;
+    padding-block-start: 1.4rem;
+    border-block-start: 1px solid var(--line);
+  }
+  .hero__index ol { display: flex; flex-wrap: wrap; gap: 0.4rem 2.2rem; }
+  .hero__index a { display: inline-flex; align-items: baseline; gap: 0.6rem; }
+  .hero__index-title { font-size: var(--step-0); }
+  .hero__index a .arrow { opacity: 0; transform: translateX(-6px); transition: opacity var(--dur-2), transform var(--dur-2) var(--ease-out); }
+  [dir='rtl'] .hero__index a .arrow { transform: scaleX(-1) translateX(-6px); }
+  .hero__index a:hover .arrow, .hero__index a:focus-visible .arrow { opacity: 1; transform: none; }
+  [dir='rtl'] .hero__index a:hover .arrow { transform: scaleX(-1); }
+  .hero__scroll { display: inline-flex; align-items: center; gap: 0.8rem; }
+  .hero__scroll i { position: relative; inline-size: 1px; block-size: 2.2rem; background: var(--line-strong); overflow: hidden; }
+  .hero__scroll i::after { content: ''; position: absolute; inset-inline: 0; block-size: 40%; background: var(--paper); animation: drip 2.2s var(--ease-in-out) infinite; }
+  @keyframes drip { from { transform: translateY(-100%); } to { transform: translateY(250%); } }
+
+  @media (max-width: 960px) {
+    .hero {
+      grid-template-columns: 1fr;
+      grid-template-areas: 'top' 'name' 'body' 'film' 'index';
+      grid-template-rows: auto;
+      min-block-size: auto;
+      padding-block-start: 6rem;
+    }
+    .hero__last { padding-inline-start: 0.45em; }
+    .hero__film :global(.intro__stage), .hero__film :global(.intro__bar) { aspect-ratio: auto; inline-size: 100%; }
+    .hero__film :global(.intro__stage) { aspect-ratio: 16 / 11; }
+    .hero__index { grid-template-columns: 1fr; gap: 0.8rem; }
+    .hero__scroll { display: none; }
+  }
+</style>

@@ -1,0 +1,121 @@
+---
+// Editorial portrait. The source photo is small (432×577), so it is shown in monochrome
+// inside an arched aperture at a modest size where it stays crisp; the colour original
+// warms in on hover. Rings, scan line and depth are decorative (aria-hidden).
+import { asset, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+---
+
+<figure class="portrait" data-portrait data-reveal>
+  <svg class="portrait__rings" viewBox="0 0 400 400" aria-hidden="true" data-depth="-14">
+    <circle cx="200" cy="200" r="196" class="r1" />
+    <circle cx="200" cy="200" r="168" class="r2" />
+    <circle cx="200" cy="200" r="132" class="r3" />
+    <g class="orbit"><circle cx="200" cy="4" r="3.2" /></g>
+    <path d="M200 0v22M200 378v22M0 200h22M378 200h22" class="ticks" />
+  </svg>
+
+  <div class="portrait__frame" data-depth="10">
+    <img class="portrait__mono" src={asset('media/profile/portrait.webp')} width="432" height="577" alt={tr(ui.about.portraitAlt, lang)} loading="lazy" decoding="async" />
+    <img class="portrait__color" src={asset('media/profile/portrait-color.webp')} width="432" height="577" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+    <span class="portrait__scan" aria-hidden="true"></span>
+  </div>
+
+  <figcaption class="portrait__cap mono" aria-hidden="true">
+    <span>36.81° N · 10.18° E</span>
+    <span>Tunis — 2026</span>
+  </figcaption>
+</figure>
+
+<style>
+  .portrait {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: min(100%, 30rem);
+    aspect-ratio: 1;
+    margin-inline: auto;
+  }
+  .portrait__rings { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; }
+  .portrait__rings circle { fill: none; stroke: var(--line-strong); stroke-width: 0.8; }
+  .portrait__rings .r2 { stroke-dasharray: 2 7; stroke: var(--line-strong); transform-origin: 200px 200px; animation: spin 90s linear infinite; }
+  .portrait__rings .r3 { stroke: var(--line); }
+  .portrait__rings .ticks { stroke: var(--faint); stroke-width: 0.8; }
+  .portrait__rings .orbit { transform-origin: 200px 200px; animation: spin 26s linear infinite; }
+  .portrait__rings .orbit circle { fill: var(--signal); stroke: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  [dir='rtl'] .portrait__rings .orbit, [dir='rtl'] .portrait__rings .r2 { animation-direction: reverse; }
+
+  .portrait__frame {
+    position: relative;
+    inline-size: 62%;
+    aspect-ratio: 432 / 577;
+    border-radius: 999px 999px 18px 18px;
+    overflow: hidden;
+    background: radial-gradient(80% 60% at 50% 30%, #23221f, #111110);
+    box-shadow: 0 0 0 1px var(--line) inset;
+  }
+  .portrait__frame img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: 50% 20%;
+  }
+  .portrait__mono { filter: contrast(1.06) brightness(0.96); }
+  .portrait__color { opacity: 0; transition: opacity 1.4s var(--ease-out); }
+  .portrait:hover .portrait__color { opacity: 0.85; }
+
+  /* Aperture opening + one scan pass when the portrait enters the viewport */
+  .js .portrait__frame { clip-path: circle(0% at 50% 38%); }
+  .js .portrait.is-in .portrait__frame { clip-path: circle(80% at 50% 38%); transition: clip-path 1.8s var(--ease-out) 0.15s; }
+  .portrait__scan {
+    position: absolute;
+    inset-inline: 0;
+    block-size: 18%;
+    inset-block-start: -20%;
+    background: linear-gradient(to bottom, transparent, rgb(255 90 38 / 0.18) 70%, rgb(255 90 38 / 0.55) 98%, transparent);
+    mix-blend-mode: screen;
+    opacity: 0;
+  }
+  .js .portrait.is-in .portrait__scan { animation: scan 2.4s var(--ease-in-out) 0.6s 1 forwards; }
+  @keyframes scan { 0% { opacity: 1; transform: translateY(0); } 90% { opacity: 1; } 100% { opacity: 0; transform: translateY(700%); } }
+
+  .portrait__cap {
+    position: absolute;
+    inset-block-end: 2%;
+    inset-inline: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.68rem;
+    direction: ltr;
+  }
+  [data-depth] { transition: transform 0.9s var(--ease-out); will-change: transform; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js .portrait__frame { clip-path: none; }
+    .portrait__scan { display: none; }
+  }
+</style>
+
+<script>
+  // Pointer depth: frame and rings drift in opposite directions.
+  const fig = document.querySelector<HTMLElement>('[data-portrait]');
+  if (fig && matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const layers = [...fig.querySelectorAll<HTMLElement>('[data-depth]')];
+    fig.addEventListener('pointermove', (e) => {
+      const r = fig.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      layers.forEach((l) => {
+        const d = Number(l.dataset.depth);
+        l.style.transform = `translate3d(${x * d}px, ${y * d}px, 0)`;
+      });
+    });
+    fig.addEventListener('pointerleave', () => layers.forEach((l) => (l.style.transform = '')));
+  }
+</script>

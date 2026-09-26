@@ -1,0 +1,192 @@
+[
+ {
+  "slug": "ai-eyes",
+  "title": "AI Eyes",
+  "tier": "lead",
+  "year": "2026",
+  "folder": "AIEyes/ + aieyes-dashboard/",
+  "type": "mobile application + web dashboard + API",
+  "runnable": "dashboard live; app needs device",
+  "captured": "dashboard sign-in stills",
+  "stack": [
+   "React Native",
+   "Expo",
+   "FastAPI",
+   "YOLOv8n",
+   "Groq (Llama)",
+   "Whisper",
+   "Supabase",
+   "Next.js",
+   "Leaflet",
+   "Railway",
+   "Vercel"
+  ],
+  "links": [
+   "https://aieyes-dashboard.vercel.app",
+   "https://github.com/Zemoo8/AIEyes",
+   "https://github.com/Zemoo8/AI-Eyes-dashboard",
+   "https://github.com/Zemoo8/aieyes-backend"
+  ],
+  "films": {
+   "mobile": "aieyes/showcase-mobile"
+  },
+  "stills": [
+   "aieyes/dashboard-auth",
+   "aieyes/dashboard-auth-mobile"
+  ]
+ },
+ {
+  "slug": "cheezy",
+  "title": "Cheezy",
+  "tier": "lead",
+  "year": "2026 —",
+  "folder": "cheezy/",
+  "type": "client website + mobile app + motion",
+  "runnable": "live",
+  "captured": "3 films + launch film + stills + ads",
+  "stack": [
+   "JavaScript",
+   "Vercel Functions",
+   "Supabase",
+   "Groq",
+   "Gemini",
+   "RAG",
+   "Expo",
+   "Playwright",
+   "Remotion"
+  ],
+  "links": [
+   "https://www.cheezy.store",
+   "https://cheezy-app-demo.vercel.app"
+  ],
+  "films": {
+   "desktop": "cheezy/showcase-desktop",
+   "mobile": "cheezy/showcase-mobile"
+  },
+  "stills": [
+   "cheezy/hero",
+   "cheezy/shop-picker",
+   "cheezy/menu",
+   "cheezy/item",
+   "cheezy/ordering",
+   "cheezy/ad-cheesecake",
+   "cheezy/ad-matcha",
+   "cheezy/ad-menu"
+  ]
+ },
+ {
+  "slug": "aegis-radar",
+  "title": "AEGIS",
+  "tier": "major",
+  "year": "2026",
+  "folder": "math.project/",
+  "type": "scientific simulation",
+  "runnable": "yes (HTML demo)",
+  "captured": "film + figures",
+  "stack": [
+   "Python",
+   "NumPy",
+   "SciPy",
+   "Matplotlib",
+   "Three.js",
+   "pytest",
+   "GitHub Actions"
+  ],
+  "links": [
+   "https://github.com/Zemoo8/radar-target-tracking-and-missile-interception"
+  ],
+  "films": {
+   "desktop": "radar/showcase-desktop"
+  },
+  "stills": [
+   "radar/fig-engagement",
+   "radar/fig-accuracy",
+   "radar/fig-imm-modes",
+   "radar/fig-sweeps"
+  ]
+ },
+ {
+  "slug": "books-intelligence",
+  "title": "Books Price Intelligence",
+  "tier": "major",
+  "year": "2026",
+  "folder": "scraping book/",
+  "type": "data pipeline + web app",
+  "runnable": "yes (Flask)",
+  "captured": "film + stills",
+  "stack": [
+   "Python",
+   "requests",
+   "BeautifulSoup",
+   "pandas",
+   "SQLite",
+   "Flask",
+   "scikit-learn",
+   "React",
+   "TypeScript",
+   "Recharts"
+  ],
+  "links": [
+   "https://github.com/Zemoo8/scraping-book"
+  ],
+  "films": {
+   "desktop": "scraping/showcase-desktop"
+  },
+  "stills": [
+   "scraping/hero",
+   "scraping/charts",
+   "scraping/prediction",
+   "scraping/kpis"
+  ]
+ },
+ {
+  "slug": "sandy-ai-lab",
+  "title": "Sandy AI Lab",
+  "tier": "minor",
+  "year": "2026",
+  "folder": "sandy-ai-lab/",
+  "type": "multi-agent API + web app",
+  "runnable": "yes; LLM key expired",
+  "captured": "stills",
+  "stack": [
+   "Python",
+   "FastAPI",
+   "Groq (Llama 3.3 70B)",
+   "React 19",
+   "TanStack Start",
+   "Tailwind CSS",
+   "Web Speech API"
+  ],
+  "links": [
+   "https://github.com/Zemoo8/CodeItUp0.6"
+  ],
+  "films": {},
+  "stills": [
+   "sandy/chat",
+   "sandy/sidebar"
+  ]
+ },
+ {
+  "slug": "subway-runner",
+  "title": "SubwayRunner",
+  "tier": "minor",
+  "year": "2026",
+  "folder": "SubwayRunner/",
+  "type": "3D game (Unity)",
+  "runnable": "yes (WebGL build of a copy)",
+  "captured": "gameplay film + still",
+  "stack": [
+   "Unity 6",
+   "C#",
+   "URP",
+   "Input System"
+  ],
+  "links": [],
+  "films": {
+   "desktop": "subway-runner/showcase-desktop"
+  },
+  "stills": [
+   "subway-runner/gameplay"
+  ]
+ }
+]

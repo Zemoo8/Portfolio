@@ -1,0 +1,217 @@
+---
+import { locales, localeMeta, path, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { profile } from '../content/profile';
+
+interface Props { lang: Locale; route: string }
+const { lang, route } = Astro.props;
+const home = path(lang);
+const items = [
+  { id: 'work', label: ui.nav.work },
+  { id: 'about', label: ui.nav.about },
+  { id: 'path', label: ui.nav.path },
+  { id: 'credentials', label: ui.nav.credentials },
+  { id: 'contact', label: ui.nav.contact },
+];
+---
+
+<header class="nav" data-nav>
+  <div class="nav__bar wrap">
+    <a class="nav__brand" href={home} aria-label={tr(ui.nav.home, lang)}>
+      <span class="nav__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="15" /><circle cx="16" cy="16" r="6.5" /><circle cx="16" cy="16" r="1.6" /></svg>
+      </span>
+      <span class="nav__name">{tr(profile.name, lang)}</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <ul>
+        {items.map((it) => <li><a class="link-u" href={`${home}#${it.id}`}>{tr(it.label, lang)}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="nav__langs" role="group" aria-label={tr(ui.nav.language, lang)}>
+      {locales.map((l) => (
+        <a
+          href={path(l, route)}
+          hreflang={l}
+          lang={l}
+          data-lang-link={l}
+          aria-current={l === lang ? 'true' : undefined}
+          title={localeMeta[l].name}
+        >
+          <span aria-hidden="true">{localeMeta[l].label}</span>
+          <span class="sr-only">{localeMeta[l].name}</span>
+        </a>
+      ))}
+    </div>
+
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="nav__toggle-label" data-open={tr(ui.nav.menu, lang)} data-close={tr(ui.nav.close, lang)}>{tr(ui.nav.menu, lang)}</span>
+      <span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </div>
+
+  <div class="menu" id="mobile-menu" hidden data-menu>
+    <nav class="menu__inner wrap" aria-label="Mobile">
+      <ol>
+        {items.map((it, i) => (
+          <li style={`--i:${i}`}>
+            <a href={`${home}#${it.id}`} data-menu-link>
+              <span class="mono">0{i + 1}</span>
+              <span class="display">{tr(it.label, lang)}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <div class="menu__foot">
+        <div class="menu__langs">
+          {locales.map((l) => (
+            <a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>{localeMeta[l].name}</a>
+          ))}
+        </div>
+        <a class="mono link-u" href={`mailto:${profile.email}`}>{profile.email}</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 50;
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .nav.is-hidden:not(.is-open) { transform: translateY(-110%); }
+  .nav__bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    block-size: 4.5rem;
+  }
+  .nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgb(12 12 11 / 0.85), rgb(12 12 11 / 0));
+    opacity: 0;
+    transition: opacity var(--dur-2);
+    pointer-events: none;
+  }
+  .nav.is-scrolled::before { opacity: 1; }
+  .nav__brand { display: inline-flex; align-items: center; gap: 0.75rem; margin-inline-end: auto; }
+  .nav__mark svg { inline-size: 1.6rem; block-size: 1.6rem; fill: none; stroke: var(--paper); stroke-width: 1.2; }
+  .nav__mark circle:last-child { fill: var(--signal); stroke: none; }
+  .nav__brand:hover .nav__mark svg { transform: rotate(90deg); }
+  .nav__mark svg { transition: transform var(--dur-3) var(--ease-out); }
+  .nav__name { font-size: var(--step--1); letter-spacing: 0.01em; }
+  .nav__links ul { display: flex; gap: clamp(1rem, 2vw, 2.2rem); font-size: var(--step--1); }
+  .nav__links a { color: var(--paper-2); }
+  .nav__links a:hover { color: var(--paper); }
+  .nav__langs {
+    display: flex;
+    gap: 0.15rem;
+    padding: 0.2rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+  .nav__langs a {
+    display: grid;
+    place-items: center;
+    min-inline-size: 2.1rem;
+    block-size: 1.8rem;
+    padding-inline: 0.5rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    transition: background var(--dur-1), color var(--dur-1);
+  }
+  .nav__langs a[lang='ar'] { font-family: var(--font-arabic); font-size: 0.85rem; }
+  .nav__langs a:hover { color: var(--paper); }
+  .nav__langs a[aria-current='true'] { background: var(--paper); color: var(--ink); }
+
+  .nav__toggle { display: none; align-items: center; gap: 0.8rem; font-size: var(--step--1); }
+  .nav__burger { position: relative; inline-size: 1.5rem; block-size: 0.7rem; }
+  .nav__burger i {
+    position: absolute;
+    inset-inline: 0;
+    block-size: 1px;
+    background: currentColor;
+    transition: transform var(--dur-2) var(--ease-out), inset var(--dur-2) var(--ease-out);
+  }
+  .nav__burger i:first-child { inset-block-start: 0; }
+  .nav__burger i:last-child { inset-block-start: 100%; }
+  .is-open .nav__burger i:first-child { inset-block-start: 50%; transform: rotate(45deg); }
+  .is-open .nav__burger i:last-child { inset-block-start: 50%; transform: rotate(-45deg); }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: var(--ink);
+    padding-block: 6.5rem 2rem;
+    overflow-y: auto;
+  }
+  .menu__inner { display: flex; flex-direction: column; justify-content: space-between; min-block-size: 100%; gap: 3rem; }
+  .menu ol { display: grid; gap: 0.4rem; }
+  .menu ol a { display: flex; align-items: baseline; gap: 1rem; padding-block: 0.35rem; border-block-end: 1px solid var(--line); }
+  .menu ol .display { font-size: clamp(2.6rem, 11vw, 4.2rem); }
+  .menu li { opacity: 0; transform: translateY(16px); }
+  .is-open .menu li { opacity: 1; transform: none; transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out); transition-delay: calc(80ms + var(--i) * 55ms); }
+  .menu__foot { display: grid; gap: 1.2rem; }
+  .menu__langs { display: flex; gap: 1.2rem; font-size: var(--step-0); color: var(--muted); }
+  .menu__langs a[aria-current='true'] { color: var(--paper); }
+
+  @media (max-width: 960px) {
+    .nav__links, .nav__langs { display: none; }
+    .nav__toggle { display: inline-flex; }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]')!;
+  const toggle = nav.querySelector<HTMLButtonElement>('[data-menu-toggle]')!;
+  const menu = nav.querySelector<HTMLElement>('[data-menu]')!;
+  const label = toggle.querySelector<HTMLElement>('.nav__toggle-label')!;
+
+  const setOpen = (open: boolean) => {
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    label.textContent = open ? label.dataset.close! : label.dataset.open!;
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+    if (open) {
+      menu.hidden = false;
+      menu.querySelector<HTMLElement>('a')?.focus({ preventScroll: true });
+    } else {
+      menu.hidden = true;
+    }
+  };
+  toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
+  menu.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
+  });
+  matchMedia('(min-width: 961px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  // Language links keep the reader's place on the page.
+  document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) =>
+    a.addEventListener('click', () => {
+      try { localStorage.setItem('lang', a.dataset.langLink!); } catch {}
+      if (location.hash) a.href = a.href.split('#')[0] + location.hash;
+    }),
+  );
+
+  // Hide on scroll down, reveal on scroll up.
+  let last = scrollY;
+  addEventListener('scroll', () => {
+    const y = scrollY;
+    nav.classList.toggle('is-scrolled', y > 40);
+    nav.classList.toggle('is-hidden', y > 400 && y > last);
+    last = y;
+  }, { passive: true });
+</script>

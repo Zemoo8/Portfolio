@@ -1,0 +1,105 @@
+---
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import '@fontsource-variable/geist';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/ibm-plex-sans-arabic/arabic-300.css';
+import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
+import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { locales, localeMeta, path, asset, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { profile } from '../content/profile';
+
+interface Props {
+  lang: Locale;
+  title: string;
+  description: string;
+  /** path below the locale root, e.g. 'work/cheezy' */
+  route?: string;
+  ogImage?: string;
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+}
+
+const { lang, title, description, route = '', ogImage = `og/default-${lang}.jpg`, jsonLd, noindex = false } = Astro.props;
+const dir = localeMeta[lang].dir;
+const site = Astro.site!;
+const canonical = new URL(path(lang, route), site).href;
+const og = new URL(asset(ogImage), site).href;
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name.en,
+  alternateName: profile.name.ar,
+  jobTitle: profile.role.en,
+  email: `mailto:${profile.email}`,
+  url: new URL(path('en'), site).href,
+  image: new URL(asset('media/profile/portrait-color.webp'), site).href,
+  address: { '@type': 'PostalAddress', addressLocality: 'Tunis', addressCountry: 'TN' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Université Sesame' },
+  knowsLanguage: ['ar', 'en', 'fr'],
+  sameAs: [profile.links.github, profile.links.linkedin],
+};
+---
+
+<!doctype html>
+<html lang={lang} dir={dir} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#0c0c0b" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href={canonical} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(l, route), site).href} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL(path('en', route), site).href} />
+
+    <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={asset('favicon-32.png')} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={asset('apple-touch-icon.png')} />
+    <link rel="manifest" href={asset('site.webmanifest')} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={tr(profile.name, lang)} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={localeMeta[lang].ogLocale} />
+    {locales.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={localeMeta[l].ogLocale} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={og} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd ?? person)} />
+
+    <script is:inline>
+      document.documentElement.classList.replace('no-js', 'js');
+      try { localStorage.setItem('lang', document.documentElement.lang); } catch (e) {}
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('reduced');
+    </script>
+  </head>
+  <body data-lang={lang}>
+    <a class="skip-link" href="#main">{tr(ui.skip, lang)}</a>
+    <Nav lang={lang} route={route} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer lang={lang} route={route} />
+    <div class="grain" aria-hidden="true"></div>
+    <script>
+      import { initMotion } from '../scripts/motion';
+      import { initFilms } from '../scripts/films';
+      initFilms();
+      initMotion();
+    </script>
+  </body>
+</html>

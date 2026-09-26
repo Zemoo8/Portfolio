@@ -1,0 +1,29 @@
+---
+// Muted, looping showcase film. Nothing is downloaded until the film nears the viewport
+// (preload="none" + IntersectionObserver in scripts/films.ts); it pauses when off-screen.
+// With reduced motion it never autoplays — the poster shows and a play button is offered.
+import type { FilmSource } from '../lib/media';
+import { tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+
+interface Props { film: FilmSource; label: string; lang: Locale; ratio?: string; class?: string; fit?: 'cover' | 'contain' }
+const { film, label, lang, ratio = '16 / 10', class: cls = '', fit = 'cover' } = Astro.props;
+---
+
+<div class:list={['media', 'film', fit === 'contain' && 'media--contain', cls]} style={`aspect-ratio:${ratio}`} data-film>
+  <video muted loop playsinline preload="none" data-poster={film.poster} aria-label={label} disablepictureinpicture>
+    {film.webm && <source src={film.webm} type="video/webm" />}
+    <source src={film.mp4} type="video/mp4" />
+  </video>
+  <button class="film-toggle" type="button" data-film-toggle data-play={tr(ui.work.play, lang)} data-pause={tr(ui.work.pause, lang)} aria-label={tr(ui.work.play, lang)}>
+    <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor" /></svg>
+    <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor" /></svg>
+  </button>
+</div>
+
+<style>
+  .film video { transition: opacity 0.6s var(--ease-out); }
+  .film .i-pause { display: none; }
+  .film.is-playing .i-play { display: none; }
+  .film.is-playing .i-pause { display: block; }
+</style>

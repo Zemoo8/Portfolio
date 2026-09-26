@@ -1,0 +1,32 @@
+---
+// Language entry point: a remembered choice wins, then the browser language, then English.
+// Works on any static host (no server redirects needed); crawlers follow the links.
+import { locales, localeMeta, path } from '../i18n/config';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ahmed Baghouli</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={new URL(path('en'), Astro.site).href} />
+    {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(l), Astro.site).href} />)}
+    <meta name="theme-color" content="#0c0c0b" />
+    <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0c0c0b;color:#ece9e2;font:16px system-ui,sans-serif}a{color:inherit;margin:0 .6rem}</style>
+    <script is:inline define:vars={{ paths: Object.fromEntries(locales.map((l) => [l, path(l)])) }}>
+      var pick = null;
+      try { pick = localStorage.getItem('lang'); } catch (e) {}
+      if (!paths[pick]) {
+        var nav = (navigator.languages || [navigator.language || 'en']).map(function (l) { return String(l).slice(0, 2).toLowerCase(); });
+        pick = nav.find(function (l) { return paths[l]; }) || 'en';
+      }
+      location.replace(paths[pick] + location.hash);
+    </script>
+    <noscript><meta http-equiv="refresh" content={`0; url=${path('en')}`} /></noscript>
+  </head>
+  <body>
+    <nav>{locales.map((l) => <a href={path(l)} hreflang={l} lang={l}>{localeMeta[l].name}</a>)}</nav>
+  </body>
+</html>

@@ -1,0 +1,302 @@
+[
+ {
+  "field": "name",
+  "value": "Ahmed Baghouli",
+  "source": "CV + LinkedIn + GitHub + Cambridge PDF",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "identical in all four",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "headline",
+  "value": "Full-stack & AI developer",
+  "source": "LinkedIn",
+  "source_url_or_file": "https://www.linkedin.com/in/ahmed-baghouli-b8199b330/",
+  "evidence": "headline \"Full-Stack & AI Developer | Creator of AI-Eyes & Cheezy.store\"",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "location",
+  "value": "Tunisia (Tunis)",
+  "source": "LinkedIn + CV + GitHub",
+  "source_url_or_file": "https://www.linkedin.com/in/ahmed-baghouli-b8199b330/",
+  "evidence": "Tunis (LinkedIn), Ariana (CV), Tunisia (GitHub)",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "email",
+  "value": "ahmedbaghoulii@gmail.com",
+  "source": "CV + GitHub README",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "published on both",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "phone",
+  "value": "(withheld)",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "",
+  "verification_status": "OMIT",
+  "confidence": "high",
+  "notes": "private"
+ },
+ {
+  "field": "education.institution",
+  "value": "Université Sesame",
+  "source": "CV + LinkedIn",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "education.programme",
+  "value": "Licence Informatique & Multimédia (L3)",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": "LinkedIn says \"Computer Science\""
+ },
+ {
+  "field": "education.end",
+  "value": "2027-06 (CV) vs 2029-07 (LinkedIn)",
+  "source": "CV / LinkedIn",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "sources disagree",
+  "verification_status": "CONFLICTING",
+  "confidence": "medium",
+  "notes": "site shows \"2024 — present\""
+ },
+ {
+  "field": "education.mpi",
+  "value": "Integrated preparatory cycle MPI 2024–2026; 22/72",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "",
+  "verification_status": "SINGLE SOURCE",
+  "confidence": "medium",
+  "notes": ""
+ },
+ {
+  "field": "experience.cheezy.start",
+  "value": "2026-06 (CV) vs 2026-07 (LinkedIn)",
+  "source": "CV / LinkedIn",
+  "source_url_or_file": "https://www.linkedin.com/in/ahmed-baghouli-b8199b330/",
+  "evidence": "",
+  "verification_status": "CONFLICTING",
+  "confidence": "medium",
+  "notes": "site shows \"2026 — present\""
+ },
+ {
+  "field": "experience.cheezy.scope",
+  "value": "storefront, WhatsApp ordering, admin, RAG chatbot, video",
+  "source": "LinkedIn + code",
+  "source_url_or_file": "cheezy/index.html; cheezy/api/_lib/*",
+  "evidence": "admin login/reset in index.html; Groq/Gemini/Supabase in api/_lib",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "experience.sotetel",
+  "value": "Introductory internship, Jun–Jul 2025",
+  "source": "LinkedIn + CV",
+  "source_url_or_file": "https://www.linkedin.com/in/ahmed-baghouli-b8199b330/",
+  "evidence": "CV: Jun 2025 one month",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "project.aieyes.stack",
+  "value": "React Native, Expo, FastAPI, YOLOv8n, Groq Llama, Whisper, Supabase, Next.js",
+  "source": "code",
+  "source_url_or_file": "AIEyes/package.json; App.js; server/main.py",
+  "evidence": "imports and model ids in source",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "project.aieyes.defence",
+  "value": "17.00/20, ranked 3rd",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "",
+  "verification_status": "SINGLE SOURCE",
+  "confidence": "medium",
+  "notes": ""
+ },
+ {
+  "field": "project.aieyes.loc",
+  "value": ">3,000 lines in main module",
+  "source": "code",
+  "source_url_or_file": "AIEyes/App.js",
+  "evidence": "wc -l = 3095",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "project.aegis.imm_rmse",
+  "value": "IMM 43.22 m vs raw 79.44 m (−45.6 %), 100 runs",
+  "source": "code output",
+  "source_url_or_file": "math.project/results/summary.json",
+  "evidence": "results[] rows",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": "src/aegis not yet pushed to GitHub"
+ },
+ {
+  "field": "project.aegis.ci",
+  "value": "GitHub Actions + Monte Carlo test",
+  "source": "GitHub",
+  "source_url_or_file": "https://github.com/Zemoo8/radar-target-tracking-and-missile-interception",
+  "evidence": ".github/workflows/ci.yml, tests/test_monte_carlo.py",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "project.books.stack",
+  "value": "Flask + React/TS/Recharts (local) / Streamlit (public repo)",
+  "source": "code + GitHub",
+  "source_url_or_file": "scraping book/; github.com/Zemoo8/scraping-book",
+  "evidence": "app.py differs between versions",
+  "verification_status": "CONFLICTING",
+  "confidence": "high",
+  "notes": "disclosed on case study"
+ },
+ {
+  "field": "project.sandy.result",
+  "value": "Code It Up 6.0 top 5",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "",
+  "verification_status": "SINGLE SOURCE",
+  "confidence": "medium",
+  "notes": ""
+ },
+ {
+  "field": "project.sandy.stack",
+  "value": "FastAPI, Groq llama-3.3-70b-versatile, React 19, TanStack Start",
+  "source": "code + README",
+  "source_url_or_file": "sandy-ai-lab/README.md; main.py",
+  "evidence": "",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "project.subway.speeds",
+  "value": "startSpeed 8, maxSpeed 22, segment 40",
+  "source": "code",
+  "source_url_or_file": "SubwayRunner/Assets/Scripts/PlayerController.cs; TrackSpawner.cs",
+  "evidence": "",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "project.attendance",
+  "value": "team project, 18.20/20 (2nd)",
+  "source": "CV + LinkedIn post + GitHub",
+  "source_url_or_file": "https://github.com/Zemoo8/gestion-absences-faculte",
+  "evidence": "LinkedIn post names teammate",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "cert.cambridge",
+  "value": "B2 First, 176, Grade B, Listening 190",
+  "source": "PDF",
+  "source_url_or_file": "English B2 First (Cambridge) Certificate.pdf",
+  "evidence": "Statement of Results",
+  "verification_status": "VERIFIED BY PRIMARY SOURCE",
+  "confidence": "high",
+  "notes": "PDF not published"
+ },
+ {
+  "field": "cert.count",
+  "value": "18",
+  "source": "LinkedIn",
+  "source_url_or_file": "https://www.linkedin.com/in/ahmed-baghouli-b8199b330/details/certifications/",
+  "evidence": "list read in Chrome",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "cert.python_data_associate.date",
+  "value": "2026-03 (LinkedIn) vs 2026-02 (CV)",
+  "source": "LinkedIn / CV",
+  "source_url_or_file": "https://www.linkedin.com/in/ahmed-baghouli-b8199b330/",
+  "evidence": "",
+  "verification_status": "CONFLICTING",
+  "confidence": "medium",
+  "notes": "LinkedIn date shown"
+ },
+ {
+  "field": "claim.beverage_campaign",
+  "value": "video campaign for a beverage retailer",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "no asset found",
+  "verification_status": "OMIT",
+  "confidence": "low",
+  "notes": ""
+ },
+ {
+  "field": "claim.competitor_gap",
+  "value": "Seeing AI / Lookout / Envision lack Arabic",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "not independently verified",
+  "verification_status": "OMIT",
+  "confidence": "low",
+  "notes": ""
+ },
+ {
+  "field": "claim.sesame_replica",
+  "value": "Université Sesame website replica",
+  "source": "CV",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "no repo or asset found",
+  "verification_status": "OMIT",
+  "confidence": "low",
+  "notes": ""
+ },
+ {
+  "field": "languages",
+  "value": "Arabic native; English B2 (176); French B1",
+  "source": "CV + Cambridge PDF",
+  "source_url_or_file": "CV - English.pdf",
+  "evidence": "",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ },
+ {
+  "field": "github.profile",
+  "value": "Zemoo8",
+  "source": "GitHub",
+  "source_url_or_file": "https://github.com/Zemoo8",
+  "evidence": "profile README featured projects match site",
+  "verification_status": "VERIFIED",
+  "confidence": "high",
+  "notes": ""
+ }
+]

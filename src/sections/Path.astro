@@ -1,0 +1,81 @@
+---
+import { formatMonth, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { experience, education, competitions, type Entry } from '../content/path';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const when = (e: Entry) => {
+  const s = formatMonth(e.start, lang);
+  if (!e.end) return s;
+  return `${s} — ${e.end === 'present' ? tr(ui.path.present, lang) : formatMonth(e.end, lang)}`;
+};
+const groups = [
+  { title: ui.path.experience, items: experience },
+  { title: ui.path.education, items: education },
+];
+---
+
+<section id="path" class="section path wrap" aria-labelledby="path-title">
+  <header class="section-head">
+    <p class="kicker" data-reveal>{tr(ui.path.kicker, lang)}</p>
+    <h2 id="path-title" class="sr-only">{tr(ui.path.kicker, lang)}</h2>
+  </header>
+
+  {groups.map((g) => (
+    <div class="path__group">
+      <h3 class="path__label display" data-reveal>{tr(g.title, lang)}</h3>
+      <ol class="path__list">
+        {g.items.map((e, i) => (
+          <li class="entry" data-reveal style={`--i:${i}`}>
+            <p class="entry__when mono"><time>{when(e)}</time></p>
+            <div class="entry__main">
+              <h4 class="entry__org">{e.org}</h4>
+              <p class="entry__role">{tr(e.role, lang)}</p>
+              <p class="entry__place mono">{tr(e.place, lang)}</p>
+            </div>
+            <div class="entry__body">
+              {e.body.map((b) => <p>{tr(b, lang)}</p>)}
+              {(e.tags || e.link) && (
+                <p class="entry__tags">
+                  {e.tags?.map((t) => <span class="pill">{t}</span>)}
+                  {e.link && <a class="pill link-u" href={e.link.href} target="_blank" rel="noopener">{e.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
+                </p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  ))}
+
+  <div class="path__group">
+    <h3 class="path__label display" data-reveal>{tr(ui.path.competitions, lang)}</h3>
+    <ol class="path__list">
+      {competitions.map((c, i) => (
+        <li class="entry" data-reveal style={`--i:${i}`}>
+          <p class="entry__when mono">{tr(c.result, lang)}</p>
+          <div class="entry__main"><h4 class="entry__org">{c.name}</h4></div>
+          <div class="entry__body"><p>{tr(c.detail, lang)}</p></div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .path__group { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: var(--gutter); padding-block: 2.5rem; border-block-start: 1px solid var(--line); }
+  .path__label { font-size: var(--step-3); }
+  .path__list { display: grid; }
+  .entry { display: grid; grid-template-columns: 11rem minmax(0, 4fr) minmax(0, 6fr); gap: 1rem var(--gutter); padding-block: 0 2.2rem; }
+  .entry + .entry { padding-block-start: 2.2rem; border-block-start: 1px solid var(--line); }
+  .entry__org { font-size: var(--step-2); font-weight: 400; line-height: 1.1; }
+  .entry__role { color: var(--paper-2); margin-block-start: 0.3rem; }
+  .entry__place { margin-block-start: 0.4rem; }
+  .entry__body { display: grid; gap: 0.8rem; color: var(--paper-2); }
+  .entry__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  @media (max-width: 960px) {
+    .path__group { grid-template-columns: 1fr; }
+    .entry { grid-template-columns: 1fr; }
+  }
+</style>

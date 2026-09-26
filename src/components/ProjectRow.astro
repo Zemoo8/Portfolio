@@ -1,0 +1,125 @@
+---
+import Film from './Film.astro';
+import Shot from './Shot.astro';
+import { film } from '../lib/media';
+import { path, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import type { Project } from '../content/projects';
+
+interface Props { project: Project; lang: Locale; flip?: boolean }
+const { project: p, lang, flip = false } = Astro.props;
+const href = path(lang, `work/${p.slug}`);
+const desk = film(p.film?.desktop);
+const mob = film(p.film?.mobile);
+const title = `${p.title} — ${tr(ui.work.film, lang)}`;
+const phoneStill = !mob ? p.gallery.find((g) => g.kind === 'mobile') : undefined;
+---
+
+<article class:list={['row', `row--${p.size}`, flip && 'row--flip']} style={`--tone:${p.tone}`} data-reveal>
+  <div class="row__media" data-cursor={tr(ui.work.open, lang)}>
+    <a class="row__hit" href={href} tabindex="-1" aria-hidden="true"></a>
+    <div class="row__glow"></div>
+    {desk ? (
+      <Film film={desk} label={title} lang={lang} ratio="16 / 10" />
+    ) : p.cover.kind === 'figure' ? (
+      <Shot src={p.cover.src} alt="" figure fit="contain" ratio="16 / 10" />
+    ) : (
+      <Shot src={p.cover.src} alt="" ratio="16 / 10" />
+    )}
+    {mob && p.size === 'lead' && (
+      <div class="row__phone phone" data-parallax="10">
+        <Film film={mob} label={title} lang={lang} ratio="390 / 844" />
+      </div>
+    )}
+    {phoneStill && p.size === 'lead' && (
+      <div class="row__phone phone" data-parallax="10">
+        <Shot src={phoneStill.src} alt="" ratio="390 / 844" sizes="15rem" />
+      </div>
+    )}
+  </div>
+
+  <div class="row__text">
+    <div class="row__meta mono">
+      <span>{p.index}</span>
+      <span>{tr(p.category, lang)}</span>
+      <span>{p.year}</span>
+    </div>
+    <h3 class="row__title display">
+      <a href={href}>
+        {p.title}
+        {p.alias && <span class="row__alias" lang="ar">{p.alias}</span>}
+      </a>
+    </h3>
+    <p class="row__tagline">{tr(p.tagline, lang)}</p>
+    <a class="row__cta btn" href={href} aria-label={`${tr(ui.work.open, lang)}: ${p.title}`}>
+      {tr(ui.work.open, lang)} <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .row { position: relative; display: grid; gap: clamp(1.4rem, 2.5vw, 2.4rem); }
+  .row__media { position: relative; display: block; }
+  .row__hit { position: absolute; inset: 0; z-index: 1; }
+  .row__media :global(.film) { isolation: auto; }
+  .row__media :global(.film-toggle) { z-index: 3; }
+  .row__phone :global(.film-toggle) { display: none; }
+  .row__media > :global(.media img), .row__media > :global(.media video) { transition: transform 1.4s var(--ease-out); }
+  .row__media:hover > :global(.media img), .row__media:hover > :global(.media video) { transform: scale(1.025); }
+  .row__glow {
+    position: absolute;
+    inset: 12% 8% -6%;
+    z-index: -1;
+    background: radial-gradient(closest-side, var(--tone), transparent);
+    opacity: 0.12;
+    filter: blur(60px);
+    transition: opacity 1s var(--ease-out);
+  }
+  .row__media:hover .row__glow { opacity: 0.28; }
+  .row__meta { display: flex; gap: 1.4rem; flex-wrap: wrap; }
+  .row__meta span:first-child { color: var(--tone-text); }
+  .row__title { font-size: var(--step-4); }
+  .row__title a { display: inline-flex; align-items: baseline; gap: 0.35em; flex-wrap: wrap; }
+  .row__alias { font-family: var(--font-arabic); font-size: 0.42em; font-weight: 300; color: var(--muted); letter-spacing: 0; }
+  .row__tagline { font-size: var(--step-1); color: var(--paper-2); max-inline-size: 34rem; line-height: 1.4; }
+  .row__text { display: grid; gap: 1rem; align-content: start; justify-items: start; }
+  .row__cta { margin-block-start: 0.6rem; }
+
+  /* lead: full-width media, phone overlapping */
+  .row--lead .row__media { margin-inline-end: clamp(0rem, 6vw, 7rem); }
+  .row--lead.row--flip .row__media { margin-inline: clamp(0rem, 6vw, 7rem) 0; }
+  .row--lead .row__text { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; column-gap: var(--gutter); }
+  @media (min-width: 901px) {
+    .row--lead:has(.row__phone) .row__text { padding-inline-end: clamp(0rem, 14vw, 16rem); margin-block-start: clamp(0.5rem, 4vw, 4rem); }
+    .row--lead.row--flip:has(.row__phone) .row__text { padding-inline: clamp(0rem, 14vw, 16rem) 0; }
+  }
+  .row--lead .row__meta, .row--lead .row__title { grid-column: 1 / -1; }
+  .row--lead .row__title { font-size: var(--step-5); }
+  .row--lead .row__cta { justify-self: end; }
+  .row__phone {
+    position: absolute;
+    inline-size: clamp(8.5rem, 16vw, 15rem);
+    inset-block-end: -7%;
+    inset-inline-end: calc(-1 * clamp(0rem, 5vw, 6rem));
+    z-index: 2;
+  }
+  .row--flip .row__phone { inset-inline: calc(-1 * clamp(0rem, 5vw, 6rem)) auto; }
+
+  /* major: side by side */
+  .row--major { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: center; column-gap: calc(var(--gutter) * 2); }
+  .row--major.row--flip .row__media { order: 2; }
+
+  /* minor: compact */
+  .row--minor .row__title { font-size: var(--step-3); }
+  .row--minor .row__tagline { font-size: var(--step-0); }
+
+  @media (max-width: 900px) {
+    .row--lead .row__media, .row--lead.row--flip .row__media { margin: 0; }
+    .row--lead .row__text { grid-template-columns: 1fr; }
+    .row--lead .row__cta { justify-self: start; }
+    .row__phone { inline-size: 30%; inset-inline-end: 4%; inset-block-end: -10%; }
+    .row--flip .row__phone { inset-inline: auto 4%; }
+    .row--major { grid-template-columns: 1fr; }
+    .row--major.row--flip .row__media { order: 0; }
+  }
+</style>

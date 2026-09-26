@@ -1,0 +1,52 @@
+---
+import { path, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { capabilities, languagesSpoken } from '../content/capabilities';
+import { projectBySlug } from '../content/projects';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+---
+
+<section id="capabilities" class="section caps wrap" aria-labelledby="caps-title">
+  <header class="section-head">
+    <p class="kicker" data-reveal>{tr(ui.capabilities.kicker, lang)}</p>
+    <h2 id="caps-title" class="display" data-lines>{tr(ui.capabilities.title, lang)}</h2>
+  </header>
+
+  <ol class="caps__list">
+    {capabilities.map((c, i) => (
+      <li class="cap" data-reveal>
+        <span class="cap__n mono">0{i + 1}</span>
+        <div class="cap__head">
+          <h3 class="cap__name display">{tr(c.name, lang)}</h3>
+          <p class="cap__body">{tr(c.body, lang)}</p>
+        </div>
+        <div class="cap__tools">
+          <ul lang="en">{c.tools.map((t) => <li>{t}</li>)}</ul>
+          <p class="cap__proof mono">
+            {tr(ui.capabilities.usedIn, lang)}{' '}
+            {c.proof.map((slug, j) => {
+              const p = projectBySlug(slug)!;
+              return <>{j > 0 && ' · '}<a class="link-u" href={path(lang, `work/${slug}`)}>{p.title}</a></>;
+            })}
+          </p>
+        </div>
+      </li>
+    ))}
+  </ol>
+  <p class="caps__langs mono" data-reveal lang="en">{languagesSpoken.join('  /  ')}</p>
+</section>
+
+<style>
+  .caps__list { border-block-start: 1px solid var(--line); }
+  .cap { display: grid; grid-template-columns: 4rem minmax(0, 5fr) minmax(0, 6fr); gap: var(--gutter); padding-block: 2.2rem; border-block-end: 1px solid var(--line); }
+  .cap__name { font-size: var(--step-3); }
+  .cap__body { color: var(--muted); margin-block-start: 0.6rem; max-inline-size: 26rem; }
+  .cap__tools ul { display: flex; flex-wrap: wrap; gap: 0.3rem 1.3rem; font-size: var(--step-1); }
+  .cap__tools li { color: var(--paper); }
+  .cap__proof { margin-block-start: 1.2rem; }
+  .cap__proof a { color: var(--paper-2); }
+  .caps__langs { margin-block-start: 2rem; white-space: pre-wrap; }
+  @media (max-width: 900px) { .cap { grid-template-columns: 1fr; gap: 1rem; } }
+</style>

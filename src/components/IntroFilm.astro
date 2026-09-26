@@ -1,0 +1,124 @@
+---
+// Three personal intro films (EN / FR / AR), detected at build time:
+//   public/media/intros/intro-<lang>.mp4   (+ optional .webm, .vtt; poster: intro-<lang>-poster.webp)
+// Missing films keep the iris placeholder, and are never requested (no 404s).
+// Adding a file and rebuilding/redeploying is all it takes. See docs/README.md → "Intro films".
+import { locales, localeMeta, asset, tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import { exists } from '../lib/media';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+const base = asset('media/intros');
+const files = Object.fromEntries(
+  locales.map((l) => [l, { mp4: exists(`media/intros/intro-${l}.mp4`), webm: exists(`media/intros/intro-${l}.webm`), vtt: exists(`media/intros/intro-${l}.vtt`), poster: exists(`media/intros/intro-${l}-poster.webp`) }]),
+);
+---
+
+<figure class="intro" data-intro data-base={base} data-lang={lang} data-files={JSON.stringify(files)}>
+  <div class="intro__stage">
+    <svg class="intro__fallback" viewBox="0 0 200 200" aria-hidden="true">
+      <circle cx="100" cy="100" r="92" /><circle cx="100" cy="100" r="66" /><circle cx="100" cy="100" r="30" />
+      <path d="M100 100 L192 100" />
+    </svg>
+    <canvas class="intro__canvas" aria-hidden="true" data-iris></canvas>
+
+    <video class="intro__video" muted playsinline loop preload="none" hidden data-intro-video crossorigin="anonymous"></video>
+
+    <div class="intro__overlay" data-intro-placeholder>
+      <span class="intro__rec"><i></i>{tr(ui.intro.label, lang)}</span>
+      <p class="intro__note">{tr(ui.intro.pendingNote, lang)}</p>
+      <span class="intro__status mono">{tr(ui.intro.pending, lang)}</span>
+    </div>
+
+    <div class="intro__controls" hidden data-intro-controls>
+      <button type="button" data-intro-sound data-on={tr(ui.intro.sound, lang)} data-off={tr(ui.intro.mute, lang)}>{tr(ui.intro.sound, lang)}</button>
+      <button type="button" data-intro-cc aria-pressed="false">{tr(ui.intro.captions, lang)}</button>
+      <button type="button" data-intro-replay>{tr(ui.intro.replay, lang)}</button>
+    </div>
+  </div>
+
+  <figcaption class="intro__bar">
+    <span class="mono">{tr(ui.intro.choose, lang)}</span>
+    <div class="intro__tabs" role="tablist" aria-label={tr(ui.intro.choose, lang)}>
+      {locales.map((l) => (
+        <button type="button" role="tab" lang={l} aria-selected={l === lang ? 'true' : 'false'} data-intro-tab={l}>
+          {localeMeta[l].name}
+        </button>
+      ))}
+    </div>
+  </figcaption>
+</figure>
+
+<style>
+  .intro { display: grid; gap: 0.9rem; }
+  .intro__stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(60% 60% at 50% 50%, rgb(255 90 38 / 0.07), transparent 70%),
+      linear-gradient(180deg, #121211, #0b0b0a);
+    box-shadow: 0 0 0 1px var(--line) inset;
+    isolation: isolate;
+  }
+  .intro__canvas, .intro__video, .intro__fallback { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  .intro__video { object-fit: cover; z-index: 2; }
+  .intro__fallback { padding: 12%; fill: none; stroke: var(--line-strong); stroke-width: 0.6; }
+  .intro.has-webgl .intro__fallback { display: none; }
+  .intro__fallback path { stroke: var(--signal); }
+
+  .intro__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: clamp(1rem, 2.4vw, 1.6rem);
+    pointer-events: none;
+  }
+  .intro__rec { display: inline-flex; align-items: center; gap: 0.55rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-2); }
+  :lang(ar) .intro__rec { font-family: var(--font-arabic); letter-spacing: 0; font-size: 0.85rem; }
+  .intro__rec i { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: var(--signal); animation: rec 2.4s ease-in-out infinite; }
+  @keyframes rec { 50% { opacity: 0.25; } }
+  .intro__note { align-self: end; max-inline-size: 22rem; font-size: var(--step--1); color: var(--paper-2); }
+  .intro__status { margin-block-start: 0.5rem; color: var(--signal); }
+
+  .intro__controls {
+    position: absolute;
+    inset-block-end: 0.9rem;
+    inset-inline-end: 0.9rem;
+    z-index: 4;
+    display: flex;
+    gap: 0.4rem;
+  }
+  .intro__controls button {
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: rgb(12 12 11 / 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong);
+    font-size: 0.75rem;
+  }
+  .intro__controls button[aria-pressed='true'] { background: var(--paper); color: var(--ink); }
+  .intro__controls[hidden] { display: none; }
+
+  .intro__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .intro__tabs { display: flex; gap: 0.2rem; }
+  .intro__tabs button {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: var(--step--1);
+    color: var(--muted);
+    transition: color var(--dur-1), background var(--dur-1);
+  }
+  .intro__tabs button[lang='ar'] { font-family: var(--font-arabic); }
+  .intro__tabs button:hover { color: var(--paper); }
+  .intro__tabs button[aria-selected='true'] { color: var(--paper); background: var(--ink-3); box-shadow: 0 0 0 1px var(--line-strong) inset; }
+</style>
+
+<script>
+  import { initIntro } from '../scripts/intro';
+  document.querySelectorAll<HTMLElement>('[data-intro]').forEach(initIntro);
+</script>
