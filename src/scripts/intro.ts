@@ -8,7 +8,7 @@ export function initIntro(root: HTMLElement) {
   const base = root.dataset.base!;
   const files: Files = JSON.parse(root.dataset.files || '{}');
   const video = root.querySelector<HTMLVideoElement>('[data-intro-video]')!;
-  const placeholder = root.querySelector<HTMLElement>('[data-intro-placeholder]')!;
+  const placeholders = [...root.querySelectorAll<HTMLElement>('[data-intro-placeholder]')];
   const controls = root.querySelector<HTMLElement>('[data-intro-controls]')!;
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-intro-tab]')];
   const soundBtn = root.querySelector<HTMLButtonElement>('[data-intro-sound]')!;
@@ -19,7 +19,7 @@ export function initIntro(root: HTMLElement) {
     video.pause();
     video.hidden = true;
     controls.hidden = true;
-    placeholder.hidden = false;
+    placeholders.forEach((el) => (el.hidden = false));
   };
 
   const load = (lang: Lang) => {
@@ -42,7 +42,7 @@ export function initIntro(root: HTMLElement) {
     else video.removeAttribute('poster');
     video.preload = 'metadata';
     video.load();
-    placeholder.hidden = true;
+    placeholders.forEach((el) => (el.hidden = true));
     controls.hidden = false;
     video.hidden = false;
     if (!reduced && !document.documentElement.classList.contains('motion-off')) video.play().catch(() => {});

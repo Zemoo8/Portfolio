@@ -58,8 +58,7 @@ export function initOrbit(root: HTMLElement) {
     caption.classList.remove('is-shown');
     requestAnimationFrame(() => {
       for (const key of ['index', 'category', 'year', 'title', 'tagline']) {
-        const el = caption.querySelector<HTMLElement>(`[data-cap="${key}"]`);
-        if (el) el.textContent = c.dataset[key] ?? '';
+        root.querySelectorAll<HTMLElement>(`[data-cap="${key}"]`).forEach((el) => (el.textContent = c.dataset[key] ?? ''));
       }
       const link = caption.querySelector<HTMLAnchorElement>('[data-cap="link"]')!;
       link.href = c.href;

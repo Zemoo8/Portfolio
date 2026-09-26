@@ -69,7 +69,8 @@
 }
 
 :root:lang(ar) {
-  --font-display: var(--font-arabic-display);
+  /* Cormorant first: Latin names (projects, tools) keep the display face; Arabic falls to Naskh */
+  --font-display: 'Cormorant Garamond', var(--font-arabic-display);
   --font-sans: var(--font-arabic);
 }
 
@@ -189,11 +190,15 @@ ul, ol { padding: 0; list-style: none; }
 }
 :lang(ar) .kicker { letter-spacing: 0; text-transform: none; font-weight: 500; }
 .kicker::before {
+  /* a short brush dash, not a hairline */
   content: '';
-  inline-size: 1.6em;
-  block-size: 1px;
+  inline-size: 2.1em;
+  block-size: 0.55em;
   background: currentColor;
+  -webkit-mask: url('/ink/dash.png') center / 100% 100% no-repeat;
+  mask: url('/ink/dash.png') center / 100% 100% no-repeat;
 }
+[dir='rtl'] .kicker::before { transform: scaleX(-1); }
 
 .label {
   font-size: var(--step--1);
@@ -224,58 +229,134 @@ ul, ol { padding: 0; list-style: none; }
 .arrow { display: inline-block; transition: transform var(--dur-2) var(--ease-out); }
 [dir='rtl'] .arrow { transform: scaleX(-1); }
 
-.link-u {
-  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
-  transition: background-size var(--dur-2) var(--ease-out), color var(--dur-1);
-}
-[dir='rtl'] .link-u { background-position: 100% 100%; }
-.link-u:hover, .link-u:focus-visible { background-size: 100% 1px; }
+/* ==========================================================================
+   Ink marks — brush-drawn masks from public/ink (scripts/art/ink-marks.mjs).
+   Every interactive mark is painted with the brush: no pills, no 1px rings.
+   ========================================================================== */
+@keyframes ink-paint { from { clip-path: inset(-20% 100% -20% 0); } to { clip-path: inset(-20% 0 -20% 0); } }
+@keyframes ink-paint-rtl { from { clip-path: inset(-20% 0 -20% 100%); } to { clip-path: inset(-20% 0 -20% 0); } }
 
+/* text link: a brush stroke paints in beneath it */
+.link-u { position: relative; transition: color var(--dur-1); }
+.link-u::after {
+  content: '';
+  position: absolute;
+  inset-inline: -0.15em;
+  inset-block-end: -0.42em;
+  block-size: 0.5em;
+  background: currentColor;
+  -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
+  mask: url('/ink/under.png') center / 100% 100% no-repeat;
+  clip-path: inset(-20% 100% -20% 0);
+  transition: clip-path 0.65s var(--ease-out);
+  pointer-events: none;
+}
+[dir='rtl'] .link-u::after { clip-path: inset(-20% 0 -20% 100%); }
+.link-u:hover::after, .link-u:focus-visible::after { clip-path: inset(-20% 0 -20% 0); }
+
+/* tag: small caps led by a vermilion brush dash — typography, not a chip */
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.45em;
-  padding: 0.3em 0.85em;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  font-size: var(--step--1);
+  gap: 0.55em;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--ink-2);
-  background: rgb(255 255 255 / 0.35);
   white-space: nowrap;
 }
+.pill::before {
+  content: '';
+  flex: none;
+  inline-size: 1.25em;
+  block-size: 0.45em;
+  background: var(--seal);
+  -webkit-mask: url('/ink/dash.png') center / 100% 100% no-repeat;
+  mask: url('/ink/dash.png') center / 100% 100% no-repeat;
+}
+[dir='rtl'] .pill::before { transform: scaleX(-1); }
+:lang(ar) .pill { letter-spacing: 0; text-transform: none; font-size: 0.86rem; font-weight: 500; }
 
+/* primary: the label sits on a loaded brush swash; hover re-inks it in rust */
 .btn {
+  --btn-ink: var(--ink);
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
-  gap: 0.7em;
-  padding: 0.85em 1.5em;
-  border-radius: 999px;
-  border: 1px solid var(--ink);
-  background: var(--ink);
+  gap: 0.75em;
+  padding: 1.2em 2.4em 1.2em 2.1em;
   color: var(--paper);
-  font-size: var(--step--1);
+  font-size: 0.76rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  transition: background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), border-color var(--dur-2), transform var(--dur-2) var(--ease-out);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color var(--dur-2) var(--ease-out);
 }
-.btn:hover, .btn:focus-visible { background: var(--rust); border-color: var(--rust); }
-.btn:hover .arrow { transform: translateX(3px); }
-[dir='rtl'] .btn:hover .arrow { transform: scaleX(-1) translateX(3px); }
-.btn--ghost { background: rgb(255 255 255 / 0.4); color: var(--ink); border-color: var(--line-strong); backdrop-filter: blur(6px); }
-.btn--ghost:hover, .btn--ghost:focus-visible { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+:lang(ar) .btn { letter-spacing: 0; text-transform: none; font-size: 0.92rem; }
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0 -0.3em;
+  z-index: -1;
+  background: var(--btn-ink);
+  -webkit-mask: url('/ink/swash.png') center / 100% 100% no-repeat;
+  mask: url('/ink/swash.png') center / 100% 100% no-repeat;
+  transition: background-color var(--dur-2) var(--ease-out), transform 0.8s var(--ease-out);
+}
+[dir='rtl'] .btn::before { transform: scaleX(-1); }
+.btn:hover, .btn:focus-visible { --btn-ink: var(--rust); }
+.btn:hover::before { transform: scaleX(1.04) translateX(1%); }
+[dir='rtl'] .btn:hover::before { transform: scaleX(-1.04) translateX(1%); }
+.btn .arrow { transition: transform 0.6s var(--ease-out); }
+.btn:hover .arrow { transform: translateX(4px); }
+[dir='rtl'] .btn:hover .arrow { transform: scaleX(-1) translateX(4px); }
 
-/* Round icon button */
+/* secondary: plain words with a brush underline that repaints on hover */
+.btn--ghost { color: var(--ink); padding: 0.9em 0.15em; }
+.btn--ghost::before {
+  inset: auto -0.1em 0.35em;
+  block-size: 0.55em;
+  background: currentColor;
+  -webkit-mask-image: url('/ink/under.png');
+  mask-image: url('/ink/under.png');
+  transform: none !important;
+}
+.btn--ghost:hover, .btn--ghost:focus-visible { color: var(--rust); }
+.btn--ghost:hover::before { animation: ink-paint 0.8s var(--ease-out); }
+[dir='rtl'] .btn--ghost:hover::before { animation-name: ink-paint-rtl; }
+
+/* brush glyph button: a painted arrow / cross, no ring */
 .ibtn {
+  --glyph: url('/ink/arrow.png');
   display: inline-grid;
   place-items: center;
-  inline-size: 2.9rem;
-  block-size: 2.9rem;
-  border-radius: 50%;
-  border: 1px solid currentColor;
-  transition: background var(--dur-2), color var(--dur-2), transform var(--dur-2) var(--ease-out);
+  inline-size: 3.6rem;
+  block-size: 2.6rem;
+  color: inherit;
+  transition: color var(--dur-2);
 }
-.ibtn svg { inline-size: 1rem; block-size: 1rem; }
-[dir='rtl'] .ibtn[data-dir] svg { transform: scaleX(-1); }
+.ibtn svg { display: none; }
+.ibtn::before {
+  content: '';
+  inline-size: 100%;
+  block-size: 100%;
+  background: currentColor;
+  -webkit-mask: var(--glyph) center / contain no-repeat;
+  mask: var(--glyph) center / contain no-repeat;
+  transition: transform 0.6s var(--ease-out);
+}
+.ibtn--prev::before { transform: scaleX(-1); }
+.ibtn--prev:hover::before { transform: scaleX(-1) translateX(5px); }
+.ibtn--next:hover::before { transform: translateX(5px); }
+[dir='rtl'] .ibtn--next::before { transform: scaleX(-1); }
+[dir='rtl'] .ibtn--next:hover::before { transform: scaleX(-1) translateX(5px); }
+[dir='rtl'] .ibtn--prev::before { transform: none; }
+[dir='rtl'] .ibtn--prev:hover::before { transform: translateX(5px); }
+.ibtn--close { --glyph: url('/ink/cross.png'); inline-size: 2.6rem; }
+.ibtn--close:hover::before { transform: rotate(90deg); }
+.ibtn:hover { color: var(--rust); }
 
 /* ==========================================================================
    Media
@@ -301,20 +382,26 @@ ul, ol { padding: 0; list-style: none; }
 
 .film-toggle {
   position: absolute;
-  inset-block-end: 0.9rem;
-  inset-inline-end: 0.9rem;
+  inset-block-end: 0.7rem;
+  inset-inline-end: 0.7rem;
   z-index: 3;
   display: grid;
   place-items: center;
-  inline-size: 2.4rem;
-  block-size: 2.4rem;
-  border-radius: 50%;
-  background: rgb(246 240 223 / 0.85);
-  color: var(--ink);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 14px -6px rgb(0 0 0 / 0.3);
+  inline-size: 2.8rem;
+  block-size: 2.8rem;
+  color: var(--paper);
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 0.45));
   opacity: 0;
   transition: opacity var(--dur-2);
+}
+.film-toggle::before {
+  /* a small painted ensō around the glyph */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: url('/ink/ring.png') center / contain no-repeat;
+  mask: url('/ink/ring.png') center / contain no-repeat;
 }
 .media:hover .film-toggle, .film-toggle:focus-visible, .reduced .film-toggle, .motion-off .film-toggle { opacity: 1; }
 .film-toggle svg { inline-size: 0.9rem; block-size: 0.9rem; }
@@ -392,5 +479,16 @@ ul, ol { padding: 0; list-style: none; }
 
 /* Native cross-document transitions where supported */
 @view-transition { navigation: auto; }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 480ms; animation-timing-function: var(--ease-in-out); }
+/* the next page is painted in: a brush swash grows from the centre until it covers the view */
+::view-transition-old(root) { animation: 700ms var(--ease-in-out) both vt-settle; }
+::view-transition-new(root) {
+  animation: 900ms cubic-bezier(0.7, 0, 0.2, 1) both vt-ink;
+  -webkit-mask: url('/ink/swash.png') 50% 50% / 400% 420% no-repeat;
+  mask: url('/ink/swash.png') 50% 50% / 400% 420% no-repeat;
+}
+@keyframes vt-ink {
+  from { -webkit-mask-size: 6% 7%; mask-size: 6% 7%; }
+  to { -webkit-mask-size: 400% 420%; mask-size: 400% 420%; }
+}
+@keyframes vt-settle { to { opacity: 0.6; transform: scale(0.985); } }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }

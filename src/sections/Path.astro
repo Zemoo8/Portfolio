@@ -42,7 +42,7 @@ const groups = [
                 {(e.tags || e.link) && (
                   <p class="entry__tags">
                     {e.tags?.map((t) => <span class="pill">{t}</span>)}
-                    {e.link && <a class="pill link-u" href={e.link.href} target="_blank" rel="noopener">{e.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
+                    {e.link && <a class="link-u entry__link" href={e.link.href} target="_blank" rel="noopener">{e.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
                   </p>
                 )}
               </div>
@@ -95,7 +95,8 @@ const groups = [
   .entry__role { color: var(--ink-2); margin-block-start: 0.3rem; font-weight: 500; }
   .entry__place { margin-block-start: 0.3rem; }
   .entry__body { display: grid; gap: 0.8rem; color: var(--ink-2); }
-  .entry__tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .entry__tags { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.4rem; margin-block-start: 0.3rem; }
+  .entry__link { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
   .entry__cert {
     justify-self: start;
     padding: 0.35rem;

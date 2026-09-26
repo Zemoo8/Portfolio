@@ -2,7 +2,21 @@
 
 Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro preview`; Chromium via Playwright 1.61 (headless; GPU via ANGLE/D3D11 for WebGL); Lighthouse 12 (mobile, simulated throttling).
 
-## Summary
+## Round 3 — films, calm scrolling, painted interface (latest)
+
+| Area | Result |
+|---|---|
+| Films in real Chrome (`scripts/qa/films.mjs`) | **14 / 14 play** locally and on the live site (before: 2 / 12 — every VP9 WebM failed with a decode error after the first frame, and never fell back to MP4) |
+| Scroll behaviour (`scripts/qa/scroll-calm.mjs`) | 5 / 5: no speed-driven effects, native wheel scrolling, depth layers on a `ScrollTimeline`, same position → same picture, hard scrolling never moves the orbit |
+| Accessibility (axe-core) | 0 violations on 7 pages (EN/FR/AR home, 3 case studies, 404) |
+| Keyboard | 15 / 15 |
+| Links | 0 broken (24 external checked; LinkedIn 999 to bots) |
+| Lighthouse (Perf · A11y · BP · SEO) | /en/ **89**·100·100·100 (TBT 0 ms, CLS 0) · /ar/ **85**·100·100·100 · /en/work/cheezy/ **95**·100·100·100 |
+| Visual review | header, hero, moon gate, orbit caption, portrait, path tags, credential filters, contact, case study — EN desktop, AR desktop, 390 px phone |
+
+Fixed in this round: films (H.264 only, re-encoded, new AI Eyes and Cheezy films); scroll-speed wind streaks / orbit push / vortex gusts / rail drift removed; Lenis removed; parallax and progress moved to scroll-driven CSS (a minifier had folded `animation-timeline` into the `animation` shorthand — kept in its own rule now); generic pills, round buttons, the recording dot, the arched portrait frame and the seal logo replaced with brushwork; SVG-filter masks (0.67 s of blocking on the Cheezy page) baked to PNG → 0 ms.
+
+## Summary (round 2)
 
 | Area | Result |
 |---|---|
@@ -53,6 +67,7 @@ Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro prev
 - **Intro films**: not yet recorded — the painted moon gate stands in until `intro-<lang>.mp4` files are added.
 - **Cross-browser**: automated runs used Chromium. The code relies only on progressive extras (View Transitions, `:has()`, WebGL with a CSS fallback), but a manual pass on Safari iOS and Firefox is recommended.
 - **Real devices**: mobile checks were emulated (touch + mobile viewport).
+- **Firefox**: CSS scroll-driven animations are not enabled there yet, so the landscape depth and the header's reading stroke stay still (the mist veil has a small position-based fallback). Everything else works.
 - **Translations**: FR/AR copy should be proof-read by Ahmed.
 - **Air Nomad emblem**: fan homage to franchise IP (see DESIGN_SYSTEM → "The air emblem"); swap for an original mark before any commercial use.
 

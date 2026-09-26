@@ -1,9 +1,9 @@
 ---
-// Editorial ink portrait. The only supplied photo (432×577) is shown as an ink-wash duotone
-// inside an arched window, framed by a painted ensō; the colour original warms in on hover.
-// A vermilion seal and coordinates caption complete the "painting". Decorative layers aria-hidden.
+// Editorial ink portrait: the photo lives inside the moon gate itself — a round window framed by
+// the painted ensō, with the same ink landscape behind (the supplied photo is a cutout, so the
+// peaks and mist sit behind the shoulders). Ink-wash duotone; the colour original warms in on
+// hover. The window opens like an iris when it arrives. Decorative layers are aria-hidden.
 import Brush from './Brush.astro';
-import Seal from './Seal.astro';
 import { asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 
@@ -12,15 +12,15 @@ const { lang } = Astro.props;
 ---
 
 <figure class="portrait" data-portrait data-reveal>
-  <div class="portrait__enso" data-depth="-10" aria-hidden="true"><Brush kind="circle" seed={19} /></div>
-  <div class="portrait__frame" data-depth="8">
+  <div class="portrait__disc">
+    <img class="portrait__land" src={asset('art/gate.webp')} width="900" height="900" alt="" aria-hidden="true" loading="lazy" decoding="async" />
     <img class="portrait__ink" src={asset('media/profile/portrait-ink.webp')} width="432" height="577" alt={tr(ui.about.portraitAlt, lang)} loading="lazy" decoding="async" />
     <img class="portrait__color" src={asset('media/profile/portrait-color.webp')} width="432" height="577" alt="" aria-hidden="true" loading="lazy" decoding="async" />
   </div>
-  <span class="portrait__seal" aria-hidden="true"><Seal size="3.1rem" /></span>
-  <figcaption class="portrait__cap label" aria-hidden="true">
-    <span>36.81° N · 10.18° E</span>
-    <span>Tunis — 2026</span>
+  <div class="portrait__enso" aria-hidden="true"><Brush kind="circle" seed={19} /></div>
+  <figcaption class="portrait__cap" aria-hidden="true">
+    <span class="portrait__place">Tunis</span>
+    <span class="portrait__coords">36.81° N · 10.18° E — 2026</span>
   </figcaption>
 </figure>
 
@@ -33,42 +33,49 @@ const { lang } = Astro.props;
     aspect-ratio: 1;
     margin-inline: auto;
   }
-  .portrait__enso { position: absolute; inset: 0; }
+  .portrait__enso { position: absolute; inset: 0; pointer-events: none; }
   .portrait__enso :global(svg) { inline-size: 100%; block-size: 100%; }
-  .portrait__frame {
+
+  /* the round window, sitting just inside the brush ring */
+  .portrait__disc {
     position: relative;
-    inline-size: 60%;
-    aspect-ratio: 432 / 577;
-    border-radius: 999px 999px 16px 16px;
+    inline-size: 76%;
+    aspect-ratio: 1;
+    border-radius: 50%;
     overflow: hidden;
-    background: radial-gradient(90% 70% at 50% 30%, #eef0e9, #dcded5);
-    box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgb(40 36 30 / 0.5);
+    background: var(--mist);
+    box-shadow: inset 0 0 0 1px rgb(31 29 26 / 0.1), inset 0 24px 60px -34px rgb(31 29 26 / 0.5);
+    isolation: isolate;
   }
-  .portrait__frame img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: 50% 20%; }
-  .portrait__color { opacity: 0; transition: opacity 1.4s var(--ease-out); }
-  .portrait:hover .portrait__color { opacity: 0.9; }
-  .portrait__seal { position: absolute; inset-block-end: 16%; inset-inline-end: 16%; }
+  .portrait__land { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; object-position: 50% 60%; opacity: 0.9; }
+  .portrait__ink, .portrait__color {
+    position: absolute;
+    inset-inline-start: 10%;
+    inset-block-start: 13%;
+    inline-size: 80%;
+    block-size: auto;
+    transition: opacity 1.4s var(--ease-out), scale 1.6s var(--ease-out);
+  }
+  .portrait__color { opacity: 0; }
+  .portrait:hover .portrait__color { opacity: 0.92; }
+  .portrait:hover .portrait__ink, .portrait:hover .portrait__color { scale: 1.02; }
 
-  /* aperture opening when the portrait arrives */
-  .js .portrait__frame { clip-path: inset(100% 0 0 0 round 999px 999px 16px 16px); }
-  .js .portrait.is-in .portrait__frame { clip-path: inset(0 0 0 0 round 999px 999px 16px 16px); transition: clip-path 1.6s cubic-bezier(0.7, 0, 0.2, 1) 0.2s; }
+  /* iris: the window opens from the centre when the portrait arrives */
+  .js .portrait__disc { clip-path: circle(0% at 50% 50%); }
+  .js .portrait.is-in .portrait__disc { clip-path: circle(50% at 50% 50%); transition: clip-path 1.6s cubic-bezier(0.7, 0, 0.2, 1) 0.25s; }
 
-  .portrait__cap { position: absolute; inset-block-end: 1%; inset-inline: 8%; display: flex; justify-content: space-between; direction: ltr; font-size: 0.72rem; }
-  [data-depth] { transition: transform 0.9s var(--ease-out); }
-  @media (prefers-reduced-motion: reduce) { .js .portrait__frame { clip-path: none; } }
+  .portrait__cap {
+    position: absolute;
+    inset-block-end: -0.6rem;
+    inset-inline: 0;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.8rem;
+    direction: ltr;
+    color: var(--muted);
+  }
+  .portrait__place { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; color: var(--ink-2); }
+  .portrait__coords { font-size: 0.68rem; letter-spacing: 0.16em; }
+  @media (prefers-reduced-motion: reduce) { .js .portrait__disc { clip-path: none; } }
 </style>
-
-<script>
-  const fig = document.querySelector<HTMLElement>('[data-portrait]');
-  if (fig && matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const layers = [...fig.querySelectorAll<HTMLElement>('[data-depth]')];
-    fig.addEventListener('pointermove', (e) => {
-      if (document.documentElement.classList.contains('motion-off')) return;
-      const r = fig.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;
-      const y = (e.clientY - r.top) / r.height - 0.5;
-      layers.forEach((l) => { const d = Number(l.dataset.depth); l.style.transform = `translate3d(${x * d}px, ${y * d}px, 0)`; });
-    });
-    fig.addEventListener('pointerleave', () => layers.forEach((l) => (l.style.transform = '')));
-  }
-</script>

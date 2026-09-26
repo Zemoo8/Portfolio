@@ -1,5 +1,11 @@
 ---
-import Seal from './Seal.astro';
+// The header, as a painted masthead rather than a floating pill:
+//  · a typographic wordmark — no logo
+//  · chapter links numbered like a table of contents; hover paints a brush stroke under the
+//    word, and the chapter you are reading keeps its stroke (scroll-spy → aria-current)
+//  · the active language sits inside a small brushed ensō
+//  · once you scroll, a sheet of paper with a torn (deckled) edge slides in behind it, and a thin
+//    rust stroke along that edge paints itself across as you read (CSS scroll timeline)
 import { locales, localeMeta, path, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -17,16 +23,28 @@ const items = [
 ---
 
 <header class="nav" data-nav>
+  <div class="nav__band" aria-hidden="true">
+    <div class="nav__paper"></div>
+    <span class="nav__read"></span>
+  </div>
+
   <div class="nav__bar">
     <a class="nav__brand" href={home} aria-label={tr(ui.nav.home, lang)}>
-      <span class="nav__seal"><Seal size="2.2rem" /></span>
-      <span class="nav__name">{tr(profile.name, lang)}</span>
+      <span class="nav__first">{tr(profile.firstName, lang)}</span>
+      <em class="nav__last">{tr(profile.lastName, lang)}</em>
     </a>
 
     <nav class="nav__links" aria-label="Primary">
-      <ul>
-        {items.map((it) => <li><a href={`${home}#${it.id}`}>{tr(it.label, lang)}</a></li>)}
-      </ul>
+      <ol>
+        {items.map((it, i) => (
+          <li>
+            <a href={`${home}#${it.id}`} data-spy={it.id}>
+              <span class="nav__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="nav__word">{tr(it.label, lang)}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
     </nav>
 
     <div class="nav__tools">
@@ -55,7 +73,7 @@ const items = [
         {items.map((it, i) => (
           <li style={`--i:${i}`}>
             <a href={`${home}#${it.id}`} data-menu-link>
-              <span class="label">0{i + 1}</span>
+              <span class="menu__num">{String(i + 1).padStart(2, '0')}</span>
               <span class="display">{tr(it.label, lang)}</span>
             </a>
           </li>
@@ -77,93 +95,159 @@ const items = [
 <style>
   .nav {
     position: fixed;
-    inset-block-start: 0.9rem;
+    inset-block-start: 0;
     inset-inline: 0;
     z-index: 50;
-    padding-inline: var(--gutter);
-    transition: transform var(--dur-2) var(--ease-out);
-    pointer-events: none;
+    transition: transform 0.6s var(--ease-out);
   }
-  .nav.is-hidden:not(.is-open) { transform: translateY(-140%); }
+  .nav.is-hidden:not(.is-open) { transform: translateY(-120%); }
+
+  /* the paper band that arrives once the page moves */
+  .nav__band {
+    position: absolute;
+    inset: 0 0 -0.9rem;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 10px rgb(40 36 30 / 0.1));
+    opacity: 0;
+    transform: translateY(-110%);
+    transition: transform 0.7s var(--ease-out), opacity 0.4s var(--ease-out);
+  }
+  .nav.is-scrolled .nav__band, .nav.is-open .nav__band { opacity: 1; transform: none; }
+  .nav__paper {
+    position: absolute;
+    inset: 0;
+    background: var(--paper-grain), linear-gradient(180deg, #f8f3e4, var(--paper));
+    /* solid sheet, torn along the bottom edge */
+    -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - 0.9rem) no-repeat, url('/ink/edge.png') bottom / 36rem 0.9rem repeat-x;
+    mask: linear-gradient(#000 0 0) top / 100% calc(100% - 0.9rem) no-repeat, url('/ink/edge.png') bottom / 36rem 0.9rem repeat-x;
+  }
+  /* reading progress: a rust brush stroke painting across the torn edge */
+  .nav__read {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0.55rem;
+    block-size: 0.5rem;
+    background: var(--rust);
+    opacity: 0.75;
+    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    clip-path: inset(-50% 100% -50% 0);
+  }
+  @supports (animation-timeline: scroll()) {
+    .nav__read { animation: nav-read linear both; }
+    .nav__band > .nav__read { animation-timeline: scroll(root block); } /* apart from the shorthand */
+    [dir='rtl'] .nav__read { animation-name: nav-read-rtl; }
+    @media (prefers-reduced-motion: reduce) { .nav__read { animation-duration: auto !important; } }
+  }
+  @keyframes nav-read { from { clip-path: inset(-50% 100% -50% 0); } to { clip-path: inset(-50% 0 -50% 0); } }
+  @keyframes nav-read-rtl { from { clip-path: inset(-50% 0 -50% 100%); } to { clip-path: inset(-50% 0 -50% 0); } }
+  :global(.motion-off) .nav__read { animation-play-state: running !important; }
+
   .nav__bar {
     position: relative;
     z-index: 2;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: clamp(1rem, 3vw, 3rem);
     max-inline-size: var(--max);
     margin-inline: auto;
-    padding: 0.45rem 0.55rem 0.45rem 0.6rem;
-    border-radius: 999px;
-    background: rgb(247 242 230 / 0.78);
-    backdrop-filter: blur(14px) saturate(1.1);
-    box-shadow: 0 0 0 1px rgb(31 29 26 / 0.08), 0 10px 30px -18px rgb(40 36 30 / 0.45);
-    pointer-events: auto;
+    padding: 1.15rem var(--gutter) 1rem;
   }
-  .nav__brand { display: inline-flex; align-items: center; gap: 0.7rem; margin-inline-end: auto; padding-inline-end: 0.6rem; }
-  .nav__seal { display: inline-block; }
-  /* the seal turns once over the whole page — reading progress, tied to scroll position */
-  @supports (animation-timeline: scroll()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .nav__seal { animation: seal-turn linear both; }
-      .nav__brand > .nav__seal { animation-timeline: scroll(root block); } /* separate rule: see Backdrop */
-    }
+
+  /* wordmark */
+  .nav__brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.28em;
+    margin-inline-end: auto;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
   }
-  @keyframes seal-turn { to { transform: rotate(360deg); } }
-  :global(.motion-off) .nav__seal { animation: none; }
-  .nav__name { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; letter-spacing: 0.01em; white-space: nowrap; }
-  @media (max-width: 420px) { .nav__name { font-size: 1.05rem; } .nav__motion { display: none; } }
-  :lang(ar) .nav__name { font-size: 1.1rem; }
-  .nav__links ul { display: flex; gap: clamp(0.4rem, 1.2vw, 1rem); }
-  .nav__links a {
-    display: inline-block;
-    padding: 0.45rem 0.7rem;
-    border-radius: 999px;
-    font-size: 0.92rem;
-    font-weight: 500;
-    color: var(--ink-2);
-    transition: background var(--dur-1), color var(--dur-1);
+  .nav__last { font-style: italic; font-weight: 500; transition: color var(--dur-2); }
+  :lang(ar) .nav__last { font-style: normal; color: var(--ink-2); }
+  .nav__brand:hover .nav__last { color: var(--rust); }
+
+  /* chapters */
+  .nav__links ol { display: flex; gap: clamp(0.9rem, 2.2vw, 2.1rem); }
+  .nav__links a { position: relative; display: inline-flex; align-items: baseline; gap: 0.45em; padding-block: 0.5rem; color: var(--ink-2); transition: color var(--dur-2); }
+  .nav__num { font-family: var(--font-display); font-style: italic; font-size: 0.88rem; color: var(--rust); }
+  .nav__word { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
+  :lang(ar) .nav__word { font-size: 0.95rem; letter-spacing: 0; text-transform: none; font-weight: 500; }
+  .nav__links a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0 -0.2em;
+    inset-block-end: 0.05rem;
+    block-size: 0.5rem;
+    background: currentColor;
+    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    clip-path: inset(-50% 100% -50% 0);
+    transition: clip-path 0.7s var(--ease-out);
   }
-  .nav__links a:hover { background: rgb(31 29 26 / 0.07); color: var(--ink); }
-  .nav__tools { display: flex; align-items: center; gap: 0.4rem; }
-  .nav__langs { display: flex; gap: 0.1rem; padding: 0.2rem; border-radius: 999px; background: rgb(31 29 26 / 0.06); }
+  [dir='rtl'] .nav__links a::after { clip-path: inset(-50% 0 -50% 100%); }
+  .nav__links a:hover, .nav__links a[aria-current] { color: var(--ink); }
+  .nav__links a:hover::after, .nav__links a[aria-current]::after { clip-path: inset(-50% 0 -50% 0); }
+
+  .nav__tools { display: flex; align-items: center; gap: 0.6rem; }
+
+  /* languages: the current one inside a brushed ensō */
+  .nav__langs { display: flex; gap: 0.2rem; }
   .nav__langs a {
+    position: relative;
     display: grid;
     place-items: center;
-    min-inline-size: 2.2rem;
-    block-size: 2rem;
-    padding-inline: 0.5rem;
-    border-radius: 999px;
-    font-size: 0.78rem;
+    inline-size: 2.3rem;
+    block-size: 2.3rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: var(--muted);
-    transition: background var(--dur-1), color var(--dur-1);
+    transition: color var(--dur-2);
   }
   .nav__langs a[lang='ar'] { font-family: var(--font-arabic-display); font-size: 1rem; letter-spacing: 0; }
-  .nav__langs a:hover { color: var(--ink); }
-  .nav__langs a[aria-current='true'] { background: var(--ink); color: var(--paper); }
-  .nav__motion {
-    display: grid;
-    place-items: center;
-    inline-size: 2.4rem;
-    block-size: 2.4rem;
-    border-radius: 50%;
-    color: var(--ink-2);
-    transition: background var(--dur-1), color var(--dur-1);
+  .nav__langs a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--rust);
+    -webkit-mask: url('/ink/ring.png') center / contain no-repeat;
+    mask: url('/ink/ring.png') center / contain no-repeat;
+    opacity: 0;
+    transform: rotate(-40deg) scale(0.8);
+    transition: opacity 0.5s var(--ease-out), transform 0.8s var(--ease-out);
   }
-  .nav__motion:hover { background: rgb(31 29 26 / 0.07); }
+  .nav__langs a:hover, .nav__langs a[aria-current='true'] { color: var(--ink); }
+  .nav__langs a[aria-current='true']::before { opacity: 1; transform: none; }
+  .nav__langs a:hover:not([aria-current])::before { opacity: 0.35; transform: none; }
+
+  .nav__motion { display: grid; place-items: center; inline-size: 2.3rem; block-size: 2.3rem; color: var(--ink-2); transition: color var(--dur-1); }
+  .nav__motion:hover { color: var(--rust); }
   .nav__motion svg { inline-size: 1.15rem; block-size: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
   .nav__motion[aria-pressed='false'] { color: var(--muted); }
   .nav__motion[aria-pressed='false'] svg { opacity: 0.45; }
 
-  .nav__toggle { display: none; align-items: center; gap: 0.7rem; padding: 0.5rem 0.9rem; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 0.85rem; font-weight: 600; }
-  .nav__burger { position: relative; inline-size: 1.2rem; block-size: 0.6rem; }
-  .nav__burger i { position: absolute; inset-inline: 0; block-size: 1.5px; background: currentColor; transition: transform var(--dur-2) var(--ease-out), inset var(--dur-2) var(--ease-out); }
-  .nav__burger i:first-child { inset-block-start: 0; }
-  .nav__burger i:last-child { inset-block-start: 100%; }
-  .is-open .nav__burger i:first-child { inset-block-start: 50%; transform: rotate(45deg); }
-  .is-open .nav__burger i:last-child { inset-block-start: 50%; transform: rotate(-45deg); }
+  /* phone: the word "Menu" over two brush strokes */
+  .nav__toggle { display: none; align-items: center; gap: 0.7rem; padding: 0.4rem 0.2rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
+  :lang(ar) .nav__toggle { letter-spacing: 0; font-size: 0.95rem; }
+  .nav__burger { position: relative; inline-size: 1.7rem; block-size: 0.75rem; }
+  .nav__burger i {
+    position: absolute;
+    inset-inline: 0;
+    block-size: 0.42rem;
+    background: currentColor;
+    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    transition: transform var(--dur-2) var(--ease-out), inset var(--dur-2) var(--ease-out);
+  }
+  .nav__burger i:first-child { inset-block-start: -0.15rem; }
+  .nav__burger i:last-child { inset-block-start: 0.5rem; inset-inline-start: 0.35rem; }
+  .is-open .nav__burger i:first-child { inset-block-start: 0.16rem; transform: rotate(35deg); }
+  .is-open .nav__burger i:last-child { inset-block-start: 0.16rem; inset-inline-start: 0; transform: rotate(-35deg); }
 
   .menu {
     position: fixed;
@@ -172,25 +256,26 @@ const items = [
     background: var(--paper-grain), var(--paper);
     padding: 6.5rem var(--gutter) 2rem;
     overflow-y: auto;
-    pointer-events: auto;
   }
   .menu__inner { display: flex; flex-direction: column; justify-content: space-between; min-block-size: 100%; gap: 3rem; }
-  .menu ol { display: grid; gap: 0.2rem; }
-  .menu ol a { display: flex; align-items: baseline; gap: 1rem; padding-block: 0.3rem; }
+  .menu ol { display: grid; gap: 0.4rem; }
+  .menu ol a { display: flex; align-items: baseline; gap: 1rem; padding-block: 0.25rem; }
+  .menu__num { font-family: var(--font-display); font-style: italic; font-size: 1.2rem; color: var(--rust); }
   .menu ol .display { font-size: clamp(2.6rem, 12vw, 4.2rem); }
-  .menu ol li { border-block-end: 1px solid var(--line); }
   .menu li { opacity: 0; transform: translateY(16px); }
   .is-open .menu li { opacity: 1; transform: none; transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out); transition-delay: calc(80ms + var(--i) * 55ms); }
   .menu__foot { display: grid; gap: 1.2rem; color: var(--ink-2); }
   .menu__langs { display: flex; gap: 1.2rem; color: var(--muted); }
   .menu__langs a[aria-current='true'] { color: var(--ink); font-weight: 600; }
-  .menu__motion { justify-self: start; padding: 0.5rem 0.9rem; border-radius: 999px; box-shadow: 0 0 0 1px var(--line-strong); font-size: 0.85rem; }
+  .menu__motion { justify-self: start; padding-block: 0.4rem; font-size: 0.85rem; text-decoration: underline; text-underline-offset: 0.3em; text-decoration-color: var(--line-strong); }
   .menu__motion[aria-pressed='false'] { color: var(--muted); }
 
+  @media (max-width: 1100px) { .nav__num { display: none; } }
   @media (max-width: 1020px) {
     .nav__links, .nav__langs { display: none; }
     .nav__toggle { display: inline-flex; }
   }
+  @media (max-width: 420px) { .nav__brand { font-size: 1.25rem; } .nav__motion { display: none; } }
 </style>
 
 <script>
@@ -221,10 +306,27 @@ const items = [
     }),
   );
 
+  // paper band once the page moves; hide on the way down, return on the way up
   let last = scrollY;
-  addEventListener('scroll', () => {
+  const onScroll = () => {
     const y = scrollY;
+    nav.classList.toggle('is-scrolled', y > 40);
     nav.classList.toggle('is-hidden', y > 500 && y > last + 2);
     last = y;
-  }, { passive: true });
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // scroll-spy: the chapter in view keeps its brush stroke
+  const links = new Map([...nav.querySelectorAll<HTMLAnchorElement>('[data-spy]')].map((a) => [a.dataset.spy!, a]));
+  const sections = [...links.keys()].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+  if (sections.length) {
+    const spy = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((a, id) => (id === e.target.id ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
+      }
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    sections.forEach((s) => spy.observe(s));
+  }
 </script>

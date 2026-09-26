@@ -1,7 +1,6 @@
 ---
 import IntroFilm from '../components/IntroFilm.astro';
 import Brush from '../components/Brush.astro';
-import Seal from '../components/Seal.astro';
 import { tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -17,7 +16,7 @@ const { lang } = Astro.props;
     <h1 id="hero-name" class="hero__name display">
       <span class="line-mask" data-onload><span>{tr(profile.firstName, lang)}</span></span>
       <span class="line-mask hero__last" data-onload style="--i:1">
-        <span><em>{tr(profile.lastName, lang)}</em><Seal size="clamp(2.4rem, 4.4vw, 4rem)" class="hero__seal" /></span>
+        <span><em>{tr(profile.lastName, lang)}</em></span>
       </span>
     </h1>
 
@@ -75,11 +74,10 @@ const { lang } = Astro.props;
   .hero__last > span { display: flex !important; align-items: center; gap: 0.18em; padding-inline-start: 0.55em; }
   .hero__last em { font-weight: 500; }
   :lang(ar) .hero__last em { color: var(--ink-2); font-weight: 500; }
-  .hero__name :global(.hero__seal) { margin-block-start: 0.12em; }
   .hero :global(.hero__stroke) { inline-size: min(100%, 30rem); block-size: 22px; margin-block: -0.4rem 0.2rem; }
   .hero__statement { font-size: var(--step-1); line-height: 1.55; max-inline-size: 34rem; color: var(--ink-2); }
   :lang(ar) .hero__statement { line-height: 1.95; }
-  .hero__cta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-block-start: 0.4rem; }
+  .hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem 2rem; margin-block-start: 0.6rem; }
   .hero__loc { margin-block-start: 0.2rem; }
 
   .hero__scroll {

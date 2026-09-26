@@ -8,6 +8,9 @@ const origin = {
   'cheezy/showcase-mobile': 'Recorded from www.cheezy.store at 390×844 (iPhone 13 profile)',
   'cheezy/app-mobile': 'Recorded from cheezy-app-demo.vercel.app (onboarding → shop choice → home)',
   'cheezy/film-app': 'Re-encoded from cheezy/LIVRAISON/Cheezy-Film-II.mp4 (Ahmed\'s own launch film for the client)',
+  'cheezy/brand-film': 'Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)',
+  'aieyes/ad-film': 'From the "AI Eyes AD" film Ahmed supplied: 9:16 content re-framed over a blurred glow of itself, opening at 5.8 s; the -card cut loops 5.8–34 s',
+  'certificates/': 'Rendered from Ahmed\'s certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)',
   'radar/showcase-desktop': 'Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)',
   'scraping/showcase-desktop': 'Recorded from the local Flask + React app (home narrative → dashboard → prediction)',
   'subway-runner/showcase-desktop': 'WebGL build of a temporary copy of SubwayRunner; two real gameplay takes joined with a 0.6 s crossfade',
@@ -15,7 +18,7 @@ const origin = {
   'cheezy/ad-': 'From cheezy/ads/approved (client-approved creatives)',
   'profile/': 'Face Picture.png, cut out (edge flood-fill mask), monochrome + colour',
   'og/': 'Rendered from the built site (scripts/og/render.mjs)',
-  'intros/': 'Neutral poster rendered from the site\'s iris (scripts/og/render.mjs)',
+  'intros/': 'Square moon-gate poster from the painted landscape (scripts/og/render.mjs)',
 };
 const why = (rel) => Object.entries(origin).find(([k]) => rel.includes(k))?.[1] ?? 'Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)';
 

@@ -1,6 +1,5 @@
 ---
 import Brush from '../components/Brush.astro';
-import Seal from '../components/Seal.astro';
 import { asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -28,7 +27,6 @@ const { lang } = Astro.props;
       <li><a class="btn" href={profile.links.linkedin} target="_blank" rel="noopener me">LinkedIn <span class="arrow" aria-hidden="true">↗</span></a></li>
       <li><a class="btn" href={profile.links.github} target="_blank" rel="noopener me">GitHub <span class="arrow" aria-hidden="true">↗</span></a></li>
     </ul>
-    <span class="contact__seal" aria-hidden="true"><Seal size="4.5rem" /></span>
     <p class="sr-only" aria-live="polite" data-copy-status></p>
   </div>
 </section>
@@ -58,9 +56,9 @@ const { lang } = Astro.props;
   .contact__avatar { inline-size: 3.8rem; block-size: 3.8rem; border-radius: 50%; object-fit: cover; object-position: 50% 18%; background: #e4e6de; box-shadow: 0 0 0 1px var(--line-strong); }
   .contact__address { font-size: clamp(1.7rem, 0.9rem + 4vw, 4.4rem); font-family: 'Cormorant Garamond', serif; font-weight: 600; overflow-wrap: anywhere; }
   .contact__address:hover { color: var(--rust); }
-  .contact__links { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-  .contact__seal { position: absolute; inset-block-start: 20%; inset-inline-end: 4%; opacity: 0.9; }
-  @media (max-width: 800px) { .contact__seal { display: none; } }
+  .contact__links { display: flex; gap: 1rem 1.6rem; flex-wrap: wrap; }
+  /* the second stroke is painted the other way up, so the pair never looks stamped */
+  .contact__links li:nth-child(2) :global(.btn)::before { scale: 1 -1; }
 </style>
 
 <script>

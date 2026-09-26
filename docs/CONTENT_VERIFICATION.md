@@ -98,6 +98,16 @@ Ahmed supplied the certificate documents themselves (PDFs + two images) during t
 
 **Privacy of documents:** only trimmed WebP exports are published (`public/media/certificates/`). The PDFs and full-resolution renders stay in `assets-source/certificates/` (git-ignored, excluded from deploys). The photo on the Cambridge statement is blurred; its verification number is intentionally kept (it is what an employer needs to verify the result).
 
+## Films (added after the redesign)
+
+| Film | Source | Claim on the site | Status |
+|---|---|---|---|
+| AI Eyes — promotional film | `AI Eyes AD.mp4`, supplied by Ahmed | credit line "Promotional film for the app" (authorship not asserted) | SUPPLIED BY AHMED |
+| Cheezy — opening film | `cheezy/LIVRAISON/Cheezy-Film.mp4` = byte-identical to `cheezy/remotion-ad/out/cheezy-film-v3.mp4` (Ahmed's Remotion project) | "Film made for the client"; note "built with Remotion" | VERIFIED BY PRIMARY SOURCE (MD5) |
+| Cheezy — launch film | `cheezy/LIVRAISON/Cheezy-Film-II.mp4` = `cheezy/motion-film/Cheezy-Film-II.mp4` | "rendered from a small HTML/JavaScript motion engine I wrote" | VERIFIED BY PRIMARY SOURCE |
+
+On-screen text inside the films (e.g. figures in the Cheezy film) belongs to those deliverables and is not repeated as a claim in the portfolio's own copy.
+
 ## Translations
 
 French and Arabic copy was written from the verified English source by the build agent (not machine-translated filler). Names of organisations, products and technologies are kept in their original form. **Ahmed should proof-read FR/AR before launch** — especially the About paragraphs and project summaries.

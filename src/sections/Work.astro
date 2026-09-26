@@ -66,31 +66,33 @@ const cards = projects.map((p) => {
 
     <div class="orbit__below wrap">
       <div class="orbit__caption" data-orbit-caption data-orbit-live aria-live="off">
-        <p class="orbit__meta"><span data-cap="index"></span><span data-cap="category"></span><span data-cap="year"></span></p>
+        <span class="orbit__big" data-cap="index" aria-hidden="true"></span>
+        <p class="orbit__meta"><span data-cap="category"></span><span data-cap="year"></span></p>
         <p class="orbit__title display" data-cap="title"></p>
         <p class="orbit__tagline" data-cap="tagline"></p>
         <a class="btn btn--cloud" data-cap="link" data-label={tr(ui.work.open, lang)} href={cards[0].href}>{tr(ui.work.open, lang)} <span class="arrow" aria-hidden="true">→</span></a>
       </div>
 
       <div class="orbit__controls">
-        <div class="orbit__buttons">
-          <button class="ibtn" type="button" data-orbit-prev data-dir aria-label={tr(ui.work.prev, lang)}>
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-          </button>
-          <button class="ibtn" type="button" data-orbit-pause aria-pressed="false" aria-label={tr(ui.work.orbitPause, lang)}>
-            <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5h2v9H5zM9 3.5h2v9H9z" fill="currentColor" /></svg>
-            <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3v10l8-5z" fill="currentColor" /></svg>
-          </button>
-          <button class="ibtn" type="button" data-orbit-next data-dir aria-label={tr(ui.work.next, lang)}>
-            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-          </button>
+        <div class="orbit__steer">
+          <button class="ibtn ibtn--prev" type="button" data-orbit-prev aria-label={tr(ui.work.prev, lang)}></button>
+          <p class="orbit__count" aria-hidden="true"><span data-cap="index"></span><span class="orbit__of">/ {String(cards.length).padStart(2, '0')}</span></p>
+          <button class="ibtn ibtn--next" type="button" data-orbit-next aria-label={tr(ui.work.next, lang)}></button>
         </div>
         <ol class="orbit__index">
           {cards.map(({ p }, i) => (
-            <li><button type="button" data-orbit-dot aria-current={i === 0 ? 'true' : 'false'}><span>{p.index}</span> {p.title}</button></li>
+            <li>
+              <button type="button" data-orbit-dot aria-current={i === 0 ? 'true' : 'false'}>
+                <span class="orbit__station-num">{p.index}</span>
+                <span class="orbit__station-name">{p.title}</span>
+              </button>
+            </li>
           ))}
         </ol>
-        <p class="orbit__hint label">{tr(ui.work.drag, lang)}</p>
+        <div class="orbit__foot">
+          <button class="orbit__pause" type="button" data-orbit-pause aria-pressed="false">{tr(ui.work.orbitPause, lang)}</button>
+          <p class="orbit__hint">{tr(ui.work.drag, lang)}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -210,35 +212,83 @@ const cards = projects.map((p) => {
   .orbit__card:focus-visible .orbit__mat { outline: 2px solid var(--amber); outline-offset: 4px; }
 
   /* ---- below ---- */
-  .orbit__below { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--gutter); align-items: end; margin-block-start: clamp(1rem, 3vh, 2.5rem); }
-  .orbit__caption { display: grid; gap: 0.7rem; justify-items: start; opacity: 0; transform: translateY(8px); transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out); }
-  .orbit__caption.is-shown { opacity: 1; transform: none; }
-  .orbit__meta { display: flex; gap: 1rem; flex-wrap: wrap; font-size: var(--step--1); letter-spacing: 0.1em; text-transform: uppercase; color: #b9c2bf; }
-  :lang(ar) .orbit__meta { letter-spacing: 0; text-transform: none; }
-  .orbit__meta span:first-child { color: #e9a86a; font-weight: 600; }
-  .orbit__title { font-size: var(--step-4); line-height: 0.95; }
-  .orbit__tagline { font-size: var(--step-1); color: #d3dad7; max-inline-size: 34rem; line-height: 1.45; }
-  :global(.btn--cloud) { background: var(--cloud); color: var(--ink); border-color: var(--cloud); margin-block-start: 0.4rem; }
-  :global(.btn--cloud:hover), :global(.btn--cloud:focus-visible) { background: #e9a86a; border-color: #e9a86a; color: var(--ink); }
+  .orbit__below { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: calc(var(--gutter) * 1.5); align-items: end; margin-block-start: clamp(1rem, 3vh, 2.5rem); }
 
-  .orbit__controls { display: grid; gap: 1.1rem; justify-items: end; }
-  .orbit__buttons { display: flex; gap: 0.5rem; color: var(--cloud); }
-  .orbit__buttons .ibtn:hover { background: var(--cloud); color: var(--ink); }
-  [data-orbit-pause] .i-play { display: none; }
-  [data-orbit-pause][aria-pressed='true'] .i-play { display: block; }
-  [data-orbit-pause][aria-pressed='true'] .i-pause { display: none; }
-  .orbit__index { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3rem 0.4rem; max-inline-size: 36rem; }
-  .orbit__index button { padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.85rem; color: #c3cbc8; border: 1px solid rgb(238 240 236 / 0.18); transition: background var(--dur-1), color var(--dur-1); }
-  .orbit__index button span { color: #e9a86a; font-weight: 600; margin-inline-end: 0.2rem; }
-  .orbit__index button:hover { color: var(--cloud); border-color: rgb(238 240 236 / 0.45); }
-  .orbit__index button[aria-current='true'] { background: var(--cloud); color: var(--ink); border-color: var(--cloud); }
-  .orbit__index button[aria-current='true'] span { color: var(--rust); }
-  .orbit__hint { color: #9ea8a5; }
+  /* caption: a chapter plate — the project number stands behind the title in outline */
+  .orbit__caption { position: relative; isolation: isolate; display: grid; gap: 0.8rem; justify-items: start; padding-block-start: clamp(2.5rem, 6vw, 5rem); opacity: 0; transform: translateY(8px); transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out); }
+  .orbit__caption.is-shown { opacity: 1; transform: none; }
+  .orbit__big {
+    position: absolute;
+    inset-block-start: -0.42em;
+    inset-inline-start: -0.08em;
+    z-index: -1;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(8rem, 5rem + 12vw, 17rem);
+    font-weight: 500;
+    font-style: italic;
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(233 168 106 / 0.32);
+    pointer-events: none;
+    user-select: none;
+  }
+  .orbit__meta { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #b9c2bf; }
+  :lang(ar) .orbit__meta { letter-spacing: 0; text-transform: none; font-size: 0.9rem; }
+  .orbit__meta span + span::before { content: ''; display: inline-block; inline-size: 1.4em; block-size: 0.45em; margin-inline-end: 0.9rem; background: #e9a86a; -webkit-mask: url('/ink/dash.png') center / 100% 100% no-repeat; mask: url('/ink/dash.png') center / 100% 100% no-repeat; }
+  .orbit__title { font-size: var(--step-4); line-height: 0.95; }
+  .orbit__tagline { font-family: var(--font-display); font-style: italic; font-size: var(--step-2); color: #d3dad7; max-inline-size: 30rem; line-height: 1.25; }
+  :lang(ar) .orbit__tagline { font-style: normal; font-size: var(--step-1); line-height: 1.7; }
+  /* on the storm the swash is a stroke of cloud-white */
+  :global(.btn--cloud) { --btn-ink: var(--cloud); color: var(--ink); margin-block-start: 0.6rem; }
+  :global(.btn--cloud:hover), :global(.btn--cloud:focus-visible) { --btn-ink: #e9a86a; }
+
+  /* steering: brush arrows around a counter */
+  .orbit__controls { display: grid; gap: 1.6rem; justify-items: end; }
+  .orbit__steer { display: flex; align-items: center; gap: 0.8rem; color: var(--cloud); }
+  .orbit__steer .ibtn:hover { color: #e9a86a; }
+  .orbit__count { display: flex; align-items: baseline; gap: 0.35rem; font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; line-height: 1; color: var(--cloud); direction: ltr; }
+  .orbit__of { font-size: 1.05rem; font-style: italic; color: #8e9894; }
+
+  /* stations: the ring's six projects as an index; the one in front gets the brush */
+  .orbit__index { display: grid; gap: 0.15rem; min-inline-size: min(100%, 19rem); }
+  .orbit__index button { position: relative; display: flex; align-items: baseline; gap: 0.9rem; inline-size: 100%; padding: 0.42rem 0.1rem; color: #aab3b0; text-align: start; transition: color var(--dur-2); }
+  .orbit__station-num { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05rem; color: #b98f63; min-inline-size: 1.6rem; }
+  .orbit__station-name { position: relative; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+  :lang(ar) .orbit__station-name { letter-spacing: 0; text-transform: none; font-size: 0.92rem; }
+  .orbit__station-name::after {
+    content: '';
+    position: absolute;
+    inset-inline: -0.3em -0.5em;
+    inset-block-end: -0.62em;
+    block-size: 0.5rem;
+    background: #e9a86a;
+    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    clip-path: inset(-50% 100% -50% 0);
+    transition: clip-path 0.7s var(--ease-out);
+  }
+  [dir='rtl'] .orbit__station-name::after { clip-path: inset(-50% 0 -50% 100%); }
+  .orbit__index button:hover { color: var(--cloud); }
+  .orbit__index button[aria-current='true'] { color: var(--cloud); }
+  .orbit__index button[aria-current='true'] .orbit__station-num { color: #e9a86a; }
+  .orbit__index button[aria-current='true'] .orbit__station-name::after { clip-path: inset(-50% 0 -50% 0); }
+  .orbit__index button:hover .orbit__station-name::after { clip-path: inset(-50% 0 -50% 0); opacity: 0.45; }
+  .orbit__index button[aria-current='true']:hover .orbit__station-name::after { opacity: 1; }
+
+  .orbit__foot { display: flex; align-items: baseline; gap: 1.4rem; flex-wrap: wrap; justify-content: flex-end; }
+  .orbit__pause { position: relative; padding-block: 0.3rem; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #c3cbc8; transition: color var(--dur-2); }
+  :lang(ar) .orbit__pause { letter-spacing: 0; text-transform: none; font-size: 0.88rem; }
+  .orbit__pause::before { content: ''; display: inline-block; inline-size: 0.5em; block-size: 0.7em; margin-inline-end: 0.6em; border-inline: 2px solid currentColor; vertical-align: -0.05em; }
+  .orbit__pause[aria-pressed='true']::before { inline-size: 0; block-size: 0; border-inline: 0; border-block: 0.38em solid transparent; border-inline-start: 0.62em solid currentColor; }
+  .orbit__pause:hover, .orbit__pause[aria-pressed='true'] { color: #e9a86a; }
+  .orbit__hint { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: #8e9894; }
+  :lang(ar) .orbit__hint { font-style: normal; font-size: 0.9rem; }
 
   @media (max-width: 900px) {
     .orbit__below { grid-template-columns: 1fr; }
     .orbit__controls { justify-items: start; }
-    .orbit__index { justify-content: flex-start; }
+    .orbit__index { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 1.2rem; inline-size: 100%; }
+    .orbit__foot { justify-content: flex-start; }
     .orbit__card { --card-w: clamp(118px, 33vw, 210px); }
     .orbit__stage { block-size: clamp(340px, 52vh, 500px); }
     .orbit__label { font-size: 0.95rem; }

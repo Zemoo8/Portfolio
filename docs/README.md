@@ -10,7 +10,7 @@ A trilingual (English · Français · العربية) portfolio built with Astro
 
 ## Stack
 
-Astro 7 (static) · TypeScript · plain CSS with design tokens (`src/styles/global.css`) · Lenis (smooth scroll) · a small hand-written WebGL shader (the smoke vortex; no 3D library) · self-hosted fonts via `@fontsource` · Playwright + ffmpeg + sharp (+ Python/PyMuPDF for certificates) for the media pipeline and QA.
+Astro 7 (static) · TypeScript · plain CSS with design tokens (`src/styles/global.css`) and CSS scroll-driven animations (native scrolling, no smooth-scroll library) · a small hand-written WebGL shader (the smoke vortex; no 3D library) · self-hosted fonts via `@fontsource` · Playwright + ffmpeg + sharp (+ Python/PyMuPDF for certificates) for the media pipeline and QA.
 
 ## Commands
 
@@ -73,16 +73,16 @@ Place files in `public/media/intros/`, then rebuild/redeploy. Detection happens 
 
 | Language | Film | Optional |
 |---|---|---|
-| English | `intro-en.mp4` | `intro-en.webm`, `intro-en.vtt`, `intro-en-poster.webp` |
-| French | `intro-fr.mp4` | `intro-fr.webm`, `intro-fr.vtt`, `intro-fr-poster.webp` |
-| Arabic | `intro-ar.mp4` | `intro-ar.webm`, `intro-ar.vtt`, `intro-ar-poster.webp` |
+| English | `intro-en.mp4` | `intro-en.vtt`, `intro-en-poster.webp` |
+| French | `intro-fr.mp4` | `intro-fr.vtt`, `intro-fr-poster.webp` |
+| Arabic | `intro-ar.mp4` | `intro-ar.vtt`, `intro-ar-poster.webp` |
 
 **Recommended:**
 - **Frame:** the film plays inside the **circular moon gate** (`object-fit: cover`), so only a centred square is visible. Keep yourself in the middle third with headroom; deliver 1:1 (1080×1080) or 16:9 with the subject centred — nothing important near the edges.
 - **Length:** 20–45 s. The film loops silently until the visitor presses *Sound on*, so the first seconds must work without audio.
 - **Encoding:** H.264 High, CRF 21–23, `+faststart`, AAC audio 128 kbps. Aim for ≤ 8 MB. Example:
   `ffmpeg -i master.mov -vf "scale=1920:-2" -c:v libx264 -crf 22 -preset slow -movflags +faststart -c:a aac -b:a 128k intro-en.mp4`
-- **WebM (optional, smaller):** `ffmpeg -i intro-en.mp4 -c:v libvpx-vp9 -b:v 0 -crf 34 -c:a libopus intro-en.webm`
+- **WebM:** not needed — MP4 (H.264) plays in every current browser; the site no longer ships WebM.
 - **Captions:** WebVTT (`intro-en.vtt`), same timing as the film. Arabic captions work as-is (the browser renders them RTL). The *Captions* button appears only when a `.vtt` exists.
 - **Poster:** a square moon-gate poster (1080×1080) is already provided for each language; replace it with a centred square frame from your film (`ffmpeg -ss 2 -i intro-en.mp4 -frames:v 1 -vf "crop='min(iw,ih)':'min(iw,ih)',scale=1080:1080" intro-en-poster.webp`).
 
@@ -100,8 +100,10 @@ Behaviour once present: muted autoplay (not with reduced motion), loop, `playsin
 4. `npm run build && npm run preview`, then `npm run og` for its social cards, and `npm run media:inventory`.
 5. Record the evidence for any new claim in `docs/CONTENT_VERIFICATION.md`.
 
+Films come from `scripts/media/encode-films.mjs` (sources listed at the top of the file — Ahmed's delivered films are read in place, never modified). Current sources: AI Eyes = the supplied "AI Eyes AD"; Cheezy = the LIVRAISON films plus screen recordings of cheezy.store and the app demo.
+
 Known pending media (drop in when available — no code change):
-- `public/media/projects/aieyes/showcase-mobile.mp4` (+ `-poster.webp`): a screen recording of the AI Eyes Android app (720×1560 or similar). It appears in the case study automatically.
+- `public/media/projects/aieyes/showcase-mobile.mp4` (+ `-poster.webp`): a screen recording of the AI Eyes Android app itself (720×1560 or similar). It appears in the case study automatically.
 - Sandy AI Lab answering a question: renew the Groq key in `sandy-ai-lab/.env`, start both servers, then add a film scenario.
 
 ## Translations
@@ -127,6 +129,11 @@ The credential gallery shows the **real documents**. Data: `src/content/credenti
 npm run build && npm run preview       # keep running in another terminal
 npm run og                             # social cards + intro posters
 npm run art                            # repaint the landscape (seeded, deterministic)
+node scripts/art/ink-marks.mjs         # brush marks for buttons / links / arrows (public/ink, SVG + baked PNG)
+node scripts/art/favicon.mjs           # brushed-ensō favicons
+node scripts/media/encode-films.mjs    # every showcase film as H.264 MP4 (+ 960 px orbit cut, posters)
+node scripts/qa/films.mjs              # every film must actually play in Chrome
+node scripts/qa/scroll-calm.mjs        # scrolling stays native and position-driven
 npm run media:certs                    # certificate WebPs from assets-source/certificates
 npm run qa:a11y && npm run qa:keys && npm run qa:links
 MSYS_NO_PATHCONV=1 npm run qa:shots -- /en/ home 360x800 1440x900   # Git Bash on Windows needs MSYS_NO_PATHCONV

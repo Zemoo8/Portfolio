@@ -19,18 +19,12 @@ const { lang } = Astro.props;
       <h2 id="lightbox-title" class="lightbox__title" data-lightbox-title></h2>
       <a class="btn btn--ghost" data-lightbox-verify href="#credentials" target="_blank" rel="noopener" hidden>{tr(ui.credentials.verify, lang)} <span class="arrow" aria-hidden="true">↗</span></a>
       <div class="lightbox__nav">
-        <button class="ibtn" type="button" data-lightbox-prev data-dir aria-label={tr(ui.work.prevItem, lang)}>
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </button>
+        <button class="ibtn ibtn--prev" type="button" data-lightbox-prev aria-label={tr(ui.work.prevItem, lang)}></button>
         <span class="label" data-lightbox-count></span>
-        <button class="ibtn" type="button" data-lightbox-next data-dir aria-label={tr(ui.work.nextItem, lang)}>
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-        </button>
+        <button class="ibtn ibtn--next" type="button" data-lightbox-next aria-label={tr(ui.work.nextItem, lang)}></button>
       </div>
     </div>
-    <button class="lightbox__close ibtn" type="button" data-lightbox-close aria-label={tr(ui.nav.close, lang)}>
-      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
-    </button>
+    <button class="lightbox__close ibtn ibtn--close" type="button" data-lightbox-close aria-label={tr(ui.nav.close, lang)}></button>
   </div>
 </dialog>
 
@@ -63,9 +57,7 @@ const { lang } = Astro.props;
   .lightbox__info { display: grid; align-content: center; gap: 1rem; padding-inline-end: 2.5rem; }
   .lightbox__title { font-family: var(--font-display); font-size: var(--step-3); font-weight: 600; line-height: 1.05; }
   .lightbox__nav { display: flex; align-items: center; gap: 0.8rem; margin-block-start: 0.6rem; }
-  .lightbox__nav .ibtn:hover { background: var(--ink); color: var(--paper); }
-  .lightbox__close { position: absolute; inset-block-start: 0.8rem; inset-inline-end: 0.8rem; background: var(--paper); }
-  .lightbox__close:hover { background: var(--ink); color: var(--paper); }
+  .lightbox__close { position: absolute; inset-block-start: 0.6rem; inset-inline-end: 0.6rem; }
   @media (max-width: 800px) {
     .lightbox__sheet { grid-template-columns: 1fr; }
     .lightbox__info { padding-inline-end: 0; }
