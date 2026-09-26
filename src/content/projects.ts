@@ -28,8 +28,11 @@ export type Project = {
   links: { label: 'live' | 'source'; href: string; text?: string }[];
   /** Accent used for the project's atmosphere (sampled from the project itself). */
   tone: string;
-  /** Films are detected at build time: drop the file in and it appears. */
-  film?: { desktop?: string; mobile?: string };
+  /** Films are detected at build time: drop the file in and it appears.
+   *  `credit`: caption for a produced film; screen recordings get the default credit line. */
+  film?: { desktop?: string; mobile?: string; credit?: L };
+  /** An extra wide film shown after the story, with its own caption. */
+  reel?: { film: string; caption: L };
   cover: Shot;
   gallery: Shot[];
   feature?: { title: L; body: L; film?: string; poster?: string; orientation: 'landscape' | 'portrait' };
@@ -95,15 +98,19 @@ export const projects: Project[] = [
       { label: 'source', href: 'https://github.com/Zemoo8/AI-Eyes-dashboard', text: 'Zemoo8/AI-Eyes-dashboard' },
       { label: 'source', href: 'https://github.com/Zemoo8/aieyes-backend', text: 'Zemoo8/aieyes-backend' },
     ],
-    film: { mobile: 'aieyes/showcase-mobile' },
+    film: {
+      desktop: 'aieyes/ad-film',
+      mobile: 'aieyes/showcase-mobile',
+      credit: a('Promotional film for the app', 'Film promotionnel de l’application', 'الفيلم الترويجي للتطبيق'),
+    },
     cover: { src: 'aieyes/dashboard-auth', kind: 'desktop', alt: a('AI Eyes family dashboard sign-in screen', 'Écran de connexion du tableau de bord familial AI Eyes', 'شاشة تسجيل الدخول إلى لوحة متابعة العائلة في AI Eyes') },
     gallery: [
       { src: 'aieyes/dashboard-auth-mobile', kind: 'mobile', alt: a('The family dashboard on a phone', 'Le tableau de bord familial sur téléphone', 'لوحة متابعة العائلة على الهاتف') },
     ],
     caveat: a(
-      'The Android app needs a physical device and camera, so it is not re-recorded here; the dashboard’s signed-in views are private family data.',
-      'L’application Android nécessite un appareil physique et sa caméra : elle n’est donc pas réenregistrée ici ; les vues connectées du tableau de bord contiennent des données familiales privées.',
-      'يحتاج تطبيق أندرويد إلى جهاز حقيقي وكاميرا، لذلك لم يُعَد تسجيله هنا؛ أما واجهات اللوحة بعد تسجيل الدخول فتحتوي بيانات عائلية خاصة.',
+      'The film above is the app’s promotional film. The Android app itself needs a physical device and camera, so it is not screen-recorded here; the dashboard’s signed-in views are private family data.',
+      'Le film ci-dessus est le film promotionnel de l’application. L’application Android elle-même nécessite un appareil physique et sa caméra : elle n’est donc pas enregistrée ici ; les vues connectées du tableau de bord contiennent des données familiales privées.',
+      'الفيلم أعلاه هو الفيلم الترويجي للتطبيق. أما تطبيق أندرويد نفسه فيحتاج إلى جهاز حقيقي وكاميرا، لذلك لم يُسجَّل هنا؛ وواجهات اللوحة بعد تسجيل الدخول تحتوي بيانات عائلية خاصة.',
     ),
   },
   {
@@ -145,15 +152,25 @@ export const projects: Project[] = [
         'محتوى الفيديو للموقع وقنوات التواصل، إضافةً إلى تطبيق جوّال بـ Expo للطلب وبرنامج الولاء، قيد التطوير حاليًا.'),
     ],
     notes: [
-      a('The app film below was rendered from a small HTML/JavaScript motion engine I wrote for the project.',
-        'Le film de l’application ci-dessous a été rendu par un petit moteur d’animation HTML/JavaScript écrit pour le projet.',
-        'فيلم التطبيق أدناه مولَّد بمحرّك حركة صغير بـ HTML وJavaScript كتبته خصيصًا للمشروع.'),
+      a('The opening film was built with Remotion (React video); the launch film further down was rendered from a small HTML/JavaScript motion engine I wrote for the project.',
+        'Le film d’ouverture a été réalisé avec Remotion (vidéo en React) ; le film de lancement plus bas a été rendu par un petit moteur d’animation HTML/JavaScript écrit pour le projet.',
+        'الفيلم الافتتاحي مصنوع بـ Remotion (فيديو بـ React)؛ أما فيلم الإطلاق في الأسفل فمولَّد بمحرّك حركة صغير بـ HTML وJavaScript كتبته خصيصًا للمشروع.'),
     ],
     links: [
       { label: 'live', href: 'https://www.cheezy.store', text: 'cheezy.store' },
       { label: 'live', href: 'https://cheezy-app-demo.vercel.app', text: 'cheezy-app-demo.vercel.app' },
     ],
-    film: { desktop: 'cheezy/showcase-desktop', mobile: 'cheezy/showcase-mobile' },
+    film: {
+      desktop: 'cheezy/brand-film',
+      mobile: 'cheezy/showcase-mobile',
+      credit: a('Film made for the client', 'Film réalisé pour le client', 'فيلم أُنجز للعميل'),
+    },
+    reel: {
+      film: 'cheezy/showcase-desktop',
+      caption: a('cheezy.store, recorded as it runs — choosing a shop, browsing the menu, building an order',
+        'cheezy.store, enregistré en fonctionnement — choix de la boutique, parcours de la carte, composition d’une commande',
+        'cheezy.store مسجَّلًا أثناء تشغيله — اختيار الفرع وتصفّح القائمة وتكوين طلب'),
+    },
     cover: { src: 'cheezy/hero', kind: 'desktop', alt: a('Cheezy home page: “Baked, served bright”', 'Page d’accueil Cheezy : « Baked, served bright »', 'الصفحة الرئيسية لـ Cheezy') },
     gallery: [
       { src: 'cheezy/shop-picker', kind: 'desktop', alt: a('Choosing a shop before ordering', 'Choix de la boutique avant la commande', 'اختيار الفرع قبل الطلب') },

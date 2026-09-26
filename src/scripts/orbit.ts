@@ -1,9 +1,10 @@
 // The orbit: project cards circling the air element on a tilted 3D ring.
-// Slow auto-rotation (pausable), drag with inertia, snap-to-card, keyboard, dots, prev/next.
+// Slow, constant auto-rotation (pausable) — it never reacts to page scrolling, so the ring only
+// moves when time passes or the visitor acts: drag with inertia, snap-to-card, keyboard, dots.
 // The front card is "active": it plays its film and drives the caption.
-import { air, motionAllowed } from './scroll';
+import { motionAllowed } from './scroll';
 
-type Film = { mp4?: string; webm?: string };
+type Film = { mp4: string };
 
 export function initOrbit(root: HTMLElement) {
   const stage = root.querySelector<HTMLElement>('[data-orbit-stage]')!;
@@ -73,11 +74,10 @@ export function initOrbit(root: HTMLElement) {
     const film: Film | null = c.dataset.orbitFilm ? JSON.parse(c.dataset.orbitFilm) : null;
     if (film && !reduced && motionAllowed()) {
       const v = document.createElement('video');
-      Object.assign(v, { muted: true, loop: true, playsInline: true, autoplay: true });
+      Object.assign(v, { muted: true, loop: true, playsInline: true, autoplay: true, src: film.mp4 });
       v.setAttribute('aria-hidden', 'true');
-      if (film.webm) v.append(Object.assign(document.createElement('source'), { src: film.webm, type: 'video/webm' }));
-      if (film.mp4) v.append(Object.assign(document.createElement('source'), { src: film.mp4, type: 'video/mp4' }));
       v.addEventListener('playing', () => v.classList.add('is-playing'), { once: true });
+      v.addEventListener('error', () => v.remove(), { once: true }); // the still stays underneath
       c.querySelector('.orbit__media')!.append(v);
       v.play().catch(() => {});
     }
@@ -168,8 +168,7 @@ export function initOrbit(root: HTMLElement) {
         base += vel * dt;
         vel *= Math.pow(0.04, dt); // inertia decays within ~1 s
         const auto = !hover && !userPaused && motionAllowed();
-        if (auto) base += dt * ((Math.PI * 2) / 95) * (1 + (air.gust || 0) * 3);
-        if (motionAllowed()) base += (air.velocity || 0) * 0.00035; // scroll gusts push the ring
+        if (auto) base += dt * ((Math.PI * 2) / 95); // one calm revolution every 95 s
       }
       window.__orbitSpin = Math.min(1, Math.abs(base - before) / Math.max(dt, 0.001) / 3);
       // a paused ring needs no style writes

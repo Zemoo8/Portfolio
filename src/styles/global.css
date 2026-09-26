@@ -88,7 +88,11 @@ html {
   text-size-adjust: 100%;
   background: var(--mist);
   scrollbar-color: var(--ash) var(--paper);
+  /* native scrolling everywhere; in-page links glide (instant with reduced motion / motion off) */
+  scroll-behavior: smooth;
+  scroll-padding-block-start: 1.5rem;
 }
+html.motion-off { scroll-behavior: auto; }
 
 body {
   margin: 0;
@@ -362,8 +366,22 @@ ul, ol { padding: 0; list-style: none; }
   transition: clip-path 1.4s cubic-bezier(0.7, 0, 0.2, 1);
 }
 
+/* Case-study phones drift a few percent as they cross the viewport — a scroll-driven
+   animation (position, not speed), run by the compositor. `translate` composes with reveals. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-parallax] { animation: parallax-y linear both; }
+    body [data-parallax] { animation-timeline: view(); animation-range: cover; } /* kept apart from the shorthand */
+  }
+}
+@keyframes parallax-y {
+  from { translate: 0 calc(var(--parallax, 6) * 1%); }
+  to { translate: 0 calc(var(--parallax, 6) * -1%); }
+}
+
 /* User-controlled motion switch (nav) — pauses every ambient animation */
 .motion-off *, .motion-off *::before, .motion-off *::after { animation-play-state: paused !important; }
+.motion-off [data-parallax] { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }

@@ -21,7 +21,10 @@ const desk = film(p.film?.desktop);
 const mob = film(p.film?.mobile);
 const featureFilm = film(p.feature?.film);
 const featurePoster = film(p.feature?.poster);
-const label = `${p.title} — ${tr(ui.work.film, lang)}`;
+const reel = film(p.reel?.film);
+const credit = tr(p.film?.credit ?? ui.work.film, lang);
+const label = `${p.title} — ${credit}`;
+const recLabel = `${p.title} — ${tr(ui.work.film, lang)}`; // phone films are always screen recordings
 const ogImage = exists(`og/${p.slug}-${lang}.jpg`) ? `og/${p.slug}-${lang}.jpg` : undefined;
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -56,14 +59,14 @@ const jsonLd = {
     <div class="case__hero wrap" data-reveal>
       <div class="mat">
         {desk ? (
-          <Film film={desk} label={label} lang={lang} ratio="16 / 10" />
+          <Film film={desk} label={label} lang={lang} ratio={desk.ratio ?? '16 / 10'} />
         ) : p.cover.kind === 'figure' ? (
           <Shot src={p.cover.src} alt={tr(p.cover.alt, lang)} figure fit="contain" ratio="16 / 10" eager sizes="100vw" />
         ) : (
           <Shot src={p.cover.src} alt={tr(p.cover.alt, lang)} eager sizes="100vw" />
         )}
       </div>
-      {desk && <p class="case__credit label">{tr(ui.work.film, lang)}</p>}
+      {desk && <p class="case__credit label">{credit}</p>}
     </div>
 
     <section class="section wrap">
@@ -108,6 +111,13 @@ const jsonLd = {
       </div>
     </section>
 
+    {reel && p.reel && (
+      <section class="case__reel wrap" data-reveal>
+        <div class="mat"><Film film={reel} label={`${p.title} — ${tr(p.reel.caption, lang)}`} lang={lang} ratio={reel.ratio ?? '16 / 10'} /></div>
+        <p class="case__credit label">{tr(p.reel.caption, lang)}</p>
+      </section>
+    )}
+
     {(mob || p.feature) && (
       <section class="case__feature wrap">
         {p.feature && (
@@ -117,9 +127,9 @@ const jsonLd = {
           </header>
         )}
         <div class="case__feature-media">
-          {featureFilm && <div class="phone" data-reveal data-parallax="6"><Film film={featureFilm} label={label} lang={lang} ratio="390 / 844" /></div>}
-          {mob && <div class="phone" data-reveal data-parallax="6"><Film film={mob} label={label} lang={lang} ratio="390 / 844" /></div>}
-          {featurePoster && <div class="case__feature-wide mat" data-reveal><Film film={featurePoster} label={`${p.title} — film`} lang={lang} ratio="16 / 9" /></div>}
+          {featureFilm && <div class="phone" data-reveal data-parallax style="--parallax:6"><Film film={featureFilm} label={recLabel} lang={lang} ratio="390 / 844" /></div>}
+          {mob && <div class="phone" data-reveal data-parallax style="--parallax:6"><Film film={mob} label={recLabel} lang={lang} ratio="390 / 844" /></div>}
+          {featurePoster && <div class="case__feature-wide mat" data-reveal><Film film={featurePoster} label={`${p.title} — film`} lang={lang} ratio={featurePoster.ratio ?? '16 / 9'} /></div>}
         </div>
       </section>
     )}
@@ -209,6 +219,9 @@ const jsonLd = {
   .case__note + .case__note { margin-block-start: 0.8rem; }
   .case__links { display: grid; gap: 0.7rem; font-weight: 500; }
   .case__links .label { margin-inline-end: 0.5rem; }
+
+  .case__reel { padding-block: var(--section) 0; }
+  .case__reel .mat { max-inline-size: 72rem; }
 
   .case__feature { padding-block: var(--section) 0; display: grid; gap: 3rem; }
   .case__feature-head { display: grid; gap: 1rem; max-inline-size: 40rem; }

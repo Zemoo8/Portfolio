@@ -1,0 +1,47 @@
+{
+  "cheezy/brand-film": [
+    1600,
+    900,
+    37.4
+  ],
+  "cheezy/film-app": [
+    1600,
+    900,
+    37
+  ],
+  "cheezy/showcase-desktop": [
+    1600,
+    1000,
+    19.6
+  ],
+  "cheezy/showcase-mobile": [
+    720,
+    1558,
+    9.3
+  ],
+  "cheezy/app-mobile": [
+    720,
+    1558,
+    10.9
+  ],
+  "radar/showcase-desktop": [
+    1440,
+    900,
+    16.3
+  ],
+  "scraping/showcase-desktop": [
+    1600,
+    1000,
+    21.1
+  ],
+  "subway-runner/showcase-desktop": [
+    1440,
+    900,
+    9.8
+  ],
+  "aieyes/ad-film": [
+    1600,
+    900,
+    53.3
+  ]
+}

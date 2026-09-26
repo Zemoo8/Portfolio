@@ -3,7 +3,7 @@
 import { chromium } from 'playwright';
 const [route, name, size, ...positions] = process.argv.slice(2);
 const [width, height] = size.split('x').map(Number);
-const b = await chromium.launch({ args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist'] });
+const b = await chromium.launch({ channel: process.env.QA_CHANNEL || undefined, args: ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist'] });
 const ctx = await b.newContext({ viewport: { width, height }, deviceScaleFactor: 1, hasTouch: width < 800, isMobile: width < 800 });
 const p = await ctx.newPage();
 const errs = [];

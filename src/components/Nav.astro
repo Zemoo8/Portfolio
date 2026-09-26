@@ -19,7 +19,7 @@ const items = [
 <header class="nav" data-nav>
   <div class="nav__bar">
     <a class="nav__brand" href={home} aria-label={tr(ui.nav.home, lang)}>
-      <span class="nav__seal" data-read><Seal size="2.2rem" /></span>
+      <span class="nav__seal"><Seal size="2.2rem" /></span>
       <span class="nav__name">{tr(profile.name, lang)}</span>
     </a>
 
@@ -101,7 +101,16 @@ const items = [
     pointer-events: auto;
   }
   .nav__brand { display: inline-flex; align-items: center; gap: 0.7rem; margin-inline-end: auto; padding-inline-end: 0.6rem; }
-  .nav__seal { display: inline-block; transform: rotate(calc(var(--read, 0) * 360deg)); transition: transform 0.2s linear; }
+  .nav__seal { display: inline-block; }
+  /* the seal turns once over the whole page — reading progress, tied to scroll position */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .nav__seal { animation: seal-turn linear both; }
+      .nav__brand > .nav__seal { animation-timeline: scroll(root block); } /* separate rule: see Backdrop */
+    }
+  }
+  @keyframes seal-turn { to { transform: rotate(360deg); } }
+  :global(.motion-off) .nav__seal { animation: none; }
   .nav__name { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; letter-spacing: 0.01em; white-space: nowrap; }
   @media (max-width: 420px) { .nav__name { font-size: 1.05rem; } .nav__motion { display: none; } }
   :lang(ar) .nav__name { font-size: 1.1rem; }

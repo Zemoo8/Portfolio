@@ -3,13 +3,12 @@
 //  - [data-lines]         heading lines rise out of the mist (word-level, so Arabic never breaks)
 //  - [data-reveal-brush]  ink brush strokes paint themselves
 //  - .scroll[data-unroll] parchment panels unroll from the top
-//  - [data-parallax=n]    drifts by n% of its height while crossing the viewport
-//  - Lenis smooth scrolling on fine pointers; its velocity feeds the air (scripts/scroll.ts)
-import Lenis from 'lenis';
-import { initScroll, motionAllowed } from './scroll';
+//  - [data-parallax=n]    drifts by n% of its height while crossing the viewport (pure CSS,
+//                         scroll-driven — see global.css)
+// Scrolling itself is the browser's own: no smooth-scroll hijacking, no inertia.
+import { initScroll } from './scroll';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const finePointer = matchMedia('(pointer: fine)').matches;
 
 /**
  * Wrap each rendered line of the given headings in a mask so it can rise into place.
@@ -103,41 +102,5 @@ export function initMotion() {
     io.observe(parent);
   });
 
-  // Parallax (small, rAF-driven)
-  const para = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
-  const tick = () => {
-    if (!motionAllowed()) return;
-    const vh = innerHeight;
-    for (const el of para) {
-      const r = el.getBoundingClientRect();
-      if (r.bottom < -100 || r.top > vh + 100) continue;
-      const p = (r.top + r.height / 2 - vh / 2) / vh;
-      el.style.transform = `translate3d(0, ${(-p * Number(el.dataset.parallax || 8)).toFixed(2)}%, 0)`;
-    }
-  };
-
-  let lenis: Lenis | null = null;
-  if (finePointer && !reduced) {
-    lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 4), smoothWheel: true });
-    document.addEventListener('click', (e) => {
-      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href*="#"]');
-      if (!a || a.origin !== location.origin || a.pathname !== location.pathname) return;
-      const id = decodeURIComponent(a.hash.slice(1));
-      const target = id === 'main' ? document.body : document.getElementById(id);
-      if (!target) return;
-      e.preventDefault();
-      lenis!.scrollTo(target, { offset: id === 'main' ? 0 : -24 });
-      history.pushState(null, '', a.hash);
-      if (id !== 'main') target.setAttribute('tabindex', '-1'), target.focus({ preventScroll: true });
-    });
-  }
-
-  initScroll(() => lenis?.velocity ?? 0);
-
-  const raf = (t: number) => {
-    lenis?.raf(t);
-    tick();
-    requestAnimationFrame(raf);
-  };
-  requestAnimationFrame(raf);
+  initScroll();
 }

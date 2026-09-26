@@ -19,7 +19,8 @@ const cards = projects.map((p) => {
     href: path(lang, `work/${p.slug}`),
     poster,
     contain: p.cover.kind === 'figure' && !f,
-    film: f ? JSON.stringify({ mp4: f.mp4, webm: f.webm }) : undefined,
+    // the orbit plays the small version; cards are ≤ 480 CSS px wide
+    film: f ? JSON.stringify({ mp4: f.card ?? f.mp4 }) : undefined,
   };
 });
 ---
@@ -122,7 +123,7 @@ const cards = projects.map((p) => {
     background: radial-gradient(60% 55% at 50% 50%, var(--storm-2), var(--storm) 70%);
   }
   .storm__canvas { opacity: 0; transition: opacity 1.2s var(--ease-out); }
-  .storm__canvas:global(.is-ready) { opacity: calc(0.35 + 0.65 * var(--storm-in, 1)); }
+  .storm__canvas:global(.is-ready) { opacity: 1; }
   .storm__canvas { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
   .storm__head { display: grid; gap: 1rem; justify-items: center; text-align: center; }
   .storm__head .kicker { color: #e9a86a; }

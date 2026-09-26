@@ -1,7 +1,8 @@
 // The air element: a WebGL smoke vortex (three wispy arms, differential rotation, domain-warped
 // fbm) on deep ink. Rendered at reduced resolution — smoke is soft, so it upscales cleanly.
 // Paused when off-screen, hidden tab, reduced motion (single frame) or motion switched off.
-import { air, motionAllowed } from './scroll';
+// It turns at a constant pace; only dragging the orbit (a deliberate act) stirs it faster.
+import { motionAllowed } from './scroll';
 
 const vert = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
 
@@ -136,7 +137,7 @@ export async function mountVortex(canvas: HTMLCanvasElement) {
   const frame = (now: number) => {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
-    gust += ((air.gust || 0) + (window.__orbitSpin || 0) - gust) * 0.08;
+    gust += ((window.__orbitSpin || 0) - gust) * 0.05;
     t += dt * (1 + gust * 2.5);
     pointer.x += (pointer.tx - pointer.x) * 0.04;
     pointer.y += (pointer.ty - pointer.y) * 0.04;
