@@ -1,0 +1,266 @@
+---
+// A project's world: one full scene per project, composed from that project's own material, in
+// its own palette. Used on the home page (after the orbit) and as the opening of each case study.
+//   vision   — AI Eyes: the ad as a full-height column, indigo night
+//   campaign — Cheezy: a product campaign spread, the film and the real printed ads
+//   science  — AEGIS: graph paper; the Kalman gain from the code is the headline
+//   data     — Books: a ledger of the actual scraped titles and prices
+//   energy   — Sandy AI Lab: saffron, the agents' relay as typography
+//   space    — SubwayRunner: the game laid on a floor that runs into the night
+// The element marked [data-world-media] is where an orbit card lands (scripts/takeover.ts).
+import Film from './Film.astro';
+import { film, still } from '../lib/media';
+import { path, tr, asset, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+import type { Project } from '../content/projects';
+import books from '../data/books-sample.json';
+
+interface Props { project: Project; lang: Locale; mode?: 'home' | 'case' }
+const { project: p, lang, mode = 'home' } = Astro.props;
+const H = mode === 'case' ? 'h1' : 'h3';
+const variant = ({ 'ai-eyes': 'vision', cheezy: 'campaign', 'aegis-radar': 'science', 'books-intelligence': 'data', 'sandy-ai-lab': 'energy', 'subway-runner': 'space' } as Record<string, string>)[p.slug] ?? 'data';
+const tone = ['campaign', 'data', 'energy'].includes(variant) ? 'light' : 'dark';
+const f = film(p.film?.desktop);
+const cover = still(p.cover.src);
+const caseHref = path(lang, `work/${p.slug}`);
+const label = `${p.title} — ${tr(p.film?.credit ?? ui.work.film, lang)}`;
+const rows = (books as { rows: { title: string; price: number; rating: number }[] }).rows;
+const priceRange = [Math.min(...rows.map((r) => r.price)), Math.max(...rows.map((r) => r.price))];
+const cheezyLive = p.links.find((l) => l.label === 'live');
+---
+
+<section id={mode === 'home' ? `world-${p.slug}` : undefined} class:list={['world', `world--${variant}`, `world--${mode}`]} data-tone={tone} data-chapter-name={p.title} data-world={p.slug} style={`--tone:${p.tone}`}>
+  {variant === 'vision' && (
+    <div class="w-vision">
+      <div class="w-vision__text">
+        <p class="w-meta">{tr(p.category, lang)} · {p.year}</p>
+        <H class="w-vision__title" tabindex="-1">{p.title}{p.alias && <span lang="ar">{p.alias}</span>}</H>
+        <p class="w-vision__line">{tr(p.tagline, lang)}</p>
+        {p.metric && <p class="w-vision__metric"><span dir="ltr">{p.metric.value}</span>{tr(p.metric.label, lang)}</p>}
+        <p class="w-vision__context">{tr(p.context, lang)}</p>
+        {mode === 'home' && <a class="arrow-link" href={caseHref}>{tr(ui.world.read, lang)} <i aria-hidden="true"></i></a>}
+      </div>
+      <div class="w-vision__film" data-world-media>{f && <Film film={f} label={label} lang={lang} ratio="auto" />}</div>
+    </div>
+  )}
+
+  {variant === 'campaign' && (
+    <div class="w-campaign">
+      <div class="w-campaign__text">
+        <p class="w-meta">{tr(p.category, lang)} · {p.year}</p>
+        <H class="w-campaign__title" tabindex="-1">{p.title}</H>
+        <div class="w-campaign__say">
+          <p class="w-campaign__line">{tr(p.tagline, lang)}</p>
+          <p class="w-links">
+            {cheezyLive && <a class="arrow-link" href={cheezyLive.href} target="_blank" rel="noopener">{tr(ui.world.live, lang)} <i aria-hidden="true"></i></a>}
+            {mode === 'home' && <a class="arrow-link" href={caseHref}>{tr(ui.world.read, lang)} <i aria-hidden="true"></i></a>}
+          </p>
+        </div>
+      </div>
+      <div class="w-campaign__film" data-world-media>{f && <Film film={f} label={label} lang={lang} ratio={f.ratio ?? '16 / 9'} />}</div>
+      <div class="w-campaign__ads" aria-hidden="true">
+        <img class="w-campaign__ad w-campaign__ad--a" src={asset('media/projects/cheezy/ad-cheesecake-sm.webp')} width="450" height="563" alt="" loading="lazy" />
+        <img class="w-campaign__ad w-campaign__ad--b" src={asset('media/projects/cheezy/ad-matcha-sm.webp')} width="450" height="800" alt="" loading="lazy" />
+      </div>
+    </div>
+  )}
+
+  {variant === 'science' && (
+    <div class="w-science">
+      <p class="w-science__eq" dir="ltr" aria-hidden="true"><i>K</i> = <i>P</i><i>H</i><sup>T</sup><i>S</i><sup>−1</sup></p>
+      <p class="w-science__eqnote">{tr(ui.world.gain, lang)}</p>
+      <div class="w-science__text">
+        <p class="w-meta">{tr(p.category, lang)} · {p.year}</p>
+        <H class="w-science__title" tabindex="-1">{p.title}</H>
+        <p class="w-science__line">{tr(p.tagline, lang)}</p>
+        {p.metric && <p class="w-science__metric"><span dir="ltr">{p.metric.value}</span>{tr(p.metric.label, lang)}</p>}
+        {mode === 'home' && <a class="arrow-link" href={caseHref}>{tr(ui.world.read, lang)} <i aria-hidden="true"></i></a>}
+      </div>
+      <div class="w-science__film" data-world-media>{f && <Film film={f} label={label} lang={lang} ratio={f.ratio ?? '16 / 10'} />}</div>
+      <p class="w-science__joseph" dir="ltr"><span aria-hidden="true"><i>P</i> = (<i>I</i> − <i>KH</i>) <i>P</i> (<i>I</i> − <i>KH</i>)<sup>T</sup> + <i>K R K</i><sup>T</sup></span> <em>{tr(ui.world.joseph, lang)}</em></p>
+    </div>
+  )}
+
+  {variant === 'data' && (
+    <div class="w-data">
+      <div class="w-data__ledger" aria-label={tr(ui.world.ledger, lang)}>
+        <ol class="w-data__rows" lang="en">
+          {[...rows, ...rows].map((r, i) => (
+            <li aria-hidden={i >= rows.length ? 'true' : undefined}><span>{r.title}</span><b>£{r.price.toFixed(2)}</b><em>{'★'.repeat(r.rating)}</em></li>
+          ))}
+        </ol>
+      </div>
+      <div class="w-data__text">
+        <p class="w-meta">{tr(p.category, lang)} · {p.year}</p>
+        <H class="w-data__title" tabindex="-1">{p.title}</H>
+        <p class="w-data__line">{tr(p.tagline, lang)}</p>
+        <p class="w-data__range" dir="ltr"><span>£{priceRange[0].toFixed(2)}</span> — <span>£{priceRange[1].toFixed(2)}</span></p>
+        <p class="w-data__caption">{tr(ui.world.ledger, lang)}</p>
+        <div class="w-data__film" data-world-media>{f && <Film film={f} label={label} lang={lang} ratio={f.ratio ?? '16 / 10'} />}</div>
+        {mode === 'home' && <a class="arrow-link" href={caseHref}>{tr(ui.world.read, lang)} <i aria-hidden="true"></i></a>}
+      </div>
+    </div>
+  )}
+
+  {variant === 'energy' && (
+    <div class="w-energy">
+      <H class="w-energy__title" tabindex="-1">{p.title}</H>
+      <ol class="w-energy__relay">
+        <li>{tr(ui.world.question, lang)}</li>
+        <li>{tr(ui.world.planner, lang)}</li>
+        <li>{tr(ui.world.agents, lang)}</li>
+        <li>{tr(ui.world.answer, lang)}</li>
+      </ol>
+      <img class="w-energy__shot" src={cover.src} srcset={cover.srcset} sizes="(max-width: 800px) 90vw, 46vw" width={cover.width} height={cover.height} alt={tr(p.cover.alt, lang)} loading="lazy" data-world-media />
+      <div class="w-energy__text">
+        <p class="w-meta">{tr(p.category, lang)} · {p.year}</p>
+        <p class="w-energy__line">{tr(p.tagline, lang)}</p>
+        {mode === 'home' && <a class="arrow-link" href={caseHref}>{tr(ui.world.read, lang)} <i aria-hidden="true"></i></a>}
+      </div>
+    </div>
+  )}
+
+  {variant === 'space' && (
+    <div class="w-space">
+      <div class="w-space__text">
+        <p class="w-meta">{tr(p.category, lang)} · {p.year}</p>
+        <H class="w-space__title" tabindex="-1">{p.title}</H>
+        <p class="w-space__line">{tr(p.tagline, lang)}</p>
+        <p class="w-space__speed" dir="ltr"><span>8</span><i aria-hidden="true"></i><span>22</span></p>
+        <p class="w-space__speedlabel">{tr(ui.world.speed, lang)}</p>
+        {mode === 'home' && <a class="arrow-link" href={caseHref}>{tr(ui.world.read, lang)} <i aria-hidden="true"></i></a>}
+      </div>
+      <div class="w-space__floor"><div class="w-space__film" data-world-media>{f && <Film film={f} label={label} lang={lang} ratio={f.ratio ?? '16 / 10'} />}</div></div>
+    </div>
+  )}
+</section>
+
+<style>
+  .world { position: relative; min-block-size: 100svh; overflow: clip; }
+  .world--case { min-block-size: 92svh; }
+  .w-meta { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.75; }
+  :lang(ar) .w-meta { letter-spacing: 0; text-transform: none; font-size: 0.9rem; }
+  .world :global(.film) { border-radius: 0; background: #000; }
+  .world h1:focus, .world h3:focus { outline: none; }
+  .w-links { display: flex; flex-wrap: wrap; gap: 1rem 2.5rem; }
+
+  /* ---- vision: AI Eyes ------------------------------------------------------------------- */
+  .world--vision { background: radial-gradient(90% 90% at 20% 30%, #1b1840, #0b0a1f 70%); color: #e9e8f7; }
+  .w-vision { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); min-block-size: inherit; }
+  .w-vision__text { display: grid; align-content: center; gap: 1.4rem; padding: 7rem var(--gutter) 4rem; }
+  .w-vision__title { display: grid; font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(4rem, 2rem + 9vw, 11rem); font-weight: 500; line-height: 0.85; letter-spacing: -0.03em; }
+  .w-vision__title span { font-family: var(--font-arabic-display); font-size: 0.42em; line-height: 1.3; letter-spacing: 0; color: #b5aef5; }
+  .w-vision__line { font-family: var(--font-display); font-style: italic; font-size: clamp(1.4rem, 1rem + 1.2vw, 2.2rem); line-height: 1.2; max-inline-size: 26ch; }
+  :lang(ar) .w-vision__line { font-style: normal; line-height: 1.6; }
+  .w-vision__metric { display: flex; align-items: baseline; gap: 1rem; max-inline-size: 28rem; color: #c9c6ee; }
+  .w-vision__metric span { font-family: 'Cormorant Garamond', serif; font-size: 5rem; line-height: 0.8; color: #fff; }
+  .w-vision__context { font-size: 0.9rem; color: #a7a4cf; max-inline-size: 30rem; }
+  .w-vision__film { position: relative; min-block-size: 100svh; }
+  .w-vision__film :global(.film) { position: absolute; inset: 0; block-size: 100%; }
+  .world--case .w-vision__film { min-block-size: 92svh; }
+
+  /* ---- campaign: Cheezy ------------------------------------------------------------------ */
+  .world--campaign { background: linear-gradient(160deg, #f8ecf1, #efd9e2 60%, #e9cfda); color: #2a1a24; }
+  .w-campaign { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: auto 1fr; align-content: center; gap: 2.5rem 0; min-block-size: inherit; padding-block: 6rem 4rem; }
+  .w-campaign__text { grid-column: 2 / 13; grid-row: 1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.6rem 4vw; align-items: end; padding-inline-end: var(--gutter); }
+  .w-campaign__text .w-meta { grid-column: 1 / -1; }
+  .w-campaign__say { display: grid; gap: 1.2rem; padding-block-end: 0.6rem; }
+  .w-campaign__film { grid-column: 1 / 9; grid-row: 2; align-self: start; box-shadow: 0 50px 80px -40px rgb(80 30 60 / 0.5); }
+  .w-campaign__ads { grid-column: 8 / 13; grid-row: 2; position: relative; }
+  .w-campaign__ad { position: absolute; inline-size: clamp(8.5rem, 15vw, 15rem); block-size: auto; box-shadow: 0 30px 50px -24px rgb(80 30 60 / 0.55); border-radius: 4px; }
+  .w-campaign__ad--a { inset-block-start: -1.5rem; inset-inline-start: 18%; rotate: 4deg; }
+  .w-campaign__ad--b { inset-block-start: 38%; inset-inline-end: var(--gutter); rotate: -3deg; }
+  [dir='rtl'] .w-campaign__ad--a { rotate: -4deg; }
+  [dir='rtl'] .w-campaign__ad--b { rotate: 3deg; }
+  .w-campaign__title { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(4.5rem, 2rem + 12vw, 14rem); font-weight: 600; line-height: 0.78; letter-spacing: -0.04em; color: #7d3a64; }
+  .w-campaign__line { font-family: var(--font-display); font-size: clamp(1.3rem, 1rem + 0.9vw, 1.9rem); line-height: 1.2; max-inline-size: 24ch; }
+  :lang(ar) .w-campaign__line { line-height: 1.6; }
+
+  /* ---- science: AEGIS -------------------------------------------------------------------- */
+  .world--science {
+    color: #cfe8dc;
+    background:
+      linear-gradient(rgb(120 220 170 / 0.07) 1px, transparent 1px) 0 0 / 64px 64px,
+      linear-gradient(90deg, rgb(120 220 170 / 0.07) 1px, transparent 1px) 0 0 / 64px 64px,
+      radial-gradient(80% 70% at 70% 60%, #0c1f17, #050c09);
+  }
+  .w-science { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr); grid-template-rows: auto auto 1fr auto; gap: 1.5rem 4vw; min-block-size: inherit; padding: 6rem var(--gutter) 3rem; }
+  .w-science__eq { grid-column: 1 / -1; font-family: 'Cormorant Garamond', serif; font-size: clamp(3.5rem, 1rem + 10vw, 12rem); line-height: 0.9; letter-spacing: -0.02em; color: #eafff4; white-space: nowrap; }
+  .w-science__eq i { font-style: italic; }
+  .w-science__eq sup { font-size: 0.42em; vertical-align: 0.9em; margin-inline-start: 0.04em; }
+  .w-science__eqnote { grid-column: 1 / -1; font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase; color: #6fcf9e; margin-block-start: -0.6rem; }
+  :lang(ar) .w-science__eqnote { letter-spacing: 0; font-size: 0.9rem; }
+  .w-science__text { display: grid; align-content: start; gap: 1.2rem; }
+  .w-science__title { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(3rem, 1.5rem + 4vw, 6rem); font-weight: 500; line-height: 0.9; letter-spacing: 0.02em; }
+  .w-science__line { font-size: 1.05rem; line-height: 1.5; max-inline-size: 26rem; color: #a8c9b8; }
+  .w-science__metric { display: grid; gap: 0.4rem; max-inline-size: 22rem; font-size: 0.9rem; color: #8fb3a1; }
+  .w-science__metric span { font-family: 'Cormorant Garamond', serif; font-size: clamp(4rem, 2rem + 5vw, 7.5rem); line-height: 0.85; color: #7dffb8; }
+  .w-science__film { outline: 1px solid rgb(120 220 170 / 0.35); outline-offset: 10px; align-self: start; }
+  .w-science__joseph { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem 1.6rem; font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #cfe8dc; border-block-start: 1px solid rgb(120 220 170 / 0.25); padding-block-start: 1rem; }
+  .w-science__joseph em { font-family: var(--font-sans); font-style: normal; font-size: 0.8rem; color: #6fcf9e; }
+
+  /* ---- data: Books ----------------------------------------------------------------------- */
+  .world--data { background: #fbfaf6; color: var(--ink); }
+  .w-data { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); min-block-size: inherit; }
+  .w-data__ledger { position: relative; overflow: hidden; border-inline-end: 1px solid rgb(31 29 26 / 0.12); -webkit-mask: linear-gradient(transparent, #000 14%, #000 86%, transparent); mask: linear-gradient(transparent, #000 14%, #000 86%, transparent); }
+  .w-data__rows { position: absolute; inset-inline: 0; padding-inline: var(--gutter) 2rem; animation: ledger 90s linear infinite; }
+  @keyframes ledger { to { translate: 0 -50%; } }
+  .w-data__rows li { display: grid; grid-template-columns: minmax(0, 1fr) auto 4.5rem; gap: 1.2rem; align-items: baseline; padding-block: 0.55rem; border-block-end: 1px dotted rgb(31 29 26 / 0.18); font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+  .w-data__rows li span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .w-data__rows li b { font-weight: 600; }
+  .w-data__rows li em { font-style: normal; font-size: 0.72rem; color: var(--tone); letter-spacing: 0.1em; }
+  .w-data__text { display: grid; align-content: center; gap: 1.2rem; padding: 7rem var(--gutter) 4rem; }
+  .w-data__title { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(3rem, 1.5rem + 4.5vw, 6.5rem); font-weight: 500; line-height: 0.9; letter-spacing: -0.02em; }
+  .w-data__line { font-size: 1.05rem; line-height: 1.5; max-inline-size: 30rem; color: var(--ink-2); }
+  .w-data__range { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.4rem, 1.5rem + 3vw, 4.5rem); line-height: 1; font-variant-numeric: lining-nums; color: var(--tone); }
+  .w-data__caption { font-size: 0.8rem; color: var(--muted); margin-block-start: -0.6rem; }
+  .w-data__film { max-inline-size: 38rem; box-shadow: 0 30px 60px -34px rgb(40 36 30 / 0.45); }
+
+  /* ---- energy: Sandy AI Lab -------------------------------------------------------------- */
+  .world--energy { background: #e98a4b; color: #1d120a; }
+  .w-energy { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: 2rem 4vw; min-block-size: inherit; padding: 6rem var(--gutter) 3rem; }
+  .w-energy__title { grid-column: 1 / -1; font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(4rem, 1.5rem + 11vw, 13rem); font-weight: 600; line-height: 0.8; letter-spacing: -0.045em; rotate: -2deg; transform-origin: 0 50%; }
+  .w-energy__relay { display: grid; align-content: center; gap: 0.2rem; }
+  .w-energy__relay li { display: flex; align-items: center; gap: 1rem; font-family: var(--font-display); font-style: italic; font-size: clamp(1.8rem, 1rem + 2.4vw, 3.6rem); line-height: 1.15; }
+  :lang(ar) .w-energy__relay li { font-style: normal; }
+  .w-energy__relay li:nth-child(2) { padding-inline-start: 1.2em; }
+  .w-energy__relay li:nth-child(3) { padding-inline-start: 2.4em; }
+  .w-energy__relay li:nth-child(4) { padding-inline-start: 3.6em; font-weight: 600; }
+  .w-energy__relay li:not(:last-child)::after { content: '↘'; font-style: normal; font-size: 0.6em; opacity: 0.55; }
+  [dir='rtl'] .w-energy__relay li:not(:last-child)::after { content: '↙'; }
+  .w-energy__shot { align-self: center; inline-size: 100%; block-size: auto; rotate: 3deg; box-shadow: 0 40px 70px -30px rgb(60 25 5 / 0.6); border-radius: 6px; }
+  .w-energy__text { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 1rem 3rem; }
+  .w-energy__line { font-size: 1.1rem; max-inline-size: 34rem; }
+
+  /* ---- space: SubwayRunner --------------------------------------------------------------- */
+  .world--space { background: linear-gradient(#050914, #0b1733 55%, #13244a); color: #e7eeff; }
+  .w-space { display: grid; grid-template-rows: auto 1fr; min-block-size: inherit; }
+  .w-space__text { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.8rem 3vw; align-items: end; padding: 7rem var(--gutter) 0; }
+  .w-space__text .w-meta, .w-space__title, .w-space__line { grid-column: 1; }
+  .w-space__title { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(3.5rem, 1.5rem + 8vw, 10rem); font-weight: 600; line-height: 0.85; letter-spacing: -0.03em; }
+  .w-space__line { font-size: 1.05rem; color: #aebde0; }
+  .w-space__speed { grid-column: 2; grid-row: 1 / span 3; display: flex; align-items: center; gap: 1.2rem; font-family: 'Cormorant Garamond', serif; font-size: clamp(3.5rem, 2rem + 5vw, 7rem); line-height: 1; color: #6cb6ff; }
+  .w-space__speed i { display: block; inline-size: 5rem; block-size: 1px; background: currentColor; position: relative; }
+  .w-space__speed i::after { content: ''; position: absolute; inset-inline-end: 0; inset-block-start: -5px; inline-size: 10px; block-size: 10px; border-block-start: 1px solid currentColor; border-inline-end: 1px solid currentColor; rotate: 45deg; }
+  .w-space__speedlabel { grid-column: 2; font-size: 0.8rem; color: #8fa6d6; max-inline-size: 16rem; }
+  .w-space__text .arrow-link { grid-column: 1; }
+  .w-space__floor { position: relative; perspective: 900px; perspective-origin: 50% 0%; overflow: hidden; display: grid; justify-items: center; padding-block-start: 2rem; min-block-size: 46vh; }
+  .w-space__film { inline-size: min(92vw, 70rem); transform: rotateX(38deg); transform-origin: 50% 0; box-shadow: 0 0 80px rgb(60 150 255 / 0.25); }
+
+  /* ---- small screens --------------------------------------------------------------------- */
+  @media (max-width: 860px) {
+    .w-vision, .w-data, .w-energy { grid-template-columns: 1fr; }
+    .w-vision__film { min-block-size: 70svh; }
+    .w-campaign { grid-template-columns: 1fr; padding-inline: var(--gutter); }
+    .w-campaign__film { grid-column: 1; }
+    .w-campaign__text { grid-column: 1; grid-template-columns: 1fr; padding: 0; }
+    .w-campaign__ads { grid-column: 1; grid-row: 3; display: flex; justify-content: center; gap: 1rem; }
+    .w-campaign__ad { position: relative; inset: auto; inline-size: 44%; }
+    .w-science { grid-template-columns: 1fr; }
+    .w-data__ledger { block-size: 40svh; border: 0; }
+    .w-space__text { grid-template-columns: 1fr; }
+    .w-space__speed, .w-space__speedlabel { grid-column: 1; grid-row: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) { .w-data__rows { animation: none; } }
+  :global(.motion-off) .w-data__rows { animation-play-state: paused; }
+</style>

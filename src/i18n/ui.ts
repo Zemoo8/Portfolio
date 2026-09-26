@@ -14,6 +14,7 @@ export const ui = {
     language: { en: 'Language', fr: 'Langue', ar: 'اللغة' },
     home: { en: 'Ahmed Baghouli — home', fr: 'Ahmed Baghouli — accueil', ar: 'أحمد بغولي — الرئيسية' },
     motion: { en: 'Animations on/off', fr: 'Animations activées/désactivées', ar: 'تشغيل الحركة أو إيقافها' },
+    index: { en: 'Index', fr: 'Sommaire', ar: 'الفهرس' },
   },
   hero: {
     scroll: { en: 'Scroll', fr: 'Défiler', ar: 'مرّر' },
@@ -21,6 +22,8 @@ export const ui = {
     selected: { en: 'Selected work', fr: 'Projets choisis', ar: 'أعمال مختارة' },
     enter: { en: 'Enter the orbit', fr: 'Entrer dans l’orbite', ar: 'ادخل المدار' },
     contact: { en: 'Get in touch', fr: 'Me contacter', ar: 'تواصل معي' },
+    see: { en: 'See the work', fr: 'Voir les projets', ar: 'شاهد الأعمال' },
+    oNote: { en: 'The o opens my introduction film', fr: 'Le o ouvre mon film de présentation', ar: 'الدائرة تفتح فيلمي التعريفي' },
   },
   intro: {
     label: { en: 'Intro film', fr: 'Film d’introduction', ar: 'فيلم تعريفي' },
@@ -35,6 +38,7 @@ export const ui = {
     replay: { en: 'Replay', fr: 'Revoir', ar: 'إعادة' },
     captions: { en: 'Captions', fr: 'Sous-titres', ar: 'ترجمة' },
     choose: { en: 'Film language', fr: 'Langue du film', ar: 'لغة الفيلم' },
+    title: { en: 'Introduction', fr: 'Présentation', ar: 'تعريف' },
   },
   work: {
     kicker: { en: 'Selected work', fr: 'Projets choisis', ar: 'أعمال مختارة' },
@@ -61,6 +65,20 @@ export const ui = {
     play: { en: 'Play film', fr: 'Lire le film', ar: 'تشغيل الفيلم' },
     pause: { en: 'Pause film', fr: 'Mettre en pause', ar: 'إيقاف مؤقت' },
     note: { en: 'Note', fr: 'Note', ar: 'ملاحظة' },
+  },
+  world: {
+    read: { en: 'Read the case', fr: 'Lire l’étude de cas', ar: 'اقرأ دراسة الحالة' },
+    step: { en: 'Step into', fr: 'Entrer dans', ar: 'ادخل إلى' },
+    lead: { en: 'Six projects. One of them always faces you.', fr: 'Six projets. L’un d’eux vous fait toujours face.', ar: 'ستة مشاريع، واحد منها يواجهك دائمًا.' },
+    gain: { en: 'Kalman gain — solved, never inverted', fr: 'Gain de Kalman — résolu, jamais inversé', ar: 'كسب كالمان — يُحَلّ ولا يُعكَس' },
+    joseph: { en: 'Joseph form: stays positive semi-definite for any gain', fr: 'Forme de Joseph : reste semi-définie positive pour tout gain', ar: 'صيغة جوزيف: تبقى شبه موجبة التعريف لأي كسب' },
+    ledger: { en: 'Two pages of the catalogue the scraper collected', fr: 'Deux pages du catalogue collecté par le scraper', ar: 'صفحتان من الفهرس الذي جمعه الكاشط' },
+    question: { en: 'A question', fr: 'Une question', ar: 'سؤال' },
+    planner: { en: 'Planner', fr: 'Planificateur', ar: 'المخطِّط' },
+    agents: { en: 'Inventory · Research', fr: 'Inventaire · Recherche', ar: 'المخزون · البحث' },
+    answer: { en: 'An answer', fr: 'Une réponse', ar: 'إجابة' },
+    speed: { en: 'units per second — the run keeps accelerating', fr: 'unités par seconde — la course ne cesse d’accélérer', ar: 'وحدة في الثانية — تتسارع الجولة باستمرار' },
+    live: { en: 'Visit cheezy.store', fr: 'Visiter cheezy.store', ar: 'زُر cheezy.store' },
   },
   about: {
     kicker: { en: 'About', fr: 'À propos', ar: 'نبذة' },

@@ -30,9 +30,9 @@ for (const pr of projects) {
 await p.goto(`${base}/en/`, { waitUntil: 'load', timeout: 45000 });
 await p.evaluate(() => document.querySelector('#work').scrollIntoView());
 await p.waitForTimeout(1500);
-const cards = await p.evaluate(() => document.querySelectorAll('[data-orbit-dot]').length);
+const cards = await p.evaluate(() => document.querySelectorAll('[data-orbit-card]').length);
 for (let k = 0; k < cards; k++) {
-  await p.evaluate((i) => document.querySelectorAll('[data-orbit-dot]')[i].click(), k);
+  if (k > 0) await p.evaluate(() => document.querySelector('[data-orbit-next]').click());
   await p.waitForTimeout(3600);
   const s = await p.evaluate(() => {
     const c = document.querySelector('[data-orbit-card][data-active]');
@@ -41,6 +41,16 @@ for (let k = 0; k < cards; k++) {
   });
   if (s.hasFilm) check(`orbit ${s.card}`, s.v);
   else results.push(`----  orbit ${s.card} (no film — poster only)`);
+}
+// the six worlds on the home page
+const worlds = await p.evaluate(() => [...document.querySelectorAll('[data-world]')].map((w) => w.id));
+for (const id of worlds) {
+  const has = await p.evaluate((i) => !!document.querySelector(`#${i} [data-film] video`), id);
+  if (!has) { results.push(`----  ${id} (still image)`); continue; }
+  await p.evaluate((i) => { document.documentElement.style.scrollBehavior = 'auto'; document.querySelector(`#${i} [data-film]`).scrollIntoView({ block: 'center' }); }, id);
+  await p.waitForTimeout(3200);
+  const s = await p.evaluate((i) => { const v = document.querySelector(`#${i} [data-film] video`); return { src: v.currentSrc.split('/').slice(-2).join('/'), ready: v.readyState, paused: v.paused, t: +v.currentTime.toFixed(2), err: v.error?.code ?? null }; }, id);
+  check(`home ${id}`, s);
 }
 void info;
 console.log(results.join('\n'));

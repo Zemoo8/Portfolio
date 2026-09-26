@@ -1,7 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Hero from '../../sections/Hero.astro';
+import Intro from '../../sections/Intro.astro';
 import Work from '../../sections/Work.astro';
+import Worlds from '../../sections/Worlds.astro';
 import About from '../../sections/About.astro';
 import Path from '../../sections/Path.astro';
 import Credentials from '../../sections/Credentials.astro';
@@ -18,7 +20,9 @@ const title = `${tr(profile.name, lang)} — ${tr(profile.role, lang)}`;
 
 <Base lang={lang} title={title} description={tr(profile.statement, lang)}>
   <Hero lang={lang} />
+  <Intro lang={lang} />
   <Work lang={lang} />
+  <Worlds lang={lang} />
   <About lang={lang} />
   <Path lang={lang} />
   <Credentials lang={lang} />

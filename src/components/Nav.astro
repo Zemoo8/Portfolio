@@ -1,11 +1,9 @@
 ---
-// The header, as a painted masthead rather than a floating pill:
-//  · a typographic wordmark — no logo
-//  · chapter links numbered like a table of contents; hover paints a brush stroke under the
-//    word, and the chapter you are reading keeps its stroke (scroll-spy → aria-current)
-//  · the active language sits inside a small brushed ensō
-//  · once you scroll, a clean sheet of paper slides in behind it (a soft shadow, no edge line)
-import { locales, localeMeta, path, tr, type Locale } from '../i18n/config';
+// Navigation without a bar. Two corners: the name (home), and the chapter you are in — which is
+// itself the button that opens a full-screen index, each chapter with a preview of what is
+// there. The corners take the colour of the scene beneath them (light or dark), so they read
+// on paper, on the storm and inside the project worlds.
+import { locales, localeMeta, path, asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
 
@@ -13,259 +11,156 @@ interface Props { lang: Locale; route: string }
 const { lang, route } = Astro.props;
 const home = path(lang);
 const items = [
-  { id: 'work', label: ui.nav.work },
-  { id: 'about', label: ui.nav.about },
-  { id: 'path', label: ui.nav.path },
-  { id: 'credentials', label: ui.nav.credentials },
-  { id: 'contact', label: ui.nav.contact },
+  { id: 'work', label: ui.nav.work, preview: 'media/projects/aieyes/ad-film-poster-sm.webp' },
+  { id: 'about', label: ui.nav.about, preview: 'media/profile/portrait-color.webp' },
+  { id: 'path', label: ui.nav.path, preview: 'media/projects/cheezy/hero-sm.webp' },
+  { id: 'credentials', label: ui.nav.credentials, preview: 'media/certificates/nvidia-deep-learning-sm.webp' },
+  { id: 'contact', label: ui.nav.contact, preview: 'media/profile/portrait-ink.webp' },
 ];
 ---
 
-<header class="nav" data-nav>
-  <div class="nav__band" aria-hidden="true"></div>
-
-  <div class="nav__bar">
-    <a class="nav__brand" href={home} aria-label={tr(ui.nav.home, lang)}>
-      <span class="nav__first">{tr(profile.firstName, lang)}</span>
-      <em class="nav__last">{tr(profile.lastName, lang)}</em>
-    </a>
-
-    <nav class="nav__links" aria-label="Primary">
-      <ol>
-        {items.map((it, i) => (
-          <li>
-            <a href={`${home}#${it.id}`} data-spy={it.id}>
-              <span class="nav__num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <span class="nav__word">{tr(it.label, lang)}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
-    </nav>
-
-    <div class="nav__tools">
-      <div class="nav__langs" role="group" aria-label={tr(ui.nav.language, lang)}>
-        {locales.map((l) => (
-          <a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined} title={localeMeta[l].name}>
-            <span aria-hidden="true">{localeMeta[l].label}</span>
-            <span class="sr-only">{localeMeta[l].name}</span>
-          </a>
-        ))}
-      </div>
-      <button class="nav__motion" type="button" data-motion-toggle aria-pressed="true" title={tr(ui.nav.motion, lang)}>
-        <span class="sr-only">{tr(ui.nav.motion, lang)}</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h11a3 3 0 1 0-3-3M3 15h15a3 3 0 1 1-3 3M3 12h8" /></svg>
-      </button>
-      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
-        <span class="nav__toggle-label" data-open={tr(ui.nav.menu, lang)} data-close={tr(ui.nav.close, lang)}>{tr(ui.nav.menu, lang)}</span>
-        <span class="nav__burger" aria-hidden="true"><i></i><i></i></span>
-      </button>
+<header class="corners" data-nav>
+  <a class="corners__name" href={home} aria-label={tr(ui.nav.home, lang)}>{tr(profile.name, lang)}</a>
+  <div class="corners__right">
+    <div class="corners__langs" role="group" aria-label={tr(ui.nav.language, lang)}>
+      {locales.map((l) => (
+        <a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined} title={localeMeta[l].name}>
+          <span aria-hidden="true">{localeMeta[l].label}</span><span class="sr-only">{localeMeta[l].name}</span>
+        </a>
+      ))}
     </div>
-  </div>
-
-  <div class="menu" id="mobile-menu" hidden data-menu>
-    <nav class="menu__inner" aria-label="Mobile">
-      <ol>
-        {items.map((it, i) => (
-          <li style={`--i:${i}`}>
-            <a href={`${home}#${it.id}`} data-menu-link>
-              <span class="menu__num">{String(i + 1).padStart(2, '0')}</span>
-              <span class="display">{tr(it.label, lang)}</span>
-            </a>
-          </li>
-        ))}
-      </ol>
-      <div class="menu__foot">
-        <div class="menu__langs">
-          {locales.map((l) => (
-            <a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>{localeMeta[l].name}</a>
-          ))}
-        </div>
-        <a class="link-u" href={`mailto:${profile.email}`}>{profile.email}</a>
-        <button class="menu__motion" type="button" data-motion-toggle aria-pressed="true">{tr(ui.nav.motion, lang)}</button>
-      </div>
-    </nav>
+    <button class="corners__now" type="button" aria-haspopup="dialog" aria-controls="index" data-index-open>
+      <span class="corners__chapter" data-chapter-label data-default={tr(ui.nav.index, lang)}>{tr(ui.nav.index, lang)}</span>
+      <span class="corners__lines" aria-hidden="true"><i></i><i></i></span>
+    </button>
   </div>
 </header>
 
+<dialog class="index" id="index" aria-label={tr(ui.nav.index, lang)} data-index>
+  <div class="index__inner">
+    <nav class="index__list" aria-label="Primary">
+      {items.map((it) => (
+        <a href={`${home}#${it.id}`} data-index-link data-preview={asset(it.preview)}>{tr(it.label, lang)}</a>
+      ))}
+    </nav>
+    <figure class="index__preview" aria-hidden="true"><img src={asset(items[0].preview)} alt="" data-index-img /></figure>
+    <div class="index__foot">
+      <a class="link-u" href={`mailto:${profile.email}`}>{profile.email}</a>
+      <a class="link-u" href={profile.links.linkedin} target="_blank" rel="noopener me">LinkedIn</a>
+      <a class="link-u" href={profile.links.github} target="_blank" rel="noopener me">GitHub</a>
+      <span class="index__langs">
+        {locales.map((l) => (
+          <a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>{localeMeta[l].name}</a>
+        ))}
+      </span>
+      <button class="index__motion" type="button" data-motion-toggle aria-pressed="true">{tr(ui.nav.motion, lang)}</button>
+    </div>
+    <button class="index__close" type="button" data-index-close>{tr(ui.nav.close, lang)}</button>
+  </div>
+</dialog>
+
 <style>
-  .nav {
+  .corners {
     position: fixed;
     inset-block-start: 0;
     inset-inline: 0;
     z-index: 50;
-    transition: transform 0.6s var(--ease-out);
-  }
-  .nav.is-hidden:not(.is-open) { transform: translateY(-120%); }
-
-  /* the paper band that arrives once the page moves */
-  .nav__band {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: var(--paper-grain), linear-gradient(180deg, #f8f3e4, var(--paper));
-    box-shadow: 0 10px 30px -18px rgb(40 36 30 / 0.35);
-    opacity: 0;
-    transform: translateY(-105%);
-    transition: transform 0.7s var(--ease-out), opacity 0.4s var(--ease-out);
-  }
-  .nav.is-scrolled .nav__band, .nav.is-open .nav__band { opacity: 1; transform: none; }
-
-  .nav__bar {
-    position: relative;
-    z-index: 2;
     display: flex;
-    align-items: center;
-    gap: clamp(1rem, 3vw, 3rem);
-    max-inline-size: var(--max);
-    margin-inline: auto;
-    padding: 1.15rem var(--gutter) 1rem;
-  }
-
-  /* wordmark */
-  .nav__brand {
-    display: inline-flex;
+    justify-content: space-between;
     align-items: baseline;
-    gap: 0.28em;
-    margin-inline-end: auto;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 1;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
+    padding: 1.3rem var(--gutter);
+    pointer-events: none;
+    color: var(--ink);
+    transition: color 0.5s var(--ease-out);
   }
-  .nav__last { font-style: italic; font-weight: 500; transition: color var(--dur-2); }
-  :lang(ar) .nav__last { font-style: normal; color: var(--ink-2); }
-  .nav__brand:hover .nav__last { color: var(--rust); }
+  :global(html[data-nav-tone='dark']) .corners { color: var(--cloud); }
+  .corners > * { pointer-events: auto; }
+  .corners__name { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; letter-spacing: -0.005em; white-space: nowrap; }
+  .corners__right { display: flex; align-items: baseline; gap: 1.6rem; }
+  .corners__langs { display: flex; gap: 0.8rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; }
+  .corners__langs a { opacity: 0.72; transition: opacity var(--dur-2); }
+  .corners__langs a[lang='ar'] { font-family: var(--font-arabic-display); font-size: 0.95rem; letter-spacing: 0; }
+  .corners__langs a:hover, .corners__langs a[aria-current='true'] { opacity: 1; }
+  .corners__now { display: inline-flex; align-items: baseline; gap: 0.8rem; font-family: var(--font-display); font-style: italic; font-size: 1.3rem; }
+  :lang(ar) .corners__now { font-style: normal; }
+  .corners__chapter { transition: opacity 0.35s var(--ease-out), translate 0.35s var(--ease-out); }
+  .corners__chapter.is-changing { opacity: 0; translate: 0 -0.3em; }
+  .corners__lines { position: relative; inline-size: 1.6rem; block-size: 0.55rem; align-self: center; }
+  .corners__lines i { position: absolute; inset-inline: 0; block-size: 1.5px; background: currentColor; transition: inset-inline-start 0.5s var(--ease-out); }
+  .corners__lines i:first-child { inset-block-start: 0; }
+  .corners__lines i:last-child { inset-block-end: 0; inset-inline-start: 0.5rem; }
+  .corners__now:hover .corners__lines i:last-child { inset-inline-start: 0; }
 
-  /* chapters */
-  .nav__links ol { display: flex; gap: clamp(0.9rem, 2.2vw, 2.1rem); }
-  .nav__links a { position: relative; display: inline-flex; align-items: baseline; gap: 0.45em; padding-block: 0.5rem; color: var(--ink-2); transition: color var(--dur-2); }
-  .nav__num { font-family: var(--font-display); font-style: italic; font-size: 0.88rem; color: var(--rust); }
-  .nav__word { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
-  :lang(ar) .nav__word { font-size: 0.95rem; letter-spacing: 0; text-transform: none; font-weight: 500; }
-  .nav__links a::after {
-    content: '';
-    position: absolute;
-    inset-inline: 0 -0.2em;
-    inset-block-end: 0.05rem;
-    block-size: 0.5rem;
-    background: currentColor;
-    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
-    mask: url('/ink/under.png') center / 100% 100% no-repeat;
-    clip-path: inset(-50% 100% -50% 0);
-    transition: clip-path 0.7s var(--ease-out);
+  .index {
+    inline-size: 100vw;
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--paper-grain), var(--paper);
+    color: var(--ink);
   }
-  [dir='rtl'] .nav__links a::after { clip-path: inset(-50% 0 -50% 100%); }
-  .nav__links a:hover, .nav__links a[aria-current] { color: var(--ink); }
-  .nav__links a:hover::after, .nav__links a[aria-current]::after { clip-path: inset(-50% 0 -50% 0); }
-
-  .nav__tools { display: flex; align-items: center; gap: 0.6rem; }
-
-  /* languages: the current one inside a brushed ensō */
-  .nav__langs { display: flex; gap: 0.2rem; }
-  .nav__langs a {
+  .index[open] { animation: index-in 0.6s var(--ease-out); }
+  @keyframes index-in { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
+  .index::backdrop { background: transparent; }
+  .index__inner {
     position: relative;
     display: grid;
-    place-items: center;
-    inline-size: 2.3rem;
-    block-size: 2.3rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    transition: color var(--dur-2);
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    gap: 2rem var(--gutter);
+    block-size: 100%;
+    padding: 5.5rem var(--gutter) 2rem;
   }
-  .nav__langs a[lang='ar'] { font-family: var(--font-arabic-display); font-size: 1rem; letter-spacing: 0; }
-  .nav__langs a::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--rust);
-    -webkit-mask: url('/ink/ring.png') center / contain no-repeat;
-    mask: url('/ink/ring.png') center / contain no-repeat;
-    opacity: 0;
-    transform: rotate(-40deg) scale(0.8);
-    transition: opacity 0.5s var(--ease-out), transform 0.8s var(--ease-out);
+  .index__list { display: grid; align-content: center; }
+  .index__list a {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 1rem + 8vw, 8.5rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    opacity: 0.35;
+    transition: opacity 0.35s var(--ease-out), translate 0.5s var(--ease-out);
+    inline-size: fit-content;
   }
-  .nav__langs a:hover, .nav__langs a[aria-current='true'] { color: var(--ink); }
-  .nav__langs a[aria-current='true']::before { opacity: 1; transform: none; }
-  .nav__langs a:hover:not([aria-current])::before { opacity: 0.35; transform: none; }
-
-  .nav__motion { display: grid; place-items: center; inline-size: 2.3rem; block-size: 2.3rem; color: var(--ink-2); transition: color var(--dur-1); }
-  .nav__motion:hover { color: var(--rust); }
-  .nav__motion svg { inline-size: 1.15rem; block-size: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
-  .nav__motion[aria-pressed='false'] { color: var(--muted); }
-  .nav__motion[aria-pressed='false'] svg { opacity: 0.45; }
-
-  /* phone: the word "Menu" over two brush strokes */
-  .nav__toggle { display: none; align-items: center; gap: 0.7rem; padding: 0.4rem 0.2rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; }
-  :lang(ar) .nav__toggle { letter-spacing: 0; font-size: 0.95rem; }
-  .nav__burger { position: relative; inline-size: 1.7rem; block-size: 0.75rem; }
-  .nav__burger i {
-    position: absolute;
-    inset-inline: 0;
-    block-size: 0.42rem;
-    background: currentColor;
-    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
-    mask: url('/ink/under.png') center / 100% 100% no-repeat;
-    transition: transform var(--dur-2) var(--ease-out), inset var(--dur-2) var(--ease-out);
+  .index__list a:hover, .index__list a:focus-visible { opacity: 1; translate: 0.08em 0; }
+  [dir='rtl'] .index__list a:hover, [dir='rtl'] .index__list a:focus-visible { translate: -0.08em 0; }
+  .index__list a:nth-child(odd) { font-style: italic; }
+  :lang(ar) .index__list a { font-style: normal; font-size: clamp(2.6rem, 1rem + 6vw, 6.5rem); line-height: 1.3; }
+  .index__preview { align-self: center; justify-self: center; inline-size: min(100%, 26rem); aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--paper-3); }
+  .index__preview img { inline-size: 100%; block-size: 100%; object-fit: cover; transition: opacity 0.3s; }
+  .index__foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.8rem 2rem; font-size: 0.9rem; color: var(--ink-2); }
+  .index__langs { display: flex; gap: 1rem; margin-inline-start: auto; }
+  .index__langs a { color: var(--muted); }
+  .index__langs a[aria-current='true'] { color: var(--ink); font-weight: 600; }
+  .index__motion { font-size: 0.85rem; color: var(--muted); text-decoration: underline; text-underline-offset: 0.3em; }
+  .index__close { position: absolute; inset-block-start: 1.3rem; inset-inline-end: var(--gutter); font-family: var(--font-display); font-style: italic; font-size: 1.3rem; }
+  @media (max-width: 760px) {
+    .index__inner { grid-template-columns: 1fr; }
+    .index__preview { display: none; }
+    .corners__langs { display: none; }
   }
-  .nav__burger i:first-child { inset-block-start: -0.15rem; }
-  .nav__burger i:last-child { inset-block-start: 0.5rem; inset-inline-start: 0.35rem; }
-  .is-open .nav__burger i:first-child { inset-block-start: 0.16rem; transform: rotate(35deg); }
-  .is-open .nav__burger i:last-child { inset-block-start: 0.16rem; inset-inline-start: 0; transform: rotate(-35deg); }
-
-  .menu {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    background: var(--paper-grain), var(--paper);
-    padding: 6.5rem var(--gutter) 2rem;
-    overflow-y: auto;
-  }
-  .menu__inner { display: flex; flex-direction: column; justify-content: space-between; min-block-size: 100%; gap: 3rem; }
-  .menu ol { display: grid; gap: 0.4rem; }
-  .menu ol a { display: flex; align-items: baseline; gap: 1rem; padding-block: 0.25rem; }
-  .menu__num { font-family: var(--font-display); font-style: italic; font-size: 1.2rem; color: var(--rust); }
-  .menu ol .display { font-size: clamp(2.6rem, 12vw, 4.2rem); }
-  .menu li { opacity: 0; transform: translateY(16px); }
-  .is-open .menu li { opacity: 1; transform: none; transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out); transition-delay: calc(80ms + var(--i) * 55ms); }
-  .menu__foot { display: grid; gap: 1.2rem; color: var(--ink-2); }
-  .menu__langs { display: flex; gap: 1.2rem; color: var(--muted); }
-  .menu__langs a[aria-current='true'] { color: var(--ink); font-weight: 600; }
-  .menu__motion { justify-self: start; padding-block: 0.4rem; font-size: 0.85rem; text-decoration: underline; text-underline-offset: 0.3em; text-decoration-color: var(--line-strong); }
-  .menu__motion[aria-pressed='false'] { color: var(--muted); }
-
-  @media (max-width: 1100px) { .nav__num { display: none; } }
-  @media (max-width: 1020px) {
-    .nav__links, .nav__langs { display: none; }
-    .nav__toggle { display: inline-flex; }
-  }
-  @media (max-width: 420px) { .nav__brand { font-size: 1.25rem; } .nav__motion { display: none; } }
 </style>
 
 <script>
   const nav = document.querySelector<HTMLElement>('[data-nav]')!;
-  const toggle = nav.querySelector<HTMLButtonElement>('[data-menu-toggle]')!;
-  const menu = nav.querySelector<HTMLElement>('[data-menu]')!;
-  const label = toggle.querySelector<HTMLElement>('.nav__toggle-label')!;
+  const dialog = document.querySelector<HTMLDialogElement>('[data-index]')!;
+  const openBtn = nav.querySelector<HTMLButtonElement>('[data-index-open]')!;
+  const label = nav.querySelector<HTMLElement>('[data-chapter-label]')!;
+  const img = dialog.querySelector<HTMLImageElement>('[data-index-img]')!;
 
-  const setOpen = (open: boolean) => {
-    nav.classList.toggle('is-open', open);
-    toggle.setAttribute('aria-expanded', String(open));
-    label.textContent = open ? label.dataset.close! : label.dataset.open!;
-    document.documentElement.style.overflow = open ? 'hidden' : '';
-    menu.hidden = !open;
-    if (open) menu.querySelector<HTMLElement>('a')?.focus({ preventScroll: true });
-  };
-  toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
-  menu.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => setOpen(false)));
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && nav.classList.contains('is-open')) { setOpen(false); toggle.focus(); }
+  openBtn.addEventListener('click', () => { dialog.showModal(); openBtn.setAttribute('aria-expanded', 'true'); });
+  dialog.querySelector('[data-index-close]')!.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => { openBtn.setAttribute('aria-expanded', 'false'); openBtn.focus(); });
+  dialog.querySelectorAll<HTMLAnchorElement>('[data-index-link]').forEach((a) => {
+    const show = () => { if (img.src !== a.dataset.preview) img.src = a.dataset.preview!; };
+    a.addEventListener('pointerenter', show);
+    a.addEventListener('focus', show);
+    a.addEventListener('click', () => dialog.close());
   });
-  matchMedia('(min-width: 1021px)').addEventListener('change', (e) => e.matches && setOpen(false));
 
   document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) =>
     a.addEventListener('click', () => {
@@ -274,27 +169,26 @@ const items = [
     }),
   );
 
-  // paper band once the page moves; hide on the way down, return on the way up
-  let last = scrollY;
-  const onScroll = () => {
-    const y = scrollY;
-    nav.classList.toggle('is-scrolled', y > 40);
-    nav.classList.toggle('is-hidden', y > 500 && y > last + 2);
-    last = y;
+  // The scene under the corners decides their colour and the chapter shown.
+  const root = document.documentElement;
+  let current = '';
+  const setChapter = (name: string) => {
+    const text = name || label.dataset.default!;
+    if (text === current) return;
+    current = text;
+    label.classList.add('is-changing');
+    setTimeout(() => { label.textContent = text; label.classList.remove('is-changing'); }, 220);
   };
-  addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  // scroll-spy: the chapter in view keeps its brush stroke
-  const links = new Map([...nav.querySelectorAll<HTMLAnchorElement>('[data-spy]')].map((a) => [a.dataset.spy!, a]));
-  const sections = [...links.keys()].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
-  if (sections.length) {
-    const spy = new IntersectionObserver((entries) => {
+  const scenes = [...document.querySelectorAll<HTMLElement>('[data-tone]')];
+  if (scenes.length) {
+    const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (!e.isIntersecting) continue;
-        links.forEach((a, id) => (id === e.target.id ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current')));
+        const el = e.target as HTMLElement;
+        root.dataset.navTone = el.dataset.tone!;
+        setChapter(el.dataset.chapterName ?? '');
       }
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    sections.forEach((s) => spy.observe(s));
+    }, { rootMargin: '-3% 0px -96% 0px' });
+    scenes.forEach((s) => io.observe(s));
   }
 </script>

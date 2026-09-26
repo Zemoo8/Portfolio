@@ -1,5 +1,7 @@
 ---
-import Brush from '../components/Brush.astro';
+// Path, set as a chronology: the years are the architecture. Each year stands huge and stays
+// pinned while its entries pass beside it (sticky), so you always know when you are. The two
+// overnight hackathons close it as their own band.
 import { formatMonth, tr, asset, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { experience, education, competitions, type Entry } from '../content/path';
@@ -12,104 +14,113 @@ const when = (e: Entry) => {
   if (!e.end) return s;
   return `${s} — ${e.end === 'present' ? tr(ui.path.present, lang) : formatMonth(e.end, lang)}`;
 };
-const groups = [
-  { title: ui.path.experience, items: experience },
-  { title: ui.path.education, items: education },
-];
+const kind = (e: Entry) => (experience.includes(e) ? ui.path.experience : ui.path.education);
+const all = [...experience, ...education];
+const years = [...new Set(all.map((e) => e.start.slice(0, 4)))].sort();
+const byYear = years.map((y) => ({ year: y, items: all.filter((e) => e.start.startsWith(y)) }));
 ---
 
-<section id="path" class="section wrap" aria-labelledby="path-title">
-  <div class="scroll path" data-unroll>
-    <header class="section-head">
-      <p class="kicker" data-reveal>{tr(ui.path.kicker, lang)}</p>
-      <h2 id="path-title" class="sr-only">{tr(ui.path.kicker, lang)}</h2>
-    </header>
+<section id="path" class="path" aria-labelledby="path-title" data-tone="light" data-chapter-name={tr(ui.nav.path, lang)}>
+  <h2 id="path-title" class="path__title">{tr(ui.path.kicker, lang)}</h2>
 
-    {groups.map((g, gi) => (
-      <div class="path__group">
-        <h3 class="path__label display" data-reveal>{tr(g.title, lang)}</h3>
-        <ol class="path__list">
-          {g.items.map((e, i) => (
-            <li class="entry" data-reveal style={`--i:${i}`}>
-              <p class="entry__when label"><time>{when(e)}</time></p>
-              <div class="entry__main">
-                <h4 class="entry__org">{e.org}</h4>
-                <p class="entry__role">{tr(e.role, lang)}</p>
-                <p class="entry__place label">{tr(e.place, lang)}</p>
-              </div>
-              <div class="entry__body">
-                {e.body.map((b) => <p>{tr(b, lang)}</p>)}
-                {(e.tags || e.link) && (
-                  <p class="entry__tags">
-                    {e.tags?.map((t) => <span class="pill">{t}</span>)}
-                    {e.link && <a class="link-u entry__link" href={e.link.href} target="_blank" rel="noopener">{e.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
-                  </p>
-                )}
-              </div>
-            </li>
-          ))}
-        </ol>
-        <Brush seed={40 + gi} length={1100} width={4} class="path__stroke" />
-      </div>
-    ))}
-
-    <div class="path__group">
-      <h3 class="path__label display" data-reveal>{tr(ui.path.competitions, lang)}</h3>
-      <ol class="path__list">
-        {competitions.map((c, i) => (
-          <li class="entry" data-reveal style={`--i:${i}`}>
-            <p class="entry__when label">{tr(c.result, lang)}</p>
-            <div class="entry__main"><h4 class="entry__org">{c.name}</h4></div>
-            <div class="entry__body">
-              <p>{tr(c.detail, lang)}</p>
-              {c.name === 'Code It Up 5.0' && (
-                <button
-                  class="entry__cert"
-                  type="button"
-                  data-lightbox
-                  data-group="competition"
-                  data-src={asset(`media/certificates/${competitionCertificate.image}.webp`)}
-                  data-title={competitionCertificate.title}
-                  data-meta={competitionCertificate.issuer}
-                  aria-label={`${tr(ui.credentials.view, lang)}: ${competitionCertificate.title}`}
-                >
-                  <img src={asset(`media/certificates/${competitionCertificate.image}-sm.webp`)} width="304" height="214" alt="" loading="lazy" decoding="async" />
-                </button>
-              )}
-            </div>
+  {byYear.map(({ year, items }) => (
+    <div class="year">
+      <p class="year__n" aria-hidden="true">{year}</p>
+      <ol class="year__items">
+        {items.map((e) => (
+          <li class="entry" data-reveal>
+            <p class="entry__when"><span>{tr(kind(e), lang)}</span> <time>{when(e)}</time></p>
+            <h3 class="entry__org">{e.org}</h3>
+            <p class="entry__role">{tr(e.role, lang)} <span>· {tr(e.place, lang)}</span></p>
+            {e.body.length > 0 && <div class="entry__body">{e.body.map((b) => <p>{tr(b, lang)}</p>)}</div>}
+            {(e.tags || e.link) && (
+              <p class="entry__tags">
+                {e.tags?.map((t) => <span class="pill">{t}</span>)}
+                {e.link && <a class="link-u entry__link" href={e.link.href} target="_blank" rel="noopener">{e.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
+              </p>
+            )}
           </li>
         ))}
       </ol>
     </div>
+  ))}
+
+  <div class="nights">
+    <h3 class="nights__title">{tr(ui.path.competitions, lang)}</h3>
+    <ol class="nights__list">
+      {competitions.map((c) => (
+        <li class="night" data-reveal>
+          <p class="night__result">{tr(c.result, lang)}</p>
+          <p class="night__name">{c.name}</p>
+          <p class="night__detail">{tr(c.detail, lang)}</p>
+          {c.name === 'Code It Up 5.0' && (
+            <button
+              class="night__cert"
+              type="button"
+              data-lightbox
+              data-group="competition"
+              data-src={asset(`media/certificates/${competitionCertificate.image}.webp`)}
+              data-title={competitionCertificate.title}
+              data-meta={competitionCertificate.issuer}
+              aria-label={`${tr(ui.credentials.view, lang)}: ${competitionCertificate.title}`}
+            >
+              <img src={asset(`media/certificates/${competitionCertificate.image}-sm.webp`)} width="304" height="214" alt="" loading="lazy" decoding="async" />
+            </button>
+          )}
+        </li>
+      ))}
+    </ol>
   </div>
 </section>
 
 <style>
-  .path__group { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 1rem var(--gutter); padding-block: 1.6rem 0; }
-  .path__label { font-size: var(--step-3); }
-  .path__list { display: grid; }
-  .path :global(.path__stroke) { grid-column: 1 / -1; inline-size: 100%; block-size: 16px; opacity: 0.55; margin-block: 1.2rem 0.6rem; }
-  .entry { display: grid; grid-template-columns: 10rem minmax(0, 4fr) minmax(0, 6fr); gap: 1rem var(--gutter); padding-block: 0 2rem; }
-  .entry + .entry { padding-block-start: 2rem; border-block-start: 1px solid var(--line); }
-  .entry__org { font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; line-height: 1.05; }
-  .entry__role { color: var(--ink-2); margin-block-start: 0.3rem; font-weight: 500; }
-  .entry__place { margin-block-start: 0.3rem; }
-  .entry__body { display: grid; gap: 0.8rem; color: var(--ink-2); }
+  .path { position: relative; padding: 7rem var(--gutter) 6rem; background: var(--paper); }
+  .path__title { font-family: var(--font-display); font-style: italic; font-size: 1.6rem; font-weight: 500; margin-block-end: 2rem; }
+  :lang(ar) .path__title { font-style: normal; }
+
+  .year { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2rem 4vw; border-block-start: 1px solid var(--line); }
+  .year__n {
+    position: sticky;
+    inset-block-start: 3rem;
+    align-self: start;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(6rem, 3rem + 16vw, 20rem);
+    font-weight: 500;
+    line-height: 0.82;
+    letter-spacing: -0.04em;
+    font-variant-numeric: lining-nums;
+    color: var(--ink);
+    direction: ltr;
+  }
+  .year:nth-child(odd) .year__n { font-style: italic; color: var(--wash); }
+  .year__items { display: grid; gap: 3.5rem; padding-block: 3rem 5rem; }
+  .entry { display: grid; gap: 0.6rem; max-inline-size: 36rem; }
+  .entry__when { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+  .entry__when span { color: var(--rust); margin-inline-end: 0.6rem; }
+  :lang(ar) .entry__when { letter-spacing: 0; text-transform: none; font-size: 0.88rem; }
+  .entry__org { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(2.2rem, 1.5rem + 2vw, 3.6rem); font-weight: 600; line-height: 0.95; letter-spacing: -0.015em; }
+  .entry__role { font-weight: 500; }
+  .entry__role span { font-weight: 400; color: var(--muted); }
+  .entry__body { display: grid; gap: 0.8rem; color: var(--ink-2); line-height: 1.65; }
   .entry__tags { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.4rem; margin-block-start: 0.3rem; }
   .entry__link { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
-  .entry__cert {
-    justify-self: start;
-    padding: 0.35rem;
-    border-radius: 4px;
-    background: #fff;
-    box-shadow: 0 14px 30px -18px rgb(40 36 30 / 0.55), 0 0 0 1px var(--line);
-    transform: rotate(-1.2deg);
-    transition: transform 0.5s var(--ease-out);
-  }
-  .entry__cert:hover, .entry__cert:focus-visible { transform: rotate(0) translateY(-4px); }
-  .entry__cert img { inline-size: clamp(180px, 22vw, 260px); block-size: auto; }
-  @media (max-width: 960px) {
-    .path__group { grid-template-columns: 1fr; }
-    .entry { grid-template-columns: 1fr; }
+
+  /* the nights: two hackathons, set like a programme */
+  .nights { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2rem 4vw; padding-block-start: 3rem; border-block-start: 1px solid var(--line); }
+  .nights__title { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(3rem, 1.5rem + 5vw, 7rem); font-weight: 500; font-style: italic; line-height: 0.9; }
+  :lang(ar) .nights__title { font-style: normal; }
+  .nights__list { display: grid; gap: 2.5rem; }
+  .night { display: grid; gap: 0.4rem; }
+  .night__result { font-family: 'Cormorant Garamond', var(--font-display); font-size: 2.6rem; line-height: 1; color: var(--rust); }
+  .night__name { font-weight: 600; font-size: 1.1rem; }
+  .night__detail { color: var(--ink-2); }
+  .night__cert { justify-self: start; margin-block-start: 0.6rem; padding: 0.35rem; background: #fff; box-shadow: 0 14px 30px -18px rgb(40 36 30 / 0.55), 0 0 0 1px var(--line); rotate: -1.2deg; transition: rotate 0.5s var(--ease-out), translate 0.5s var(--ease-out); }
+  .night__cert:hover, .night__cert:focus-visible { rotate: 0deg; translate: 0 -4px; }
+  .night__cert img { inline-size: clamp(180px, 22vw, 260px); block-size: auto; }
+
+  @media (max-width: 860px) {
+    .year, .nights { grid-template-columns: 1fr; }
+    .year__n { position: relative; inset: auto; font-size: 34vw; margin-block-start: 1rem; }
+    .year__items { padding-block: 1rem 3rem; }
   }
 </style>

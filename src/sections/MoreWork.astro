@@ -1,57 +1,67 @@
 ---
-import Shot from '../components/Shot.astro';
-import { tr, type Locale } from '../i18n/config';
+// Smaller builds as an index: big names in a list; pointing at one shows its picture beside the
+// pointer (where one exists), so the list stays typographic and the images appear on demand.
+import { tr, asset, type Locale, type L } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { moreWork } from '../content/more-work';
 import { profile } from '../content/profile';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
+const heading: L = { en: 'And smaller things, on GitHub.', fr: 'Et des choses plus petites, sur GitHub.', ar: 'وأشياء أصغر، على GitHub.' };
 ---
 
-<section id="more" class="section wrap" aria-labelledby="more-title">
-  <div class="scroll more" data-unroll>
-    <header class="section-head more__head">
-      <p class="kicker" data-reveal>{tr(ui.more.kicker, lang)}</p>
-      <h2 id="more-title" class="display" data-lines>{tr(ui.more.title, lang)}</h2>
-      <a class="btn btn--ghost" href={profile.links.github} target="_blank" rel="noopener me" data-reveal>{tr(ui.more.all, lang)} <span class="arrow" aria-hidden="true">↗</span></a>
-    </header>
-
-    <ul class="more__list">
-      {moreWork.map((w, i) => (
-        <li class="item" data-reveal style={`--i:${i}`}>
-          <div class="item__thumb">{w.image ? <Shot src={w.image} alt="" sizes="16rem" ratio="16 / 10" /> : <div class="item__blank" aria-hidden="true"><span lang="en">{w.tech[0]}</span></div>}</div>
-          <div class="item__main">
-            <h3 class="item__title" lang="en">{w.title}</h3>
-            <p class="item__body">{tr(w.body, lang)}</p>
-            <p class="item__tech label" lang="en">{w.tech.join(' · ')}</p>
-          </div>
-          <div class="item__links">
-            {w.live && <a class="link-u" href={w.live} target="_blank" rel="noopener">{tr(ui.work.live, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
-            {w.repo && <a class="link-u" href={w.repo} target="_blank" rel="noopener">{tr(ui.work.source, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
-          </div>
-        </li>
-      ))}
-    </ul>
-  </div>
+<section id="more" class="more" aria-labelledby="more-title" data-tone="light" data-chapter-name="GitHub" data-more>
+  <header class="more__head">
+    <h2 id="more-title" class="more__title">{tr(heading, lang)}</h2>
+    <a class="arrow-link" href={profile.links.github} target="_blank" rel="noopener me">{tr(ui.more.all, lang)} <i aria-hidden="true"></i></a>
+  </header>
+  <ul class="more__list">
+    {moreWork.map((w) => (
+      <li class="item" data-preview={w.image ? asset(`media/projects/${w.image}-sm.webp`) : undefined}>
+        <h3 class="item__title" lang="en">{w.title}</h3>
+        <p class="item__body">{tr(w.body, lang)} <span class="item__tech" lang="en">{w.tech.join(' · ')}</span></p>
+        <p class="item__links">
+          {w.live && <a class="link-u" href={w.live} target="_blank" rel="noopener">{tr(ui.work.live, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
+          {w.repo && <a class="link-u" href={w.repo} target="_blank" rel="noopener">{tr(ui.work.source, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
+        </p>
+      </li>
+    ))}
+  </ul>
+  <img class="more__float" alt="" aria-hidden="true" data-more-float />
 </section>
 
 <style>
-  .more__head { max-inline-size: none; grid-template-columns: 1fr auto; align-items: end; }
-  .more__head .kicker { grid-column: 1 / -1; }
-  .more__head h2 { font-size: var(--step-4); }
-  .more__list { border-block-start: 1px solid var(--line); }
-  .item { display: grid; grid-template-columns: 11rem minmax(0, 1fr) auto; gap: var(--gutter); align-items: start; padding-block: 1.5rem; border-block-end: 1px solid var(--line); }
-  .item__thumb :global(.media) { box-shadow: 0 12px 26px -16px rgb(40 36 30 / 0.5); }
-  .item__blank { aspect-ratio: 16 / 10; display: grid; place-items: center; border-radius: var(--radius); background: var(--paper-2); box-shadow: 0 0 0 1px var(--line) inset; font-size: 0.8rem; color: var(--muted); }
-  .item__title { font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; line-height: 1.1; }
-  .item__body { color: var(--ink-2); margin-block-start: 0.4rem; max-inline-size: 44rem; }
-  .item__tech { margin-block-start: 0.6rem; }
-  .item__links { display: grid; gap: 0.4rem; justify-items: end; white-space: nowrap; font-weight: 600; color: var(--rust); font-size: var(--step--1); }
-  @media (max-width: 800px) {
-    .more__head { grid-template-columns: 1fr; }
+  .more { position: relative; padding: 7rem var(--gutter) 6rem; background: var(--paper); }
+  .more__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1rem 2rem; margin-block-end: 3rem; }
+  .more__title { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(2.2rem, 1.2rem + 3vw, 4.4rem); font-weight: 500; line-height: 1; max-inline-size: 16ch; }
+  .more__list { border-block-start: 1px solid var(--line-strong); }
+  .item { position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) auto; gap: 1rem 3vw; align-items: baseline; padding-block: 1.6rem; border-block-end: 1px solid var(--line); transition: padding 0.5s var(--ease-out); }
+  .item__title { font-family: 'Cormorant Garamond', var(--font-display); font-size: clamp(1.8rem, 1.2rem + 1.8vw, 3.2rem); font-weight: 500; line-height: 1; transition: translate 0.5s var(--ease-out), font-style 0s; }
+  .item:hover .item__title { translate: 0.25em 0; font-style: italic; }
+  [dir='rtl'] .item:hover .item__title { translate: -0.25em 0; }
+  .item__body { color: var(--ink-2); font-size: 0.95rem; line-height: 1.6; }
+  .item__tech { display: block; margin-block-start: 0.4rem; font-size: 0.75rem; letter-spacing: 0.06em; color: var(--muted); }
+  .item__links { display: grid; gap: 0.3rem; justify-items: end; white-space: nowrap; font-size: 0.85rem; font-weight: 600; color: var(--rust); }
+  .more__float { position: fixed; inset-block-start: 0; left: 0; z-index: 30; inline-size: 18rem; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 4px; box-shadow: 0 30px 50px -24px rgb(40 36 30 / 0.55); pointer-events: none; opacity: 0; scale: 0.92; transition: opacity 0.3s, scale 0.4s var(--ease-out); }
+  .more__float.is-on { opacity: 1; scale: 1; }
+  @media (max-width: 860px) {
     .item { grid-template-columns: 1fr; }
-    .item__thumb { max-inline-size: 16rem; }
-    .item__links { justify-items: start; grid-auto-flow: column; justify-content: start; gap: 1.4rem; }
+    .item__links { justify-items: start; grid-auto-flow: column; gap: 1.2rem; }
+    .more__float { display: none; }
   }
 </style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-more]');
+  const float = root?.querySelector<HTMLImageElement>('[data-more-float]');
+  if (root && float && matchMedia('(pointer: fine)').matches) {
+    let x = 0, y = 0, raf = 0;
+    const place = () => { raf = 0; float.style.transform = `translate(${x + 24}px, ${y - 90}px)`; };
+    root.querySelectorAll<HTMLElement>('.item[data-preview]').forEach((item) => {
+      item.addEventListener('pointerenter', () => { float.src = item.dataset.preview!; float.classList.add('is-on'); });
+      item.addEventListener('pointerleave', () => float.classList.remove('is-on'));
+    });
+    root.addEventListener('pointermove', (e) => { x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(place); });
+  }
+</script>
