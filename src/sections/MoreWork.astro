@@ -9,41 +9,45 @@ interface Props { lang: Locale }
 const { lang } = Astro.props;
 ---
 
-<section id="more" class="section more wrap" aria-labelledby="more-title">
-  <header class="section-head more__head">
-    <p class="kicker" data-reveal>{tr(ui.more.kicker, lang)}</p>
-    <h2 id="more-title" class="display" data-lines>{tr(ui.more.title, lang)}</h2>
-    <a class="btn" href={profile.links.github} target="_blank" rel="noopener me" data-reveal>{tr(ui.more.all, lang)} <span class="arrow" aria-hidden="true">↗</span></a>
-  </header>
+<section id="more" class="section wrap" aria-labelledby="more-title">
+  <div class="scroll more" data-unroll>
+    <header class="section-head more__head">
+      <p class="kicker" data-reveal>{tr(ui.more.kicker, lang)}</p>
+      <h2 id="more-title" class="display" data-lines>{tr(ui.more.title, lang)}</h2>
+      <a class="btn btn--ghost" href={profile.links.github} target="_blank" rel="noopener me" data-reveal>{tr(ui.more.all, lang)} <span class="arrow" aria-hidden="true">↗</span></a>
+    </header>
 
-  <ul class="more__list">
-    {moreWork.map((w, i) => (
-      <li class="item" data-reveal style={`--i:${i}`}>
-        <div class="item__thumb">{w.image ? <Shot src={w.image} alt="" sizes="16rem" ratio="16 / 10" /> : <div class="item__blank" aria-hidden="true"><span lang="en">{w.tech[0]}</span></div>}</div>
-        <div class="item__main">
-          <h3 class="item__title" lang="en">{w.title}</h3>
-          <p class="item__body">{tr(w.body, lang)}</p>
-          <p class="item__tech mono" lang="en">{w.tech.join(' · ')}</p>
-        </div>
-        <div class="item__links mono">
-          {w.live && <a class="link-u" href={w.live} target="_blank" rel="noopener">{tr(ui.work.live, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
-          {w.repo && <a class="link-u" href={w.repo} target="_blank" rel="noopener">{tr(ui.work.source, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
-        </div>
-      </li>
-    ))}
-  </ul>
+    <ul class="more__list">
+      {moreWork.map((w, i) => (
+        <li class="item" data-reveal style={`--i:${i}`}>
+          <div class="item__thumb">{w.image ? <Shot src={w.image} alt="" sizes="16rem" ratio="16 / 10" /> : <div class="item__blank" aria-hidden="true"><span lang="en">{w.tech[0]}</span></div>}</div>
+          <div class="item__main">
+            <h3 class="item__title" lang="en">{w.title}</h3>
+            <p class="item__body">{tr(w.body, lang)}</p>
+            <p class="item__tech label" lang="en">{w.tech.join(' · ')}</p>
+          </div>
+          <div class="item__links">
+            {w.live && <a class="link-u" href={w.live} target="_blank" rel="noopener">{tr(ui.work.live, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
+            {w.repo && <a class="link-u" href={w.repo} target="_blank" rel="noopener">{tr(ui.work.source, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
 </section>
 
 <style>
   .more__head { max-inline-size: none; grid-template-columns: 1fr auto; align-items: end; }
   .more__head .kicker { grid-column: 1 / -1; }
+  .more__head h2 { font-size: var(--step-4); }
   .more__list { border-block-start: 1px solid var(--line); }
-  .item { display: grid; grid-template-columns: 11rem minmax(0, 1fr) auto; gap: var(--gutter); align-items: start; padding-block: 1.6rem; border-block-end: 1px solid var(--line); }
-  .item__blank { aspect-ratio: 16 / 10; display: grid; place-items: center; border-radius: var(--radius); background: var(--ink-2); box-shadow: 0 0 0 1px var(--line) inset; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
-  .item__title { font-size: var(--step-1); font-weight: 400; }
-  .item__body { color: var(--paper-2); margin-block-start: 0.4rem; max-inline-size: 44rem; }
-  .item__tech { margin-block-start: 0.7rem; }
-  .item__links { display: grid; gap: 0.4rem; justify-items: end; white-space: nowrap; }
+  .item { display: grid; grid-template-columns: 11rem minmax(0, 1fr) auto; gap: var(--gutter); align-items: start; padding-block: 1.5rem; border-block-end: 1px solid var(--line); }
+  .item__thumb :global(.media) { box-shadow: 0 12px 26px -16px rgb(40 36 30 / 0.5); }
+  .item__blank { aspect-ratio: 16 / 10; display: grid; place-items: center; border-radius: var(--radius); background: var(--paper-2); box-shadow: 0 0 0 1px var(--line) inset; font-size: 0.8rem; color: var(--muted); }
+  .item__title { font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; line-height: 1.1; }
+  .item__body { color: var(--ink-2); margin-block-start: 0.4rem; max-inline-size: 44rem; }
+  .item__tech { margin-block-start: 0.6rem; }
+  .item__links { display: grid; gap: 0.4rem; justify-items: end; white-space: nowrap; font-weight: 600; color: var(--rust); font-size: var(--step--1); }
   @media (max-width: 800px) {
     .more__head { grid-template-columns: 1fr; }
     .item { grid-template-columns: 1fr; }

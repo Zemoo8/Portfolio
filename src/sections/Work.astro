@@ -1,96 +1,266 @@
 ---
-import ProjectRow from '../components/ProjectRow.astro';
-import { tr, type Locale } from '../i18n/config';
+// The storm chapter: projects orbiting the air element. Real media on every card.
+import Emblem from '../components/Emblem.astro';
+import { path, tr, asset, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { projects } from '../content/projects';
+import { film, still } from '../lib/media';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
-const lead = projects.filter((p) => p.size === 'lead');
-const major = projects.filter((p) => p.size === 'major');
-const minor = projects.filter((p) => p.size === 'minor');
+
+const cards = projects.map((p) => {
+  const f = film(p.film?.desktop);
+  const s = still(p.cover.src);
+  // cards are small: use the half-size poster / still
+  const poster = f?.poster ? f.poster.replace('-poster.webp', '-poster-sm.webp') : s.src.replace(/\.webp$/, '-sm.webp');
+  return {
+    p,
+    href: path(lang, `work/${p.slug}`),
+    poster,
+    contain: p.cover.kind === 'figure' && !f,
+    film: f ? JSON.stringify({ mp4: f.mp4, webm: f.webm }) : undefined,
+  };
+});
 ---
 
-<section id="work" class="section work wrap" aria-labelledby="work-title">
-  <header class="section-head">
-    <p class="kicker" data-reveal>{tr(ui.work.kicker, lang)}</p>
+<section id="work" class="storm" aria-labelledby="work-title" data-storm>
+  <div class="storm__bg" aria-hidden="true">
+    <canvas class="storm__canvas" data-vortex></canvas>
+  </div>
+
+  <header class="storm__head wrap">
+    <p class="kicker">{tr(ui.work.kicker, lang)}</p>
     <h2 id="work-title" class="display" data-lines>{tr(ui.work.title, lang)}</h2>
   </header>
 
-  <div class="work__lead">
-    {lead.map((p, i) => <ProjectRow project={p} lang={lang} flip={i % 2 === 1} />)}
-  </div>
-  <div class="work__major">
-    {major.map((p, i) => <ProjectRow project={p} lang={lang} flip={i % 2 === 1} />)}
-  </div>
-  <div class="work__minor">
-    {minor.map((p) => <ProjectRow project={p} lang={lang} />)}
-  </div>
+  <div class="orbit" data-orbit>
+    <div class="orbit__stage" data-orbit-stage>
+      <div class="orbit__ring">
+        <div class="orbit__core" aria-hidden="true"><Emblem spin /></div>
+        {cards.map(({ p, href, poster, contain, film: fl }) => (
+          <a
+            class="orbit__card"
+            href={href}
+            data-orbit-card
+            data-index={p.index}
+            data-title={p.title}
+            data-category={tr(p.category, lang)}
+            data-year={p.year}
+            data-tagline={tr(p.tagline, lang)}
+            data-tone={p.tone}
+            data-orbit-film={fl}
+            style={`--tone:${p.tone}`}
+          >
+            <span class="orbit__mat">
+              <span class:list={['orbit__media', contain && 'orbit__media--figure']}>
+                <img src={poster} alt="" loading="lazy" decoding="async" draggable="false" />
+              </span>
+            </span>
+            <span class="orbit__label"><span class="orbit__num">{p.index}</span> {p.title}<span class="sr-only"> — {tr(p.tagline, lang)}</span></span>
+          </a>
+        ))}
+      </div>
+    </div>
 
-  <div class="cursor" aria-hidden="true" data-cursor-el><span></span></div>
+    <div class="orbit__below wrap">
+      <div class="orbit__caption" data-orbit-caption data-orbit-live aria-live="off">
+        <p class="orbit__meta"><span data-cap="index"></span><span data-cap="category"></span><span data-cap="year"></span></p>
+        <p class="orbit__title display" data-cap="title"></p>
+        <p class="orbit__tagline" data-cap="tagline"></p>
+        <a class="btn btn--cloud" data-cap="link" data-label={tr(ui.work.open, lang)} href={cards[0].href}>{tr(ui.work.open, lang)} <span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="orbit__controls">
+        <div class="orbit__buttons">
+          <button class="ibtn" type="button" data-orbit-prev data-dir aria-label={tr(ui.work.prev, lang)}>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+          </button>
+          <button class="ibtn" type="button" data-orbit-pause aria-pressed="false" aria-label={tr(ui.work.orbitPause, lang)}>
+            <svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.5h2v9H5zM9 3.5h2v9H9z" fill="currentColor" /></svg>
+            <svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3v10l8-5z" fill="currentColor" /></svg>
+          </button>
+          <button class="ibtn" type="button" data-orbit-next data-dir aria-label={tr(ui.work.next, lang)}>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+          </button>
+        </div>
+        <ol class="orbit__index">
+          {cards.map(({ p }, i) => (
+            <li><button type="button" data-orbit-dot aria-current={i === 0 ? 'true' : 'false'}><span>{p.index}</span> {p.title}</button></li>
+          ))}
+        </ol>
+        <p class="orbit__hint label">{tr(ui.work.drag, lang)}</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <style>
-  .work__lead { display: grid; gap: clamp(7rem, 5rem + 8vw, 13rem); }
-  .work__major { display: grid; gap: clamp(5rem, 3rem + 6vw, 9rem); margin-block-start: clamp(7rem, 5rem + 8vw, 13rem); }
-  .work__minor {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: calc(var(--gutter) * 1.5);
-    margin-block-start: clamp(6rem, 4rem + 6vw, 10rem);
-    padding-block-start: 3rem;
-    border-block-start: 1px solid var(--line);
+  .storm {
+    position: relative;
+    margin-block-start: clamp(3rem, 8vh, 6rem);
+    padding-block: clamp(6rem, 13vh, 9rem) clamp(6rem, 14vh, 10rem);
+    color: var(--cloud);
+    background-color: var(--storm); /* solid ink ground: text contrast never depends on the canvas */
+    isolation: isolate;
+    overflow-x: clip; /* 3D cards near the edges must not widen the page */
   }
-  @media (max-width: 760px) { .work__minor { grid-template-columns: 1fr; gap: 4.5rem; } }
-
-  .cursor {
-    position: fixed;
-    inset: 0 auto auto 0;
-    z-index: 40;
+  /* soft transitions from the painted daylight into the storm and back */
+  .storm::before, .storm::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    block-size: clamp(90px, 16vh, 180px);
     pointer-events: none;
-    display: grid;
-    place-items: center;
-    inline-size: 6.5rem;
-    block-size: 6.5rem;
-    margin: -3.25rem 0 0 -3.25rem;
-    border-radius: 50%;
-    background: var(--paper);
-    color: var(--ink);
-    font-size: 0.72rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    text-align: center;
-    line-height: 1.2;
-    padding: 0.8rem;
-    scale: 0;
-    transition: scale 0.45s var(--ease-out);
   }
-  :lang(ar) .cursor { font-family: var(--font-arabic); text-transform: none; font-size: 0.85rem; }
-  .cursor.is-on { scale: 1; }
+  .storm::before { inset-block-end: 100%; background: linear-gradient(180deg, rgb(18 20 19 / 0), rgb(18 20 19 / 0.55) 60%, var(--storm)); }
+  .storm::after { inset-block-start: 100%; background: linear-gradient(0deg, rgb(18 20 19 / 0), rgb(18 20 19 / 0.55) 60%, var(--storm)); }
+  .storm__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(60% 55% at 50% 50%, var(--storm-2), var(--storm) 70%);
+  }
+  .storm__canvas { opacity: 0; transition: opacity 1.2s var(--ease-out); }
+  .storm__canvas:global(.is-ready) { opacity: calc(0.35 + 0.65 * var(--storm-in, 1)); }
+  .storm__canvas { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  .storm__head { display: grid; gap: 1rem; justify-items: center; text-align: center; }
+  .storm__head .kicker { color: #e9a86a; }
+  .storm__head h2 { font-size: var(--step-4); max-inline-size: 22ch; }
+
+  /* ---- stage ---- */
+  .orbit__stage {
+    position: relative;
+    block-size: clamp(420px, 60vh, 680px);
+    perspective: 1800px;
+    perspective-origin: 50% 30%;
+    touch-action: pan-y;
+    user-select: none;
+    cursor: grab;
+  }
+  .orbit__stage:active { cursor: grabbing; }
+  .orbit__ring { position: absolute; inset: 0; transform-style: preserve-3d; }
+  .orbit__core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    inline-size: clamp(110px, 13vw, 190px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%) translateZ(0);
+    color: #f3f5f2;
+    filter: drop-shadow(0 0 22px rgb(236 244 240 / 0.45));
+    pointer-events: none;
+  }
+  .orbit__core :global(.emblem) { inline-size: 100%; block-size: 100%; }
+
+  .orbit__card {
+    --card-w: clamp(170px, 19vw, 320px);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    inline-size: var(--card-w);
+    display: grid;
+    gap: 0.55rem;
+    justify-items: center;
+    will-change: transform;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .orbit__mat {
+    position: relative;
+    display: block;
+    inline-size: 100%;
+    padding: 0.45rem;
+    border-radius: 12px;
+    background: var(--paper-grain), #f7f2e5;
+    box-shadow: 0 30px 50px -24px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.2) inset;
+  }
+  .orbit__mat::after {
+    /* recedes into ink toward the back of the orbit */
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #0f1110;
+    opacity: calc((1 - var(--f, 1)) * 0.62);
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .orbit__media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 7px; background: #1b1d1c; }
+  .orbit__media img, .orbit__media :global(video) { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .orbit__media--figure { background: #fbfaf6; }
+  .orbit__media--figure img { object-fit: contain; }
+  .orbit__media :global(video) { opacity: 0; transition: opacity 0.6s var(--ease-out); }
+  .orbit__media :global(video.is-playing) { opacity: 1; }
+  .orbit__label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 0.8rem + 0.6vw, 1.35rem);
+    font-weight: 600;
+    color: var(--cloud);
+    opacity: calc(0.25 + var(--f, 1) * 0.75);
+    white-space: nowrap;
+    text-shadow: 0 2px 12px rgb(0 0 0 / 0.6);
+  }
+  .orbit__num { font-family: var(--font-sans); font-size: 0.7em; font-weight: 600; color: #e9a86a; letter-spacing: 0.08em; }
+  .orbit__card[data-active] .orbit__mat { box-shadow: 0 0 0 2px #e9a86a, 0 34px 60px -24px rgb(0 0 0 / 0.8); }
+  .orbit__card:focus-visible { outline: none; }
+  .orbit__card:focus-visible .orbit__mat { outline: 2px solid var(--amber); outline-offset: 4px; }
+
+  /* ---- below ---- */
+  .orbit__below { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--gutter); align-items: end; margin-block-start: clamp(1rem, 3vh, 2.5rem); }
+  .orbit__caption { display: grid; gap: 0.7rem; justify-items: start; opacity: 0; transform: translateY(8px); transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out); }
+  .orbit__caption.is-shown { opacity: 1; transform: none; }
+  .orbit__meta { display: flex; gap: 1rem; flex-wrap: wrap; font-size: var(--step--1); letter-spacing: 0.1em; text-transform: uppercase; color: #b9c2bf; }
+  :lang(ar) .orbit__meta { letter-spacing: 0; text-transform: none; }
+  .orbit__meta span:first-child { color: #e9a86a; font-weight: 600; }
+  .orbit__title { font-size: var(--step-4); line-height: 0.95; }
+  .orbit__tagline { font-size: var(--step-1); color: #d3dad7; max-inline-size: 34rem; line-height: 1.45; }
+  :global(.btn--cloud) { background: var(--cloud); color: var(--ink); border-color: var(--cloud); margin-block-start: 0.4rem; }
+  :global(.btn--cloud:hover), :global(.btn--cloud:focus-visible) { background: #e9a86a; border-color: #e9a86a; color: var(--ink); }
+
+  .orbit__controls { display: grid; gap: 1.1rem; justify-items: end; }
+  .orbit__buttons { display: flex; gap: 0.5rem; color: var(--cloud); }
+  .orbit__buttons .ibtn:hover { background: var(--cloud); color: var(--ink); }
+  [data-orbit-pause] .i-play { display: none; }
+  [data-orbit-pause][aria-pressed='true'] .i-play { display: block; }
+  [data-orbit-pause][aria-pressed='true'] .i-pause { display: none; }
+  .orbit__index { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3rem 0.4rem; max-inline-size: 36rem; }
+  .orbit__index button { padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.85rem; color: #c3cbc8; border: 1px solid rgb(238 240 236 / 0.18); transition: background var(--dur-1), color var(--dur-1); }
+  .orbit__index button span { color: #e9a86a; font-weight: 600; margin-inline-end: 0.2rem; }
+  .orbit__index button:hover { color: var(--cloud); border-color: rgb(238 240 236 / 0.45); }
+  .orbit__index button[aria-current='true'] { background: var(--cloud); color: var(--ink); border-color: var(--cloud); }
+  .orbit__index button[aria-current='true'] span { color: var(--rust); }
+  .orbit__hint { color: #9ea8a5; }
+
+  @media (max-width: 900px) {
+    .orbit__below { grid-template-columns: 1fr; }
+    .orbit__controls { justify-items: start; }
+    .orbit__index { justify-content: flex-start; }
+    .orbit__card { --card-w: clamp(118px, 33vw, 210px); }
+    .orbit__stage { block-size: clamp(340px, 52vh, 500px); }
+    .orbit__label { font-size: 0.95rem; }
+  }
 </style>
 
 <script>
-  // Cursor label over project media (fine pointers only; purely decorative —
-  // every project also has a visible, keyboard-reachable "Open case study" link).
-  const el = document.querySelector<HTMLElement>('[data-cursor-el]');
-  if (el && matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const label = el.querySelector('span')!;
-    let x = 0, y = 0, cx = 0, cy = 0, on = false;
-    const loop = () => {
-      cx += (x - cx) * 0.18;
-      cy += (y - cy) * 0.18;
-      el.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
-      if (on || Math.abs(x - cx) > 0.5) requestAnimationFrame(loop);
-    };
-    document.querySelectorAll<HTMLElement>('[data-cursor]').forEach((t) => {
-      t.addEventListener('pointerenter', (e) => {
-        label.textContent = t.dataset.cursor!;
-        x = cx = e.clientX; y = cy = e.clientY;
-        on = true; el.classList.add('is-on'); requestAnimationFrame(loop);
-      });
-      t.addEventListener('pointermove', (e) => { x = e.clientX; y = e.clientY; });
-      t.addEventListener('pointerleave', () => { on = false; el.classList.remove('is-on'); });
-    });
+  import { initOrbit } from '../scripts/orbit';
+  import { mountVortex } from '../scripts/vortex';
+  // Nothing heavy runs until the storm chapter approaches the viewport.
+  const section = document.querySelector<HTMLElement>('[data-storm]');
+  if (section) {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const root = section.querySelector<HTMLElement>('[data-orbit]');
+      if (root) initOrbit(root);
+      const canvas = section.querySelector<HTMLCanvasElement>('[data-vortex]');
+      if (canvas) {
+        const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 60));
+        idle(() => mountVortex(canvas).catch(() => { /* no WebGL: the CSS ink gradient remains */ }));
+      }
+    }, { rootMargin: '0px 0px 150px 0px' });
+    io.observe(section);
   }
 </script>

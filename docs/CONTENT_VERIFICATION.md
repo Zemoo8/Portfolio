@@ -74,23 +74,29 @@ Statuses: **VERIFIED BY PRIMARY SOURCE** (code, official document) · **VERIFIED
 | Caffeine, Bubbleberry, Brew Bliss, aieyes-backend descriptions | each repo's own GitHub description + language stats | VERIFIED |
 | Université Sesame website replica "without AI" (CV) | CV | **OMIT** (no repo or asset found) |
 
-## Credentials (18, LinkedIn "Licenses & certifications")
+## Credentials (18) — primary sources
 
-| Credential | Issuer | Date (LinkedIn) | CV | Status |
+Ahmed supplied the certificate documents themselves (PDFs + two images) during the redesign. **The certificate is now the primary source** for title, issuer and date; LinkedIn and the CV are secondary. Every credential on the site is shown with its real document.
+
+| Credential | Issuer | Date shown | Source | Status |
 |---|---|---|---|---|
-| Fundamentals of Deep Learning | NVIDIA DLI | Feb 2026 | Feb 2026 | VERIFIED |
-| IT Specialist — AI | Pearson/Certiport | Jan 2026 (Credly verified) | Jan 2026 | VERIFIED BY PRIMARY SOURCE |
-| AI Engineer for Data Scientists Associate | DataCamp | Jul 2026 | Jul 2026 | VERIFIED |
-| Python Data Associate | DataCamp | **Mar 2026** | **Feb 2026** | CONFLICTING (1 month) → LinkedIn date shown |
-| EU AI Act Literacy | DataCamp | Jun 2026 | Jun 2026 | VERIFIED |
-| CCNA: Introduction to Networks | Cisco | Jun 2026 | Jun 2026 | VERIFIED |
-| Python Essentials 1 & 2 | Cisco/OpenEDG | Jun 2026 (Credly verified) | "2025–2026" | VERIFIED BY PRIMARY SOURCE |
-| C Essentials 1 | Cisco | Jun 2025 (Credly verified) | "2025–2026" | VERIFIED BY PRIMARY SOURCE |
-| B2 First, 176, Grade B; Listening 190 | Cambridge English | Aug 2026 (LinkedIn) / session 25 Jul 2026 (PDF) | ✓ | VERIFIED BY PRIMARY SOURCE (PDF) |
-| Aspire Leaders Program; Online Dialogue Facilitation (Soliya) | — | Sep 2026 | Sep 2026 | VERIFIED |
-| IBM Prompt Engineering Basics; NASA Open Science Essentials; DataCamp Intro to ChatGPT, Data Literacy, NumPy, GitHub Concepts | — | Jun–Jul 2026 | not on CV | SINGLE SOURCE (LinkedIn) |
+| Fundamentals of Deep Learning | NVIDIA DLI | Feb 2026 | certificate PDF + NVIDIA verify page | VERIFIED BY PRIMARY SOURCE (verify link) |
+| IT Specialist — Artificial Intelligence | Certiport · Pearson VUE | Jan 2026 | certificate PDF + Credly | VERIFIED BY PRIMARY SOURCE (verify link) |
+| AI Engineer for Data Scientists Associate | DataCamp | Jul 2026 | certificate PDF | VERIFIED BY PRIMARY SOURCE |
+| Python Data Associate | DataCamp | **Feb 2026** | certificate PDF (LinkedIn said Mar 2026, CV Feb 2026) | CONFLICT RESOLVED → certificate date |
+| Generative AI: Prompt Engineering Basics | IBM · Coursera | Jul 2026 | certificate image + Coursera verify page | VERIFIED BY PRIMARY SOURCE (verify link) |
+| EU AI Act Literacy; Introduction to ChatGPT; Data Literacy; Introduction to NumPy; Introduction to GitHub Concepts | DataCamp | Jun 2026 | certificate PDFs | VERIFIED BY PRIMARY SOURCE (DataCamp pages return 403 to automated checks → no verify links) |
+| CCNA: Introduction to Networks | Cisco NetAcad | Jun 2026 | certificate PDF | VERIFIED BY PRIMARY SOURCE |
+| Python Essentials 1 & 2 | Cisco NetAcad · OpenEDG | Jun 2026 | certificate PDFs + Credly | VERIFIED BY PRIMARY SOURCE (verify links) |
+| C Essentials 1 | Cisco NetAcad | Jun 2025 | certificate PDF + Credly | VERIFIED BY PRIMARY SOURCE (verify link) |
+| B2 First — Pass at Grade B, 176 (Listening 190) | Cambridge English | Aug 2026 | Statement of Results PDF (exam **session** 25 Jul 2026) + LinkedIn (issue date Aug 2026) | VERIFIED BY PRIMARY SOURCE — the site shows the issue month; the session date is on the document |
+| 2026 Aspire Leaders Program | Aspire Institute | Sep 2026 | LinkedIn + CV | VERIFIED |
+| Introduction to Online Dialogue Facilitation | Soliya | Sep 2026 | certificate PDF | VERIFIED BY PRIMARY SOURCE |
+| Open Science Essentials | NASA | Jul 2026 | certificate PDF | VERIFIED BY PRIMARY SOURCE |
 
-Verify links are shown only where the public page was confirmed (4 Credly badges, Cambridge verifier service). The NVIDIA certificate URL resolves to a generic app shell and is therefore not linked. Certificate images/PDFs attached on LinkedIn were **not downloaded** (downloads require explicit permission; see README → "Certificates").
+**Competition certificate:** *Code It Up 5.0 — Certificate of competition* (IEEE ISET Bizerte Student Branch), from the supplied PDF; shown under Path → Competitions as **Participant** (the certificate states participation, no rank).
+
+**Privacy of documents:** only trimmed WebP exports are published (`public/media/certificates/`). The PDFs and full-resolution renders stay in `assets-source/certificates/` (git-ignored, excluded from deploys). The photo on the Cambridge statement is blurred; its verification number is intentionally kept (it is what an employer needs to verify the result).
 
 ## Translations
 
@@ -98,4 +104,4 @@ French and Arabic copy was written from the verified English source by the build
 
 ## Anti-hallucination sweep (final)
 
-`grep -rniE "lorem|ipsum|example\.com|john doe|acme|10\+ years|award-winning|top 1%|millions|TODO|FIXME|placeholder" src` (run 2026-09-26) → 8 matches, all the word *placeholder* in the intro-film code (the intentional, replaceable iris placeholder). No lorem ipsum, fake names, fake metrics, invented dates, awards or clients.
+`grep -rniE "lorem|ipsum|example\.com|john doe|acme|10\+ years|award-winning|top 1%|millions|TODO|FIXME|placeholder" src` — re-run after the redesign (2026-09-26); results are listed in `docs/QA_REPORT.md`. No lorem ipsum, fake names, fake metrics, invented dates, awards or clients.

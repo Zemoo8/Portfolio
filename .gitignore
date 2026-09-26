@@ -7,3 +7,6 @@ dist/
 assets-generated/
 public/media/projects/*/_frames/
 .vercel
+
+# private: original certificate PDFs and unredacted renders (only public/media/certificates is published)
+assets-source/certificates/

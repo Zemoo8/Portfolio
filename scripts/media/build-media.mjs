@@ -48,6 +48,15 @@ for (const [slug, src, name, w] of external) {
   if (fs.existsSync(src)) manifest.push(await emit(slug, src, name, w));
   else console.warn('missing source', src);
 }
+// Half-size film posters for small placements (orbit cards).
+for (const slug of fs.readdirSync(OUT)) {
+  const dir = path.join(OUT, slug);
+  if (!fs.statSync(dir).isDirectory()) continue;
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('-poster.webp'))) {
+    await sharp(path.join(dir, f)).resize({ width: 800, withoutEnlargement: true }).webp({ quality: 76, effort: 6 }).toFile(path.join(dir, f.replace('-poster.webp', '-poster-sm.webp')));
+  }
+}
+
 // Dimensions are consumed by the site to reserve layout space (no CLS).
 fs.writeFileSync('src/data/media-dimensions.json', JSON.stringify(Object.fromEntries(manifest.map((m) => [`${m.slug}/${m.name}`, [m.w, m.h]])), null, 1));
 console.log(`${manifest.length} images written`);

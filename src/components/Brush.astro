@@ -1,0 +1,52 @@
+---
+// A procedural ink-brush stroke (src/lib/brush.ts) that paints itself when revealed.
+// kind: 'line' (dividers, underlines) | 'circle' (ensō frame). Decorative → aria-hidden.
+import { circle, line, type Bristle } from '../lib/brush';
+
+interface Props {
+  kind?: 'line' | 'circle';
+  seed?: number;
+  /** viewBox width for lines (height is fixed) */
+  length?: number;
+  width?: number;
+  class?: string;
+  /** paint on reveal (default) or show immediately */
+  paint?: boolean;
+  color?: string;
+}
+const { kind = 'line', seed = 1, length = 600, width, class: cls = '', paint = true, color = 'var(--ink)' } = Astro.props;
+
+let bristles: Bristle[];
+let viewBox: string;
+if (kind === 'circle') {
+  bristles = circle(200, 200, 170, { width: width ?? 21, bristles: 34, seed, dryness: 0.75, gap: 0.42 });
+  viewBox = '0 0 400 400';
+} else {
+  bristles = line(length, 18, { width: width ?? 8, bristles: 22, seed, dryness: 0.65, bow: 5, rise: -3 });
+  viewBox = `-6 0 ${length + 12} 36`;
+}
+---
+
+<svg class:list={['brush', `brush--${kind}`, paint && 'brush--paint', cls]} viewBox={viewBox} preserveAspectRatio={kind === 'line' ? 'none' : 'xMidYMid meet'} aria-hidden="true" data-reveal-brush style={`--ink-color:${color}`}>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    {bristles.map((b) => (
+      <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay}`} />
+    ))}
+  </g>
+</svg>
+
+<style>
+  .brush { overflow: visible; }
+  .brush path { stroke: var(--ink-color); vector-effect: non-scaling-stroke; }
+  .brush--circle path { vector-effect: none; }
+  /* painting: each bristle is drawn along its length, the whole stroke in ~1.3 s */
+  .js .brush--paint path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .js .brush--paint.is-in path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.3s cubic-bezier(0.55, 0.05, 0.25, 1);
+    transition-delay: calc(var(--d) * 1s + var(--brush-delay, 0s));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .js .brush--paint path { stroke-dashoffset: 0; }
+  }
+</style>

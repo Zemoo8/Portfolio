@@ -1,6 +1,6 @@
 # Ahmed Baghouli — portfolio
 
-Trilingual (EN · FR · AR) static portfolio built with Astro.
+Trilingual (EN · FR · AR) static portfolio built with Astro — live at **https://ahmed-baghouli.vercel.app**.
 
 ```bash
 npm install

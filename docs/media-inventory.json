@@ -1,28 +1,168 @@
 [
  {
+  "file": "media/certificates/aspire-leaders.webp",
+  "kb": 39,
+  "width": 751,
+  "height": 615,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/cambridge-statement-upload.webp",
+  "kb": 151,
+  "width": 1204,
+  "height": 1800,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/certiport-it-specialist-ai.webp",
+  "kb": 99,
+  "width": 1800,
+  "height": 1472,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/cisco-c-essentials-1.webp",
+  "kb": 69,
+  "width": 1800,
+  "height": 1214,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/cisco-ccna-itn.webp",
+  "kb": 77,
+  "width": 1800,
+  "height": 1214,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/cisco-python-essentials-1-course.webp",
+  "kb": 75,
+  "width": 1800,
+  "height": 1214,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/cisco-python-essentials-2.webp",
+  "kb": 69,
+  "width": 1800,
+  "height": 1214,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/code-it-up-5.webp",
+  "kb": 111,
+  "width": 1800,
+  "height": 1265,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/datacamp-ai-engineer.webp",
+  "kb": 52,
+  "width": 1800,
+  "height": 1035,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/datacamp-data-literacy.webp",
+  "kb": 45,
+  "width": 1800,
+  "height": 1035,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/datacamp-eu-ai-act.webp",
+  "kb": 46,
+  "width": 1800,
+  "height": 1035,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/datacamp-github-concepts.webp",
+  "kb": 78,
+  "width": 1800,
+  "height": 1039,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/datacamp-intro-chatgpt.webp",
+  "kb": 99,
+  "width": 1800,
+  "height": 1035,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/datacamp-numpy.webp",
+  "kb": 97,
+  "width": 1800,
+  "height": 1035,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/datacamp-python-data-associate.webp",
+  "kb": 43,
+  "width": 1800,
+  "height": 1035,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/ibm-prompt-engineering.webp",
+  "kb": 34,
+  "width": 1114,
+  "height": 864,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/nasa-open-science.webp",
+  "kb": 84,
+  "width": 1800,
+  "height": 1342,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/nvidia-deep-learning.webp",
+  "kb": 45,
+  "width": 1560,
+  "height": 1495,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/certificates/soliya-dialogue-facilitation.webp",
+  "kb": 74,
+  "width": 1800,
+  "height": 1391,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
   "file": "media/intros/intro-ar-poster.webp",
-  "kb": 37,
+  "kb": 13,
   "width": 1080,
-  "height": 1350,
+  "height": 1080,
   "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
  },
  {
   "file": "media/intros/intro-en-poster.webp",
-  "kb": 37,
+  "kb": 13,
   "width": 1080,
-  "height": 1350,
+  "height": 1080,
   "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
  },
  {
   "file": "media/intros/intro-fr-poster.webp",
-  "kb": 37,
+  "kb": 13,
   "width": 1080,
-  "height": 1350,
+  "height": 1080,
   "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
  },
  {
   "file": "media/profile/portrait-color.webp",
   "kb": 33,
+  "width": 432,
+  "height": 577,
+  "source": "Face Picture.png, cut out (edge flood-fill mask), monochrome + colour"
+ },
+ {
+  "file": "media/profile/portrait-ink.webp",
+  "kb": 25,
   "width": 432,
   "height": 577,
   "source": "Face Picture.png, cut out (edge flood-fill mask), monochrome + colour"
@@ -350,84 +490,84 @@
  },
  {
   "file": "og/aegis-radar-ar.jpg",
-  "kb": 45,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/aegis-radar-en.jpg",
-  "kb": 47,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/aegis-radar-fr.jpg",
-  "kb": 48,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/ai-eyes-ar.jpg",
-  "kb": 46,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/ai-eyes-en.jpg",
-  "kb": 48,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/ai-eyes-fr.jpg",
   "kb": 50,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
+  "file": "og/aegis-radar-en.jpg",
+  "kb": 53,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/aegis-radar-fr.jpg",
+  "kb": 54,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/ai-eyes-ar.jpg",
+  "kb": 50,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/ai-eyes-en.jpg",
+  "kb": 52,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/ai-eyes-fr.jpg",
+  "kb": 53,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
   "file": "og/books-intelligence-ar.jpg",
-  "kb": 64,
+  "kb": 60,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/books-intelligence-en.jpg",
-  "kb": 71,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/books-intelligence-fr.jpg",
-  "kb": 73,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/cheezy-ar.jpg",
   "kb": 65,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
+  "file": "og/books-intelligence-fr.jpg",
+  "kb": 66,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/cheezy-ar.jpg",
+  "kb": 62,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
   "file": "og/cheezy-en.jpg",
-  "kb": 68,
+  "kb": 66,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/cheezy-fr.jpg",
-  "kb": 71,
+  "kb": 67,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
@@ -441,21 +581,21 @@
  },
  {
   "file": "og/default-en.jpg",
-  "kb": 57,
+  "kb": 56,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/default-fr.jpg",
-  "kb": 59,
+  "kb": 57,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/sandy-ai-lab-ar.jpg",
-  "kb": 62,
+  "kb": 61,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
@@ -469,28 +609,28 @@
  },
  {
   "file": "og/sandy-ai-lab-fr.jpg",
-  "kb": 65,
+  "kb": 64,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/subway-runner-ar.jpg",
-  "kb": 60,
+  "kb": 63,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/subway-runner-en.jpg",
-  "kb": 58,
+  "kb": 60,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/subway-runner-fr.jpg",
-  "kb": 59,
+  "kb": 60,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"

@@ -1,0 +1,39 @@
+---
+// A vermilion artist's seal carrying the air emblem — the signature mark of the site.
+import Emblem from './Emblem.astro';
+
+interface Props { size?: string; class?: string }
+const { size = '3rem', class: cls = '' } = Astro.props;
+---
+
+<span class:list={['seal', cls]} style={`--size:${size}`} aria-hidden="true">
+  <Emblem />
+</span>
+
+<style>
+  .seal {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--size);
+    block-size: var(--size);
+    border-radius: 18%;
+    background:
+      radial-gradient(120% 120% at 30% 25%, rgb(255 255 255 / 0.14), transparent 55%),
+      var(--seal);
+    color: #fbeee0;
+    box-shadow: 0 0 0 2px rgb(179 60 26 / 0.25), 0 6px 14px -8px rgb(120 30 10 / 0.6);
+    transform: rotate(-4deg);
+  }
+  .seal::after {
+    /* stamped-ink texture */
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--paper-grain);
+    mix-blend-mode: screen;
+    opacity: 0.55;
+  }
+  .seal :global(.emblem) { inline-size: 72%; block-size: 72%; }
+</style>

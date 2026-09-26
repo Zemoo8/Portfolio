@@ -1,14 +1,21 @@
 ---
-import '@fontsource/instrument-serif/400.css';
-import '@fontsource/instrument-serif/400-italic.css';
-import '@fontsource-variable/geist';
-import '@fontsource/geist-mono/400.css';
+import '@fontsource/cormorant-garamond/latin-500.css';
+import '@fontsource/cormorant-garamond/latin-500-italic.css';
+import '@fontsource/cormorant-garamond/latin-600.css';
+import '@fontsource/cormorant-garamond/latin-ext-500.css';
+import '@fontsource/cormorant-garamond/latin-ext-600.css';
+import '@fontsource-variable/figtree';
+import '@fontsource/noto-naskh-arabic/arabic-500.css';
+import '@fontsource/noto-naskh-arabic/arabic-600.css';
 import '@fontsource/ibm-plex-sans-arabic/arabic-300.css';
 import '@fontsource/ibm-plex-sans-arabic/arabic-400.css';
 import '@fontsource/ibm-plex-sans-arabic/arabic-500.css';
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import Backdrop from '../components/Backdrop.astro';
+import Lightbox from '../components/Lightbox.astro';
+import EmblemSymbol from '../components/EmblemSymbol.astro';
 import { locales, localeMeta, path, asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -53,8 +60,8 @@ const person = {
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#0c0c0b" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#f5efe1" />
+    <meta name="color-scheme" content="light" />
     <link rel="canonical" href={canonical} />
     {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(l, route), site).href} />)}
     <link rel="alternate" hreflang="x-default" href={new URL(path('en', route), site).href} />
@@ -83,18 +90,23 @@ const person = {
 
     <script is:inline>
       document.documentElement.classList.replace('no-js', 'js');
-      try { localStorage.setItem('lang', document.documentElement.lang); } catch (e) {}
+      try {
+        localStorage.setItem('lang', document.documentElement.lang);
+        if (localStorage.getItem('motion') === 'off') document.documentElement.classList.add('motion-off');
+      } catch (e) {}
       if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('reduced');
     </script>
   </head>
   <body data-lang={lang}>
+    <EmblemSymbol />
+    <Backdrop />
     <a class="skip-link" href="#main">{tr(ui.skip, lang)}</a>
     <Nav lang={lang} route={route} />
     <main id="main" tabindex="-1">
       <slot />
     </main>
     <Footer lang={lang} route={route} />
-    <div class="grain" aria-hidden="true"></div>
+    <Lightbox lang={lang} />
     <script>
       import { initMotion } from '../scripts/motion';
       import { initFilms } from '../scripts/films';

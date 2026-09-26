@@ -1,51 +1,37 @@
-// Intro film controller: language tabs, runtime detection of the film files,
-// silent autoplay, optional sound, captions and replay. Falls back to the iris.
+// Moon-gate intro films: language tabs, silent autoplay, optional sound, captions, replay.
+// Which films exist is decided at build time (data-files), so missing ones are never fetched;
+// the painted view simply stays.
 type Lang = 'en' | 'fr' | 'ar';
+type Files = Record<Lang, { mp4: boolean; webm: boolean; vtt: boolean; poster: boolean }>;
 
 export function initIntro(root: HTMLElement) {
   const base = root.dataset.base!;
-  const files: Record<Lang, { mp4: boolean; webm: boolean; vtt: boolean; poster: boolean }> = JSON.parse(root.dataset.files || '{}');
+  const files: Files = JSON.parse(root.dataset.files || '{}');
   const video = root.querySelector<HTMLVideoElement>('[data-intro-video]')!;
   const placeholder = root.querySelector<HTMLElement>('[data-intro-placeholder]')!;
   const controls = root.querySelector<HTMLElement>('[data-intro-controls]')!;
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-intro-tab]')];
-  const canvas = root.querySelector<HTMLCanvasElement>('[data-iris]')!;
+  const soundBtn = root.querySelector<HTMLButtonElement>('[data-intro-sound]')!;
+  const ccBtn = root.querySelector<HTMLButtonElement>('[data-intro-cc]')!;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let iris: { destroy(): void } | null = null;
-  const startIris = async () => {
-    if (iris) return;
-    const hasWebGL = (() => { try { return !!document.createElement('canvas').getContext('webgl2'); } catch { return false; } })();
-    if (!hasWebGL) return;
-    const { mountIris } = await import('./iris');
-    iris = mountIris(canvas, { still: reduced });
-    if (iris) root.classList.add('has-webgl');
-  };
-
-  const showPlaceholder = () => {
+  const showView = () => {
+    video.pause();
     video.hidden = true;
     controls.hidden = true;
     placeholder.hidden = false;
-    canvas.hidden = false;
-    startIris();
-  };
-
-  const showFilm = () => {
-    placeholder.hidden = true;
-    controls.hidden = false;
-    video.hidden = false;
-    iris?.destroy();
-    iris = null;
-    canvas.hidden = true;
-    if (!reduced) video.play().catch(() => {});
   };
 
   const load = (lang: Lang) => {
-    tabs.forEach((t) => { const on = t.dataset.introTab === lang; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
+    tabs.forEach((t) => {
+      const on = t.dataset.introTab === lang;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
     video.pause();
     video.innerHTML = '';
     const f = files[lang];
-    if (!f?.mp4 && !f?.webm) return showPlaceholder();
+    if (!f?.mp4 && !f?.webm) return showView();
 
     const src = (ext: string) => `${base}/intro-${lang}.${ext}`;
     if (f.webm) video.append(Object.assign(document.createElement('source'), { src: src('webm'), type: 'video/webm' }));
@@ -56,17 +42,17 @@ export function initIntro(root: HTMLElement) {
     else video.removeAttribute('poster');
     video.preload = 'metadata';
     video.load();
-    showFilm();
+    placeholder.hidden = true;
+    controls.hidden = false;
+    video.hidden = false;
+    if (!reduced && !document.documentElement.classList.contains('motion-off')) video.play().catch(() => {});
   };
 
-  // Controls
-  const soundBtn = root.querySelector<HTMLButtonElement>('[data-intro-sound]')!;
   soundBtn.addEventListener('click', () => {
     video.muted = !video.muted;
     soundBtn.textContent = video.muted ? soundBtn.dataset.on! : soundBtn.dataset.off!;
     if (!video.muted) { video.currentTime = 0; video.play(); }
   });
-  const ccBtn = root.querySelector<HTMLButtonElement>('[data-intro-cc]')!;
   ccBtn.addEventListener('click', () => {
     const t = video.textTracks[0];
     if (!t) return;
@@ -76,7 +62,7 @@ export function initIntro(root: HTMLElement) {
   });
   root.querySelector('[data-intro-replay]')!.addEventListener('click', () => { video.currentTime = 0; video.play(); });
 
-  // Keyboard: arrow keys move between tabs (mirrored in RTL).
+  // Arrow keys move between tabs, mirrored in RTL.
   tabs.forEach((t, i) => {
     t.addEventListener('click', () => load(t.dataset.introTab as Lang));
     t.addEventListener('keydown', (e) => {
@@ -89,6 +75,5 @@ export function initIntro(root: HTMLElement) {
     });
   });
 
-  showPlaceholder();
   load((root.dataset.lang as Lang) || 'en');
 }

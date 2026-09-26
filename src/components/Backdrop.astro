@@ -1,0 +1,56 @@
+---
+// The painted world behind every page: procedural ink-wash layers (scripts/art/landscape.mjs).
+// Scroll makes the camera "climb": mountains sink at different depths while mist thickens,
+// so text panels deeper in the page always sit on calm, misty paper. Decorative only.
+import { asset } from '../i18n/config';
+---
+
+<div class="world" aria-hidden="true" data-world>
+  <img class="world__sky" src={asset('art/sky.webp')} srcset={`${asset('art/sky-1000.webp')} 1000w, ${asset('art/sky.webp')} 2000w`} sizes="100vw" alt="" width="2000" height="1250" fetchpriority="low" decoding="async" />
+  <img class="world__layer" data-depth="0.05" src={asset('art/peaks.webp')} srcset={`${asset('art/peaks-1000.webp')} 1000w, ${asset('art/peaks.webp')} 2000w`} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />
+  <div class="world__mist world__mist--a" data-depth="0.08"></div>
+  <img class="world__layer" data-depth="0.11" src={asset('art/near.webp')} srcset={`${asset('art/near-1000.webp')} 1000w, ${asset('art/near.webp')} 2000w`} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />
+  <div class="world__mist world__mist--b"></div>
+  <canvas class="world__wind" data-wind></canvas>
+  <div class="world__veil" data-veil></div>
+</div>
+
+<style>
+  .world {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: linear-gradient(180deg, #f6f1e4, #efeadc 50%, #e6e1d4);
+    pointer-events: none;
+  }
+  .world img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: 50% 100%;
+    will-change: transform;
+  }
+  .world__sky { object-position: 50% 100% !important; }
+  .world__mist {
+    position: absolute;
+    inset-inline: -20%;
+    block-size: 38%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(247 242 230 / 0.95), rgb(247 242 230 / 0));
+    will-change: transform;
+  }
+  .world__mist--a { inset-block-end: 16%; animation: mist-drift 70s ease-in-out infinite alternate; }
+  .world__mist--b { inset-block-end: -12%; block-size: 42%; animation: mist-drift 90s ease-in-out infinite alternate-reverse; }
+  @keyframes mist-drift { from { translate: -6% 0; } to { translate: 6% 0; } }
+  .world__wind { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  .world__veil {
+    /* thickens with scroll depth (set by scripts/scroll.ts) */
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(245 239 225 / 0.2), rgb(245 239 225 / 0.72));
+    opacity: var(--veil, 0);
+  }
+</style>

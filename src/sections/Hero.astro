@@ -1,124 +1,105 @@
 ---
 import IntroFilm from '../components/IntroFilm.astro';
-import { path, tr, type Locale } from '../i18n/config';
+import Brush from '../components/Brush.astro';
+import Seal from '../components/Seal.astro';
+import { tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
-import { projects } from '../content/projects';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
-const leads = projects.slice(0, 3);
 ---
 
 <section class="hero wrap" aria-labelledby="hero-name">
-  <div class="hero__top">
+  <div class="hero__text">
     <p class="kicker">{tr(profile.role, lang)}</p>
-    <p class="mono hero__loc">{tr(ui.hero.based, lang)}</p>
-  </div>
 
-  <h1 id="hero-name" class="hero__name display">
-    <span class="line-mask" data-onload><span class="hero__first">{tr(profile.firstName, lang)}</span></span>
-    <span class="line-mask" data-onload style="--i:1"><span class="hero__last"><em>{tr(profile.lastName, lang)}</em></span></span>
-  </h1>
+    <h1 id="hero-name" class="hero__name display">
+      <span class="line-mask" data-onload><span>{tr(profile.firstName, lang)}</span></span>
+      <span class="line-mask hero__last" data-onload style="--i:1">
+        <span><em>{tr(profile.lastName, lang)}</em><Seal size="clamp(2.4rem, 4.4vw, 4rem)" class="hero__seal" /></span>
+      </span>
+    </h1>
 
-  <div class="hero__body">
+    <Brush seed={11} length={520} class="hero__stroke" />
+
     <p class="hero__statement">{tr(profile.statement, lang)}</p>
 
-    <div class="hero__film">
-      <IntroFilm lang={lang} />
+    <div class="hero__cta">
+      <a class="btn" href="#work">{tr(ui.hero.enter, lang)} <span aria-hidden="true">↓</span></a>
+      <a class="btn btn--ghost" href="#contact">{tr(ui.hero.contact, lang)}</a>
     </div>
+    <p class="label hero__loc">{tr(ui.hero.based, lang)}</p>
   </div>
 
-  <nav class="hero__index" aria-label={tr(ui.hero.selected, lang)}>
-    <span class="mono">{tr(ui.hero.selected, lang)}</span>
-    <ol>
-      {leads.map((p) => (
-        <li>
-          <a href={path(lang, `work/${p.slug}`)}>
-            <span class="mono">{p.index}</span>
-            <span class="hero__index-title">{p.title}</span>
-            <span class="arrow" aria-hidden="true">→</span>
-          </a>
-        </li>
-      ))}
-    </ol>
-    <a class="hero__scroll mono" href="#work">
-      <span>{tr(ui.hero.scroll, lang)}</span>
-      <i aria-hidden="true"></i>
-    </a>
-  </nav>
+  <div class="hero__gate">
+    <IntroFilm lang={lang} />
+  </div>
+
+  <a class="hero__scroll label" href="#work" aria-hidden="true" tabindex="-1">
+    <span>{tr(ui.hero.scroll, lang)}</span>
+    <i></i>
+  </a>
 </section>
 
 <style>
   .hero {
+    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-    grid-template-areas:
-      'top top'
-      'name film'
-      'body film'
-      'index index';
-    grid-template-rows: auto auto 1fr auto;
-    column-gap: calc(var(--gutter) * 1.5);
-    row-gap: clamp(1.2rem, 2vw, 2rem);
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    gap: calc(var(--gutter) * 1.5);
     min-block-size: 100svh;
-    padding-block: 6.5rem 2rem;
+    padding-block: 7.5rem 4rem;
+    overflow-x: clip;
   }
-  .hero__top { grid-area: top; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .hero__text { position: relative; display: grid; gap: 1.4rem; justify-items: start; }
+  .hero__text::before {
+    /* a soft wash of paper so text never fights the painting */
+    content: '';
+    position: absolute;
+    inset: -10% -18% -14% -30%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgb(246 241 229 / 0.96), rgb(246 241 229 / 0.82) 60%, rgb(246 241 229 / 0));
+    pointer-events: none;
+  }
   .hero__name {
-    grid-area: name;
-    align-self: end;
-    font-size: clamp(4rem, 1.2rem + 10.4vw, 13.5rem);
-    line-height: 0.84;
-    letter-spacing: -0.035em;
+    font-size: clamp(4rem, 1.4rem + 9.6vw, 12.5rem);
+    font-weight: 600;
+    line-height: 0.86;
+    letter-spacing: -0.03em;
     margin-inline-start: -0.04em;
   }
-  .hero__name .line-mask { padding-block-end: 0.2em; margin-block-end: -0.2em; }
-  :lang(ar) .hero__name { font-size: clamp(3.6rem, 1.5rem + 8vw, 10rem); line-height: 1.12; font-weight: 500; letter-spacing: 0; }
-  .hero__last { padding-inline-start: 0.7em; }
-  :lang(ar) .hero__last em { font-weight: 300; }
+  :lang(ar) .hero__name { font-size: clamp(3.6rem, 1.4rem + 8vw, 10rem); line-height: 1.2; letter-spacing: 0; }
   .hero__name .line-mask > span { display: block; }
+  .hero__last > span { display: flex !important; align-items: center; gap: 0.18em; padding-inline-start: 0.55em; }
+  .hero__last em { font-weight: 500; }
+  :lang(ar) .hero__last em { color: var(--ink-2); font-weight: 500; }
+  .hero__name :global(.hero__seal) { margin-block-start: 0.12em; }
+  .hero :global(.hero__stroke) { inline-size: min(100%, 30rem); block-size: 22px; margin-block: -0.4rem 0.2rem; }
+  .hero__statement { font-size: var(--step-1); line-height: 1.55; max-inline-size: 34rem; color: var(--ink-2); }
+  :lang(ar) .hero__statement { line-height: 1.95; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-block-start: 0.4rem; }
+  .hero__loc { margin-block-start: 0.2rem; }
 
-  .hero__body { display: contents; }
-  .hero__statement { grid-area: body; align-self: start; font-size: var(--step-1); line-height: 1.45; max-inline-size: 31rem; color: var(--paper-2); margin-block-start: 1rem; }
-  :lang(ar) .hero__statement { line-height: 1.85; }
-  .hero__film { grid-area: film; align-self: end; }
-  .hero__film :global(.intro__stage) { aspect-ratio: 4 / 5; inline-size: min(100%, calc(66svh * 4 / 5)); margin-inline-start: auto; }
-  .hero__film :global(.intro__bar) { inline-size: min(100%, calc(66svh * 4 / 5)); margin-inline-start: auto; }
-
-  .hero__index {
-    grid-area: index;
+  .hero__scroll {
+    position: absolute;
+    inset-block-end: 1.6rem;
+    inset-inline-start: 50%;
+    translate: -50% 0;
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 1.5rem 2.5rem;
-    padding-block-start: 1.4rem;
-    border-block-start: 1px solid var(--line);
+    justify-items: center;
+    gap: 0.5rem;
   }
-  .hero__index ol { display: flex; flex-wrap: wrap; gap: 0.4rem 2.2rem; }
-  .hero__index a { display: inline-flex; align-items: baseline; gap: 0.6rem; }
-  .hero__index-title { font-size: var(--step-0); }
-  .hero__index a .arrow { opacity: 0; transform: translateX(-6px); transition: opacity var(--dur-2), transform var(--dur-2) var(--ease-out); }
-  [dir='rtl'] .hero__index a .arrow { transform: scaleX(-1) translateX(-6px); }
-  .hero__index a:hover .arrow, .hero__index a:focus-visible .arrow { opacity: 1; transform: none; }
-  [dir='rtl'] .hero__index a:hover .arrow { transform: scaleX(-1); }
-  .hero__scroll { display: inline-flex; align-items: center; gap: 0.8rem; }
-  .hero__scroll i { position: relative; inline-size: 1px; block-size: 2.2rem; background: var(--line-strong); overflow: hidden; }
-  .hero__scroll i::after { content: ''; position: absolute; inset-inline: 0; block-size: 40%; background: var(--paper); animation: drip 2.2s var(--ease-in-out) infinite; }
-  @keyframes drip { from { transform: translateY(-100%); } to { transform: translateY(250%); } }
+  [dir='rtl'] .hero__scroll { translate: 50% 0; }
+  .hero__scroll i { position: relative; inline-size: 1.5px; block-size: 2.6rem; background: var(--line-strong); overflow: hidden; border-radius: 2px; }
+  .hero__scroll i::after { content: ''; position: absolute; inset-inline: 0; block-size: 45%; background: var(--ink); animation: drip 2.4s var(--ease-in-out) infinite; }
+  @keyframes drip { from { transform: translateY(-100%); } to { transform: translateY(240%); } }
 
   @media (max-width: 960px) {
-    .hero {
-      grid-template-columns: 1fr;
-      grid-template-areas: 'top' 'name' 'body' 'film' 'index';
-      grid-template-rows: auto;
-      min-block-size: auto;
-      padding-block-start: 6rem;
-    }
-    .hero__last { padding-inline-start: 0.45em; }
-    .hero__film :global(.intro__stage), .hero__film :global(.intro__bar) { aspect-ratio: auto; inline-size: 100%; }
-    .hero__film :global(.intro__stage) { aspect-ratio: 16 / 11; }
-    .hero__index { grid-template-columns: 1fr; gap: 0.8rem; }
+    .hero { grid-template-columns: 1fr; padding-block: 7rem 3rem; min-block-size: auto; }
+    .hero__gate { order: 2; }
+    .hero__last > span { padding-inline-start: 0.35em; }
     .hero__scroll { display: none; }
   }
 </style>

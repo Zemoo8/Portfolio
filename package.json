@@ -12,6 +12,8 @@
     "media:stills": "node scripts/media/run.mjs stills",
     "media:build": "node scripts/media/build-media.mjs",
     "media:inventory": "node scripts/media/inventory.mjs",
+    "media:certs": "python scripts/media/build-certificates.py",
+    "art": "node scripts/art/landscape.mjs",
     "og": "node scripts/og/render.mjs",
     "qa:shots": "node scripts/qa/shoot.mjs",
     "qa:a11y": "node scripts/qa/axe.mjs",
@@ -19,18 +21,16 @@
     "qa:links": "node scripts/qa/links.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/geist": "^5.3.0",
-    "@fontsource/geist-mono": "^5.3.0",
+    "@fontsource-variable/figtree": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
-    "@fontsource/instrument-serif": "^5.3.0",
+    "@fontsource/noto-naskh-arabic": "^5.3.0",
     "astro": "^7.3.5",
-    "lenis": "^1.3.26",
-    "three": "^0.186.1"
+    "lenis": "^1.3.26"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@axe-core/playwright": "^4.13.0",
-    "@types/three": "^0.186.0",
     "playwright": "^1.61.1",
     "sharp": "^0.35.4",
     "typescript": "^6.0.3"

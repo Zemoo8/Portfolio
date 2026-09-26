@@ -1,4 +1,6 @@
 ---
+import Brush from '../components/Brush.astro';
+import Seal from '../components/Seal.astro';
 import { asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -11,12 +13,13 @@ const { lang } = Astro.props;
   <div class="contact__inner">
     <p class="kicker" data-reveal>{tr(ui.contact.kicker, lang)}</p>
     <h2 id="contact-title" class="display contact__title" data-lines>{tr(ui.contact.title, lang)}</h2>
+    <Brush seed={63} length={700} class="contact__stroke" color="var(--seal)" />
     <p class="contact__body" data-reveal>{tr(ui.contact.body, lang)}</p>
 
     <div class="contact__mail" data-reveal>
-      <img class="contact__avatar" src={asset('media/profile/portrait.webp')} width="432" height="577" alt="" loading="lazy" decoding="async" />
+      <img class="contact__avatar" src={asset('media/profile/portrait-ink.webp')} width="432" height="577" alt="" loading="lazy" decoding="async" />
       <a class="contact__address display" href={`mailto:${profile.email}`} dir="ltr">{profile.email}</a>
-      <button class="btn contact__copy" type="button" data-copy={profile.email} data-copied={tr(ui.contact.copied, lang)}>
+      <button class="btn btn--ghost contact__copy" type="button" data-copy={profile.email} data-copied={tr(ui.contact.copied, lang)}>
         <span data-copy-label>{tr(ui.contact.copy, lang)}</span>
       </button>
     </div>
@@ -25,20 +28,39 @@ const { lang } = Astro.props;
       <li><a class="btn" href={profile.links.linkedin} target="_blank" rel="noopener me">LinkedIn <span class="arrow" aria-hidden="true">↗</span></a></li>
       <li><a class="btn" href={profile.links.github} target="_blank" rel="noopener me">GitHub <span class="arrow" aria-hidden="true">↗</span></a></li>
     </ul>
+    <span class="contact__seal" aria-hidden="true"><Seal size="4.5rem" /></span>
     <p class="sr-only" aria-live="polite" data-copy-status></p>
   </div>
 </section>
 
 <style>
-  .contact__inner { display: grid; gap: 1.8rem; justify-items: start; padding-block-start: 4rem; border-block-start: 1px solid var(--line); }
-  .contact__title { font-size: var(--step-5); max-inline-size: 16ch; }
+  .contact__inner {
+    position: relative;
+    display: grid;
+    gap: 1.6rem;
+    justify-items: start;
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+  .contact__inner::before {
+    content: '';
+    position: absolute;
+    inset: -10% 0 -10% -12%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgb(246 241 229 / 0.9), rgb(246 241 229 / 0));
+    pointer-events: none;
+  }
+  .contact { overflow-x: clip; }
+  .contact__title { font-size: var(--step-5); font-weight: 600; max-inline-size: 15ch; }
   :lang(ar) .contact__title { max-inline-size: 14ch; }
-  .contact__body { color: var(--paper-2); max-inline-size: 36rem; font-size: var(--step-1); }
-  .contact__mail { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; margin-block-start: 1rem; }
-  .contact__avatar { inline-size: 3.6rem; block-size: 3.6rem; border-radius: 50%; object-fit: cover; object-position: 50% 18%; background: var(--ink-3); box-shadow: 0 0 0 1px var(--line-strong); }
-  .contact__address { font-size: clamp(1.7rem, 0.9rem + 4vw, 4.6rem); font-family: 'Instrument Serif', serif; letter-spacing: -0.01em; overflow-wrap: anywhere; }
-  .contact__address:hover { color: var(--signal); }
+  .contact :global(.contact__stroke) { inline-size: min(100%, 26rem); block-size: 22px; margin-block: -0.6rem 0; }
+  .contact__body { color: var(--ink-2); max-inline-size: 36rem; font-size: var(--step-1); }
+  .contact__mail { display: flex; align-items: center; gap: 1.1rem; flex-wrap: wrap; margin-block-start: 0.6rem; }
+  .contact__avatar { inline-size: 3.8rem; block-size: 3.8rem; border-radius: 50%; object-fit: cover; object-position: 50% 18%; background: #e4e6de; box-shadow: 0 0 0 1px var(--line-strong); }
+  .contact__address { font-size: clamp(1.7rem, 0.9rem + 4vw, 4.4rem); font-family: 'Cormorant Garamond', serif; font-weight: 600; overflow-wrap: anywhere; }
+  .contact__address:hover { color: var(--rust); }
   .contact__links { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .contact__seal { position: absolute; inset-block-start: 20%; inset-inline-end: 4%; opacity: 0.9; }
+  @media (max-width: 800px) { .contact__seal { display: none; } }
 </style>
 
 <script>

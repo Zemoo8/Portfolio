@@ -1,0 +1,121 @@
+---
+// One shared <dialog> for viewing documents full size. Any element with
+// [data-lightbox] (and data-src, data-title, data-meta, data-verify, data-group) opens it.
+// Native dialog = focus containment + Escape; arrows move within the same group.
+import { tr, type Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+
+interface Props { lang: Locale }
+const { lang } = Astro.props;
+---
+
+<dialog class="lightbox" data-lightbox-dialog aria-labelledby="lightbox-title">
+  <div class="lightbox__sheet">
+    <figure class="lightbox__figure">
+      <img data-lightbox-img alt="" />
+    </figure>
+    <div class="lightbox__info">
+      <p class="label" data-lightbox-meta></p>
+      <h2 id="lightbox-title" class="lightbox__title" data-lightbox-title></h2>
+      <a class="btn btn--ghost" data-lightbox-verify href="#credentials" target="_blank" rel="noopener" hidden>{tr(ui.credentials.verify, lang)} <span class="arrow" aria-hidden="true">↗</span></a>
+      <div class="lightbox__nav">
+        <button class="ibtn" type="button" data-lightbox-prev data-dir aria-label={tr(ui.work.prevItem, lang)}>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+        </button>
+        <span class="label" data-lightbox-count></span>
+        <button class="ibtn" type="button" data-lightbox-next data-dir aria-label={tr(ui.work.nextItem, lang)}>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+        </button>
+      </div>
+    </div>
+    <button class="lightbox__close ibtn" type="button" data-lightbox-close aria-label={tr(ui.nav.close, lang)}>
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+    </button>
+  </div>
+</dialog>
+
+<style>
+  .lightbox {
+    inline-size: min(96vw, 1200px);
+    max-block-size: 94vh;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+  }
+  .lightbox::backdrop { background: rgb(20 19 17 / 0.72); backdrop-filter: blur(6px); }
+  .lightbox[open] { animation: lb-in 0.45s var(--ease-out); }
+  @keyframes lb-in { from { opacity: 0; transform: translateY(16px) scale(0.98); } }
+  .lightbox__sheet {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(16rem, 1fr);
+    gap: clamp(1rem, 2vw, 2rem);
+    padding: clamp(0.8rem, 2vw, 1.6rem);
+    border-radius: var(--radius-lg);
+    background: var(--paper-grain), var(--paper);
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.6);
+  }
+  .lightbox__figure { display: grid; place-items: center; background: #fff; border-radius: 8px; box-shadow: 0 0 0 1px var(--line); overflow: hidden; }
+  .lightbox__figure img { max-block-size: 80vh; inline-size: auto; max-inline-size: 100%; object-fit: contain; }
+  .lightbox__info { display: grid; align-content: center; gap: 1rem; padding-inline-end: 2.5rem; }
+  .lightbox__title { font-family: var(--font-display); font-size: var(--step-3); font-weight: 600; line-height: 1.05; }
+  .lightbox__nav { display: flex; align-items: center; gap: 0.8rem; margin-block-start: 0.6rem; }
+  .lightbox__nav .ibtn:hover { background: var(--ink); color: var(--paper); }
+  .lightbox__close { position: absolute; inset-block-start: 0.8rem; inset-inline-end: 0.8rem; background: var(--paper); }
+  .lightbox__close:hover { background: var(--ink); color: var(--paper); }
+  @media (max-width: 800px) {
+    .lightbox__sheet { grid-template-columns: 1fr; }
+    .lightbox__info { padding-inline-end: 0; }
+    .lightbox__figure img { max-block-size: 55vh; }
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox-dialog]');
+  if (dialog) {
+    const img = dialog.querySelector<HTMLImageElement>('[data-lightbox-img]')!;
+    const title = dialog.querySelector<HTMLElement>('[data-lightbox-title]')!;
+    const meta = dialog.querySelector<HTMLElement>('[data-lightbox-meta]')!;
+    const verify = dialog.querySelector<HTMLAnchorElement>('[data-lightbox-verify]')!;
+    const count = dialog.querySelector<HTMLElement>('[data-lightbox-count]')!;
+    let list: HTMLElement[] = [];
+    let index = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (i: number) => {
+      index = (i + list.length) % list.length;
+      const el = list[index];
+      img.src = el.dataset.src!;
+      img.alt = el.dataset.title || '';
+      title.textContent = el.dataset.title || '';
+      meta.textContent = el.dataset.meta || '';
+      verify.hidden = !el.dataset.verify;
+      if (el.dataset.verify) verify.href = el.dataset.verify;
+      count.textContent = `${index + 1} / ${list.length}`;
+    };
+    document.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-lightbox]');
+      if (!t) return;
+      e.preventDefault();
+      opener = t;
+      const group = t.dataset.group;
+      list = [...document.querySelectorAll<HTMLElement>('[data-lightbox]')].filter((x) => x.dataset.group === group && x.offsetParent !== null);
+      if (!list.includes(t)) list = [t];
+      show(list.indexOf(t));
+      dialog.showModal();
+    });
+    dialog.querySelector('[data-lightbox-close]')!.addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-lightbox-prev]')!.addEventListener('click', () => show(index - 1));
+    dialog.querySelector('[data-lightbox-next]')!.addEventListener('click', () => show(index + 1));
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener('keydown', (e) => {
+      const rtl = document.dir === 'rtl';
+      if (e.key === 'ArrowRight') show(index + (rtl ? -1 : 1));
+      if (e.key === 'ArrowLeft') show(index + (rtl ? 1 : -1));
+    });
+    dialog.addEventListener('close', () => opener?.focus());
+  }
+</script>

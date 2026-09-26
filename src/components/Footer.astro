@@ -1,4 +1,5 @@
 ---
+import Seal from './Seal.astro';
 import { locales, localeMeta, path, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -10,7 +11,7 @@ const year = new Date().getFullYear();
 
 <footer class="foot">
   <div class="wrap foot__grid">
-    <p class="foot__sign display">{tr(profile.name, lang)}</p>
+    <p class="foot__sign"><Seal size="2.4rem" /><span class="display">{tr(profile.name, lang)}</span></p>
     <ul class="foot__links">
       <li><a class="link-u" href={profile.links.github} rel="me noopener" target="_blank">GitHub</a></li>
       <li><a class="link-u" href={profile.links.linkedin} rel="me noopener" target="_blank">LinkedIn</a></li>
@@ -21,20 +22,26 @@ const year = new Date().getFullYear();
         <li><a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>{localeMeta[l].name}</a></li>
       ))}
     </ul>
-    <div class="foot__base mono">
+    <div class="foot__base label">
       <span>© {year} · {tr(ui.footer.rights, lang)}</span>
-      <a class="link-u" href="#main">{tr(ui.footer.top, lang)} <span class="arrow" aria-hidden="true" style="transform:rotate(-90deg)">→</span></a>
+      <a class="link-u" href="#main">{tr(ui.footer.top, lang)} <span aria-hidden="true">↑</span></a>
     </div>
   </div>
 </footer>
 
 <style>
-  .foot { margin-block-start: var(--section); border-block-start: 1px solid var(--line); padding-block: 3.5rem 2rem; }
+  .foot {
+    margin-block-start: var(--section);
+    padding-block: 3rem 1.6rem;
+    background: var(--paper-grain), linear-gradient(180deg, rgb(245 239 225 / 0.6), var(--paper) 40%);
+    border-block-start: 1px solid var(--line);
+  }
   .foot__grid { display: grid; grid-template-columns: 1fr auto auto; gap: 2rem 4rem; align-items: start; }
-  .foot__sign { font-size: var(--step-3); }
-  .foot__links, .foot__langs { display: grid; gap: 0.5rem; font-size: var(--step--1); }
+  .foot__sign { display: inline-flex; align-items: center; gap: 0.9rem; }
+  .foot__sign .display { font-size: var(--step-2); font-weight: 600; }
+  .foot__links, .foot__langs { display: grid; gap: 0.45rem; font-size: var(--step--1); font-weight: 500; }
   .foot__langs a { color: var(--muted); }
-  .foot__langs a[aria-current='true'] { color: var(--paper); }
-  .foot__base { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-block-start: 2rem; border-block-start: 1px solid var(--line); }
+  .foot__langs a[aria-current='true'] { color: var(--ink); font-weight: 700; }
+  .foot__base { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-block-start: 1.5rem; border-block-start: 1px solid var(--line); }
   @media (max-width: 720px) { .foot__grid { grid-template-columns: 1fr 1fr; } .foot__sign { grid-column: 1 / -1; } }
 </style>

@@ -14,11 +14,9 @@ const now: L = {
 };
 ---
 
-<section id="about" class="section about wrap" aria-labelledby="about-title">
-  <div class="about__grid">
-    <div class="about__portrait">
-      <Portrait lang={lang} />
-    </div>
+<section id="about" class="section wrap" aria-labelledby="about-title">
+  <div class="scroll about" data-unroll>
+    <div class="about__portrait"><Portrait lang={lang} /></div>
 
     <div class="about__text">
       <p class="kicker" data-reveal>{tr(ui.about.kicker, lang)}</p>
@@ -29,19 +27,19 @@ const now: L = {
 
       <dl class="about__facts">
         <div data-reveal>
-          <dt class="mono">{tr(ui.about.now, lang)}</dt>
+          <dt class="label">{tr(ui.about.now, lang)}</dt>
           <dd>{tr(now, lang)}</dd>
         </div>
         <div data-reveal style="--i:1">
-          <dt class="mono">{tr(ui.about.languages, lang)}</dt>
+          <dt class="label">{tr(ui.about.languages, lang)}</dt>
           <dd>
             <ul class="about__langs">
-              {profile.languages.map((l) => <li><span>{tr(l.name, lang)}</span><span class="mono">{tr(l.level, lang)}</span></li>)}
+              {profile.languages.map((l) => <li><span>{tr(l.name, lang)}</span><span class="label">{tr(l.level, lang)}</span></li>)}
             </ul>
           </dd>
         </div>
         <div data-reveal style="--i:2">
-          <dt class="mono">{tr(ui.about.outside, lang)}</dt>
+          <dt class="label">{tr(ui.about.outside, lang)}</dt>
           <dd>{profile.interests.map((x) => tr(x, lang)).join(' · ')}</dd>
         </div>
       </dl>
@@ -50,17 +48,17 @@ const now: L = {
 </section>
 
 <style>
-  .about__grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: calc(var(--gutter) * 2); align-items: center; }
-  .about__title { font-size: var(--step-5); margin-block: 1.4rem 2.2rem; }
-  .about__body { display: grid; gap: 1.2rem; font-size: var(--step-1); line-height: 1.5; color: var(--paper-2); max-inline-size: 38rem; }
-  :lang(ar) .about__body { line-height: 1.9; }
-  .about__facts { display: grid; gap: 0; margin-block-start: 3rem; border-block-start: 1px solid var(--line); }
-  .about__facts > div { display: grid; grid-template-columns: 10rem 1fr; gap: 1.5rem; padding-block: 1.1rem; border-block-end: 1px solid var(--line); }
-  .about__langs { display: grid; gap: 0.35rem; }
+  .about { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: calc(var(--gutter) * 1.6); align-items: center; }
+  .about__title { font-size: var(--step-5); margin-block: 1.2rem 2rem; }
+  .about__body { display: grid; gap: 1.1rem; font-size: var(--step-1); line-height: 1.6; color: var(--ink-2); max-inline-size: 38rem; }
+  :lang(ar) .about__body { line-height: 1.95; }
+  .about__facts { display: grid; margin-block-start: 2.6rem; border-block-start: 1px solid var(--line); }
+  .about__facts > div { display: grid; grid-template-columns: 10rem 1fr; gap: 1.5rem; padding-block: 1rem; border-block-end: 1px solid var(--line); }
+  .about__langs { display: grid; gap: 0.3rem; }
   .about__langs li { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
   @media (max-width: 960px) {
-    .about__grid { grid-template-columns: 1fr; }
-    .about__portrait { order: 0; max-inline-size: 26rem; inline-size: 100%; margin-inline: auto; }
+    .about { grid-template-columns: 1fr; }
+    .about__portrait { max-inline-size: 24rem; inline-size: 100%; margin-inline: auto; }
     .about__facts > div { grid-template-columns: 1fr; gap: 0.3rem; }
   }
 </style>

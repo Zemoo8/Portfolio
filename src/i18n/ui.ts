@@ -13,11 +13,14 @@ export const ui = {
     close: { en: 'Close', fr: 'Fermer', ar: 'إغلاق' },
     language: { en: 'Language', fr: 'Langue', ar: 'اللغة' },
     home: { en: 'Ahmed Baghouli — home', fr: 'Ahmed Baghouli — accueil', ar: 'أحمد بغولي — الرئيسية' },
+    motion: { en: 'Animations on/off', fr: 'Animations activées/désactivées', ar: 'تشغيل الحركة أو إيقافها' },
   },
   hero: {
     scroll: { en: 'Scroll', fr: 'Défiler', ar: 'مرّر' },
     based: { en: 'Based in Tunisia', fr: 'Basé en Tunisie', ar: 'مقيم في تونس' },
     selected: { en: 'Selected work', fr: 'Projets choisis', ar: 'أعمال مختارة' },
+    enter: { en: 'Enter the orbit', fr: 'Entrer dans l’orbite', ar: 'ادخل المدار' },
+    contact: { en: 'Get in touch', fr: 'Me contacter', ar: 'تواصل معي' },
   },
   intro: {
     label: { en: 'Intro film', fr: 'Film d’introduction', ar: 'فيلم تعريفي' },
@@ -35,7 +38,12 @@ export const ui = {
   },
   work: {
     kicker: { en: 'Selected work', fr: 'Projets choisis', ar: 'أعمال مختارة' },
-    title: { en: 'Things I have built, and what they had to do.', fr: 'Ce que j’ai construit, et ce que chaque projet devait accomplir.', ar: 'ما بنيته، وما كان على كل مشروع أن يحققه.' },
+    title: { en: 'Six builds, carried by one current.', fr: 'Six projets, portés par un même courant.', ar: 'ستة مشاريع يحملها تيار واحد.' },
+    prev: { en: 'Previous project', fr: 'Projet précédent', ar: 'المشروع السابق' },
+    prevItem: { en: 'Previous', fr: 'Précédent', ar: 'السابق' },
+    nextItem: { en: 'Next', fr: 'Suivant', ar: 'التالي' },
+    orbitPause: { en: 'Pause the orbit', fr: 'Mettre l’orbite en pause', ar: 'أوقف الدوران' },
+    drag: { en: 'Drag the orbit, or use the arrows', fr: 'Faites tourner l’orbite, ou utilisez les flèches', ar: 'اسحب المدار أو استخدم الأسهم' },
     open: { en: 'Open case study', fr: 'Voir l’étude de cas', ar: 'افتح دراسة الحالة' },
     role: { en: 'Role', fr: 'Rôle', ar: 'الدور' },
     context: { en: 'Context', fr: 'Contexte', ar: 'السياق' },
@@ -73,6 +81,9 @@ export const ui = {
     title: { en: 'Eighteen credentials, earned one at a time.', fr: 'Dix-huit certifications, obtenues une à une.', ar: 'ثماني عشرة شهادة، نلتُها واحدة تلو الأخرى.' },
     verify: { en: 'Verify', fr: 'Vérifier', ar: 'تحقّق' },
     issued: { en: 'Issued', fr: 'Délivrée', ar: 'صدرت' },
+    all: { en: 'All', fr: 'Toutes', ar: 'الكل' },
+    view: { en: 'View certificate', fr: 'Voir le certificat', ar: 'عرض الشهادة' },
+    hint: { en: 'Drag sideways · tap a certificate to open it', fr: 'Faites glisser · touchez un certificat pour l’ouvrir', ar: 'اسحب جانبيًا · انقر على شهادة لفتحها' },
   },
   capabilities: {
     kicker: { en: 'Capabilities', fr: 'Compétences', ar: 'القدرات' },

@@ -1,0 +1,16 @@
+---
+// The triple air spiral. The geometry (src/lib/emblem.ts) is defined once per page as an SVG
+// <symbol> in the layout (EmblemSymbol); every emblem references it with <use>.
+interface Props { class?: string; title?: string; spin?: boolean }
+const { class: cls = '', title, spin = false } = Astro.props;
+---
+
+<svg class:list={['emblem', spin && 'emblem--spin', cls]} viewBox="-100 -100 200 200" role={title ? 'img' : undefined} aria-hidden={title ? undefined : 'true'} aria-label={title}>
+  <use href="#air-emblem" x="-100" y="-100" width="200" height="200" />
+</svg>
+
+<style>
+  .emblem { fill: currentColor; overflow: visible; }
+  .emblem--spin { animation: emblem-spin 60s linear infinite; }
+  @keyframes emblem-spin { to { transform: rotate(-360deg); } }
+</style>

@@ -43,3 +43,7 @@ Node 24.13, npm 11.8, Python 3.14, ffmpeg 8.1, Playwright 1.61 (Chromium 1228), 
 `.env` files exist in `AIEyes/`, `cheezy/`, `sandy-ai-lab/`, `aieyes-dashboard/.env.local`. None were read beyond key *names* (to diagnose Sandy's backend), none were copied into this repository, and none of their values appear in any output.
 
 Machine-readable versions: [`project-matrix.json`](project-matrix.json), [`media-inventory.json`](media-inventory.json), [`content-source-of-truth.json`](content-source-of-truth.json).
+
+## Supplied during the redesign (2026-09-26)
+
+Ahmed uploaded the certificate documents (19 PDFs/images: NVIDIA, Certiport, IBM/Coursera, DataCamp ×8, Cisco ×5, Cambridge statement, Soliya, NASA, Code It Up 5.0) and an Air Nomad emblem reference. The documents were rendered to `assets-source/certificates/` (private, git-ignored) and published only as trimmed WebP images (`public/media/certificates/`). The emblem reference was used as a visual guide; the emblem on the site is re-drawn from geometry (`src/lib/emblem.ts`). No originals were modified or moved.
