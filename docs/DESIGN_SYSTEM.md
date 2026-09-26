@@ -37,16 +37,15 @@ Strokes are bundles of bristles (not one path): each bristle wobbles, thins and 
 
 ## Ink marks (`scripts/art/ink-marks.mjs` → `public/ink/`)
 
-Seven brush marks drawn with the same bristle engine, given a directional "fibre" displacement so their edges break up like a dry brush, then **baked to small PNG alpha masks** (1–18 KB; an SVG with `feTurbulence` used as a mask is re-rasterised at every size and cost ~0.7 s of main thread on a busy page). CSS paints any colour through them with `mask`:
+Six brush marks drawn with the same bristle engine, given a directional "fibre" displacement so their edges break up like a dry brush, then **baked to small PNG alpha masks** (1–18 KB; an SVG with `feTurbulence` used as a mask is re-rasterised at every size and cost ~0.7 s of main thread on a busy page). CSS paints any colour through them with `mask`:
 
 | Mark | Used for |
 |---|---|
 | `swash` | primary button (`.btn`): the label sits on a loaded brush swash with a solid core (AA contrast); hover re-inks it in rust. `.btn--cloud` is the same stroke in cloud-white on the storm |
-| `under` | brush underline: secondary button (`.btn--ghost`), text links (`.link-u`), active nav chapter, active filter / film language / orbit station, reading progress |
+| `under` | brush underline: secondary button (`.btn--ghost`), text links (`.link-u`), active nav chapter, active filter / film language / orbit station |
 | `ring` | a small ensō around the active language, the film play/pause toggle, the case-study note |
 | `arrow`, `cross` | `.ibtn` prev / next / close (mirrored in CSS for "previous" and RTL) |
 | `dash` | leads every kicker and every tag (`.pill` is now small caps + a vermilion dash — no chips) |
-| `edge` | the torn bottom edge of the header's paper band |
 
 ## The air emblem (`src/lib/emblem.ts`, `EmblemSymbol.astro`, `Emblem.astro`)
 
@@ -58,7 +57,7 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 | Component | What it is |
 |---|---|
 | `Backdrop` | fixed painted world: sky · peaks · breeze · mist A · near · mist B, mist veil — each layer in a depth wrapper |
-| `Nav` | a masthead, not a pill: typographic wordmark (no logo), chapters numbered like a table of contents with a brush stroke under the one you are reading (scroll-spy), languages with a brushed ensō around the current one; after scrolling, a paper band with a torn edge slides in and a rust stroke along it paints the reading progress |
+| `Nav` | a masthead, not a pill: typographic wordmark (no logo), chapters numbered like a table of contents with a brush stroke under the one you are reading (scroll-spy), languages with a brushed ensō around the current one; after scrolling, a clean paper band with a soft shadow slides in behind it |
 | `IntroFilm` | the **moon gate**: a painted ensō around a circular window onto the temple; the intro films play inside the circle. Until they exist, the label hangs vertically beside the gate like a scroll's title slip (in Arabic and on phones it is the caption's first line) |
 | `Work` (storm chapter) | six projects **orbiting the air emblem** over a WebGL smoke vortex; the front card plays its film. Below: a chapter plate (outlined italic numeral behind the title, italic tagline, cloud-white swash), brush arrows around an `01 / 06` counter, and the six projects as a station index |
 | `Credentials` | a rail of the real certificates, tilted like sheets on a table; word filters with an italic count; opens in `Lightbox` |
@@ -75,8 +74,7 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 | Unroll | `.scroll[data-unroll]` | `clip-path` opens top → bottom as the panel enters |
 | Depth | painted layers | CSS scroll-driven animation: layers sink at 0.05 / 0.065 / 0.08 / 0.11 of the first 220vh; mist veil thickens (≤ 0.62) over the first 100vh |
 | Wind | open sky | ambient and time-based: three soft mist wisps cross the sky at a constant pace (95–150 s), mist banks breathe sideways — the same whether or not you scroll |
-| Reading | header | the seal is gone; a rust brush stroke paints across the header's torn edge with scroll position |
-| Orbit | projects | one calm revolution per 95 s; it never reacts to page scrolling; drag with inertia and snap; arrow keys; pause |
+| Orbit | projects | a rhythm, not a drift: one project rests in front for 6.5 s, then the ring glides (1.5 s, ease-in-out) to the next — the card in front, its film and the caption always agree. Drag settles on the nearest project in one motion; arrows / stations / keys glide there; the automatic turn waits while the pointer rests on the ring or focus is inside, and on pause. The ring and the smoke vortex both centre exactly on the emblem; the vortex turns at one constant pace (30 fps) and ignores the pointer |
 | Page change | cross-document | the next page is painted in: a brush swash grows from the centre until it covers the view (View Transitions + mask) |
 
 **Scrolling is the browser's own** (no smooth-scroll library, no inertia). Nothing responds to scroll *speed*; everything that follows the scroll is a function of scroll *position*, run by the compositor, so the same place on the page always looks the same.

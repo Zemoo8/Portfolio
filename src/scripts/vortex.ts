@@ -1,7 +1,9 @@
 // The air element: a WebGL smoke vortex (three wispy arms, differential rotation, domain-warped
 // fbm) on deep ink. Rendered at reduced resolution — smoke is soft, so it upscales cleanly.
-// Paused when off-screen, hidden tab, reduced motion (single frame) or motion switched off.
-// It turns at a constant pace; only dragging the orbit (a deliberate act) stirs it faster.
+// Its eye sits exactly on the air emblem (the orbit's centre) and it turns at one constant,
+// slow pace — it does not follow the pointer or react to scrolling or to the orbit. Drawn at
+// 30 fps (smoke is slow) and paused when off-screen, in a hidden tab, with reduced motion
+// (single frame) or with motion switched off.
 import { motionAllowed } from './scroll';
 
 const vert = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
@@ -10,8 +12,7 @@ const frag = `
 precision highp float;
 uniform vec2 uRes;
 uniform float uTime;
-uniform float uGust;
-uniform vec2 uPointer;
+uniform vec2 uCenter;
 
 float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float noise(vec2 p){
@@ -27,14 +28,13 @@ float fbm(vec2 p){
 }
 
 void main(){
-  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / min(uRes.x, uRes.y) * 2.1;
-  uv -= uPointer * 0.06;
+  vec2 uv = (gl_FragCoord.xy - uCenter) / min(uRes.x, uRes.y) * 2.1;
   float r = length(uv);
   float a = atan(uv.y, uv.x);
   float t = uTime;
 
   // differential rotation: the core turns faster; gusts add spin
-  float spin = t * (0.10 + 0.5 * uGust) + 1.9 / (r + 0.38);
+  float spin = t * 0.10 + 1.9 / (r + 0.38);
   float aa = a + spin;
 
   vec2 p = vec2(cos(aa), sin(aa)) * r;
@@ -85,7 +85,7 @@ async function buildProgram(gl: WebGLRenderingContext): Promise<WebGLProgram | n
   return gl.getProgramParameter(prog, gl.LINK_STATUS) ? prog : null;
 }
 
-export async function mountVortex(canvas: HTMLCanvasElement) {
+export async function mountVortex(canvas: HTMLCanvasElement, anchor?: HTMLElement | null) {
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: false, powerPreference: 'low-power' });
   if (!gl) return null;
   const prog = await buildProgram(gl);
@@ -99,51 +99,45 @@ export async function mountVortex(canvas: HTMLCanvasElement) {
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   const uRes = gl.getUniformLocation(prog, 'uRes');
   const uTime = gl.getUniformLocation(prog, 'uTime');
-  const uGust = gl.getUniformLocation(prog, 'uGust');
-  const uPointer = gl.getUniformLocation(prog, 'uPointer');
+  const uCenter = gl.getUniformLocation(prog, 'uCenter');
 
   // render scale: soft smoke tolerates half resolution; smaller on small screens
   const scale = () => Math.min(devicePixelRatio || 1, 1.5) * (innerWidth < 800 ? 0.45 : 0.55);
   const resize = () => {
-    const w = Math.max(2, Math.round(canvas.clientWidth * scale()));
-    const h = Math.max(2, Math.round(canvas.clientHeight * scale()));
+    const k = scale();
+    const w = Math.max(2, Math.round(canvas.clientWidth * k));
+    const h = Math.max(2, Math.round(canvas.clientHeight * k));
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
     gl.viewport(0, 0, w, h);
     gl.uniform2f(uRes, w, h);
+    // the eye of the vortex = the centre of the anchor (the emblem), in GL pixels (y up)
+    const cr = canvas.getBoundingClientRect();
+    const ar = anchor?.getBoundingClientRect();
+    const cx = ar ? ar.left + ar.width / 2 - cr.left : cr.width / 2;
+    const cy = ar ? ar.top + ar.height / 2 - cr.top : cr.height / 2;
+    gl.uniform2f(uCenter, cx * (w / Math.max(1, cr.width)), (cr.height - cy) * (h / Math.max(1, cr.height)));
+    if (!running) draw();
   };
   const ro = new ResizeObserver(resize);
   ro.observe(canvas);
-  resize();
-
-  const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  const onMove = (e: PointerEvent) => {
-    const r = canvas.getBoundingClientRect();
-    pointer.tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
-    pointer.ty = -((e.clientY - r.top) / r.height - 0.5) * 2;
-  };
-  addEventListener('pointermove', onMove, { passive: true });
+  if (anchor) ro.observe(anchor);
 
   let t = 12;
   let last = performance.now();
   let running = false;
   let raf = 0;
-  let gust = 0;
   const draw = () => {
     gl.uniform1f(uTime, t);
-    gl.uniform1f(uGust, gust);
-    gl.uniform2f(uPointer, pointer.x, pointer.y);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
   const frame = (now: number) => {
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    gust += ((window.__orbitSpin || 0) - gust) * 0.05;
-    t += dt * (1 + gust * 2.5);
-    pointer.x += (pointer.tx - pointer.x) * 0.04;
-    pointer.y += (pointer.ty - pointer.y) * 0.04;
-    draw();
     if (running) raf = requestAnimationFrame(frame);
+    if (now - last < 32) return; // ~30 fps
+    t += Math.min(0.1, (now - last) / 1000);
+    last = now;
+    draw();
   };
+  resize();
   const start = () => {
     if (running) return;
     if (!motionAllowed()) { draw(); return; }
@@ -162,4 +156,4 @@ export async function mountVortex(canvas: HTMLCanvasElement) {
   return { stop };
 }
 
-declare global { interface Window { __orbitSpin?: number } }
+

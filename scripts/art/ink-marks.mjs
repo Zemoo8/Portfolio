@@ -6,7 +6,6 @@
 //   arrow     — prev / next (points right; mirrored in CSS for "previous" and for RTL)
 //   cross     — close
 //   dash      — kicker and tag bullet
-//   edge      — the deckled bottom edge of the header's paper band (tiles horizontally)
 // A directional turbulence displacement ("fibre") breaks every edge up like the hairs of a
 // dry brush. Deterministic (seeded). Usage: node scripts/art/ink-marks.mjs
 import fs from 'node:fs';
@@ -53,14 +52,11 @@ write('cross', svg('0 0 40 40', paths(diag([8, 7], [33, 33], 21)) + paths(diag([
 
 write('dash', svg('0 0 44 12', paths(line(38, 6, { width: 3.2, bristles: 7, seed: 9, dryness: 0.5, bow: 0.6, rise: -0.8 }), 3, 0), { stretch: true, filter: fibre(0.06, 0.6, 1.6, 11) }));
 
-// deckled paper edge: torn fibres from turbulence (stitched, so it tiles seamlessly)
-write('edge', `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 24" preserveAspectRatio="none"><filter id="t" x="0" y="-50%" width="100%" height="200%"><feTurbulence type="fractalNoise" baseFrequency="0.045 0.22" numOctaves="3" seed="5" stitchTiles="stitch"/><feDisplacementMap in="SourceGraphic" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter><rect x="-20" y="-20" width="640" height="32" fill="#000" filter="url(#t)"/></svg>\n`);
-
 // Bake every mark to a PNG alpha mask as well: an SVG with feTurbulence is re-rasterised by the
 // browser at every size it is used — measurable main-thread cost on pages with many marks.
 // CSS uses the PNGs; the SVGs stay as the editable source.
 import sharp from 'sharp';
-const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24], edge: [1200, 48] };
+const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24] };
 for (const [name, [w, h]] of Object.entries(bake)) {
   const src = fs.readFileSync(path.join(OUT, `${name}.svg`));
   await sharp(src, { density: 72 * (w / Number(/viewBox="0 0 ([\d.]+)/.exec(src.toString())[1])) })

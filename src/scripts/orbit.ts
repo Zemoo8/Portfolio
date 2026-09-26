@@ -1,10 +1,17 @@
-// The orbit: project cards circling the air element on a tilted 3D ring.
-// Slow, constant auto-rotation (pausable) — it never reacts to page scrolling, so the ring only
-// moves when time passes or the visitor acts: drag with inertia, snap-to-card, keyboard, dots.
-// The front card is "active": it plays its film and drives the caption.
+// The orbit: project cards on a tilted 3D ring around the air element.
+// Rhythm, not drift: the ring rests with one project in front, then glides on to the next, so the
+// card in front, its film and the caption always agree. It never reacts to page scrolling.
+// Visitors can drag it (it settles on the nearest project in one motion), use the arrows, the
+// station index or the keyboard; "pause" stops the automatic turning only. The automatic turn
+// also waits while the pointer rests on the ring or focus is inside it.
 import { motionAllowed } from './scroll';
 
 type Film = { mp4: string };
+
+const DWELL = 6500; // ms a project rests in front
+const GLIDE = 1500; // ms to glide to the next one
+const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
 export function initOrbit(root: HTMLElement) {
   const stage = root.querySelector<HTMLElement>('[data-orbit-stage]')!;
@@ -16,62 +23,63 @@ export function initOrbit(root: HTMLElement) {
   const N = cards.length;
   const STEP = (Math.PI * 2) / N;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wrap = (i: number) => ((i % N) + N) % N;
+  const norm = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
-  let base = 0;
-  let vel = 0;
-  let target: number | null = null;
+  let base = 0; // ring angle; card i is in front when base + i·STEP ≡ 0
+  let active = -1; // card resting in front
+  let pending = 0; // card the ring is heading to
+  let glide: { from: number; to: number; t0: number; dur: number; ease: (t: number) => number; swapped: boolean } | null = null;
+  let restUntil = performance.now() + DWELL;
+  let userPaused = reduced;
   let hover = false;
-  let userPaused = false;
+  let focusInside = false;
   let dragging = false;
-  let active = -1;
-  let Rx = 400, Rz = 240, Ry = 40;
   let visible = true;
-  let resized = true;
+  let Rx = 400, Rz = 240, Ry = 40;
+  let drawn = NaN;
 
   const measure = () => {
     const w = stage.clientWidth;
     const h = stage.clientHeight;
     Rx = Math.min(w * (w < 700 ? 0.3 : 0.37), 620);
     Rz = Rx * (w < 700 ? 0.9 : 0.62);
-    Ry = Math.min(h * 0.24, 190);
-    resized = true;
+    Ry = Math.min(h * 0.22, 170);
+    drawn = NaN;
   };
   new ResizeObserver(measure).observe(stage);
   measure();
 
-  const norm = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
-  /** Rotation that brings card i to the front, nearest to the current angle. */
-  const baseFor = (i: number) => base + norm(-i * STEP - base);
+  /** Ring angle that brings card i to the front, by the shortest way round. */
+  const angleFor = (i: number) => base + norm(-i * STEP - base);
+  const autoOn = () => !userPaused && !hover && !focusInside && !dragging && motionAllowed();
 
-  const select = (i: number, announce = true) => {
-    target = baseFor(((i % N) + N) % N);
-    vel = 0;
-    if (announce) live.setAttribute('aria-live', 'polite');
+  // --- what the front card owns: highlight, caption, film -----------------------------------
+  const showCaption = (i: number) => {
+    const c = cards[i];
+    for (const key of ['index', 'category', 'year', 'title', 'tagline']) {
+      root.querySelectorAll<HTMLElement>(`[data-cap="${key}"]`).forEach((el) => (el.textContent = c.dataset[key] ?? ''));
+    }
+    const link = caption.querySelector<HTMLAnchorElement>('[data-cap="link"]')!;
+    link.href = c.href;
+    link.setAttribute('aria-label', `${link.dataset.label}: ${c.dataset.title}`);
+    caption.classList.add('is-shown');
+    dots.forEach((d, k) => d.setAttribute('aria-current', String(k === i)));
   };
-
-  const setActive = (i: number) => {
-    if (i === active) return;
-    const prev = cards[active];
+  const release = () => {
+    // the card leaving the front lets go of its film and highlight as the ring starts to move
+    const c = cards[active];
+    if (!c) return;
+    c.removeAttribute('data-active');
+    c.querySelector('video')?.remove();
+  };
+  const arrive = (i: number) => {
     active = i;
     const c = cards[i];
-    // caption
-    caption.classList.remove('is-shown');
-    requestAnimationFrame(() => {
-      for (const key of ['index', 'category', 'year', 'title', 'tagline']) {
-        root.querySelectorAll<HTMLElement>(`[data-cap="${key}"]`).forEach((el) => (el.textContent = c.dataset[key] ?? ''));
-      }
-      const link = caption.querySelector<HTMLAnchorElement>('[data-cap="link"]')!;
-      link.href = c.href;
-      link.setAttribute('aria-label', `${link.dataset.label}: ${c.dataset.title}`);
-      caption.style.setProperty('--tone', c.dataset.tone || 'var(--saffron)');
-      caption.classList.add('is-shown');
-    });
     cards.forEach((x, k) => x.toggleAttribute('data-active', k === i));
-    dots.forEach((d, k) => d.setAttribute('aria-current', String(k === i)));
-    // films: only the active card plays
-    if (prev) prev.querySelector('video')?.remove();
+    showCaption(i);
     const film: Film | null = c.dataset.orbitFilm ? JSON.parse(c.dataset.orbitFilm) : null;
-    if (film && !reduced && motionAllowed()) {
+    if (film && !reduced && motionAllowed() && !c.querySelector('video')) {
       const v = document.createElement('video');
       Object.assign(v, { muted: true, loop: true, playsInline: true, autoplay: true, src: film.mp4 });
       v.setAttribute('aria-hidden', 'true');
@@ -80,55 +88,72 @@ export function initOrbit(root: HTMLElement) {
       c.querySelector('.orbit__media')!.append(v);
       v.play().catch(() => {});
     }
+    restUntil = performance.now() + DWELL;
   };
 
-  // --- pointer drag -----------------------------------------------------------------------
-  let startX = 0, lastX = 0, lastT = 0, moved = 0;
+  /** Glide the ring so card i ends up in front. */
+  const glideTo = (i: number, dur = GLIDE, ease = easeInOut, announce = false) => {
+    i = wrap(i);
+    if (announce) live.setAttribute('aria-live', 'polite');
+    const to = angleFor(i);
+    pending = i;
+    if (i === active && Math.abs(to - base) < 1e-4) return;
+    release();
+    caption.classList.remove('is-shown');
+    glide = { from: base, to, t0: performance.now(), dur: reduced ? 0 : dur, ease, swapped: false };
+  };
+
+  // --- pointer: drag the ring, then settle on the nearest project in one motion ---------------
+  let startX = 0, startBase = 0, lastX = 0, lastT = 0, vel = 0, moved = 0;
   stage.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
     dragging = true;
     moved = 0;
+    vel = 0;
     startX = lastX = e.clientX;
     lastT = performance.now();
-    target = null;
-    vel = 0;
+    startBase = base;
   });
   addEventListener('pointermove', (e) => {
     if (!dragging) return;
-    const dx = e.clientX - lastX;
-    const now = performance.now();
     moved = Math.max(moved, Math.abs(e.clientX - startX));
-    if (moved > 6) stage.setPointerCapture?.(e.pointerId);
-    base += dx / (Rx * 1.1);
-    vel = (dx / (Rx * 1.1)) / Math.max(0.008, (now - lastT) / 1000);
+    if (moved <= 6) return;
+    if (glide) glide = null;
+    if (cards[active]?.hasAttribute('data-active')) { release(); caption.classList.remove('is-shown'); }
+    stage.setPointerCapture?.(e.pointerId);
+    const now = performance.now();
+    base = startBase + (e.clientX - startX) / (Rx * 1.1);
+    const v = ((e.clientX - lastX) / (Rx * 1.1)) / Math.max(0.008, (now - lastT) / 1000);
+    vel = vel * 0.6 + v * 0.4;
     lastX = e.clientX;
     lastT = now;
   });
-  const release = () => {
+  const endDrag = () => {
     if (!dragging) return;
     dragging = false;
-    vel = Math.max(-3, Math.min(3, vel));
-    // let inertia play, then snap to the nearest card
-    setTimeout(() => { if (!dragging) select(nearest(), false); }, 380);
-  };
-  addEventListener('pointerup', release);
-  addEventListener('pointercancel', release);
-
-  const nearest = () => {
+    if (moved <= 6) return; // a click, handled below
+    // a flick carries on a little; the nearest project to where it would coast becomes the target
+    const coast = base + Math.max(-1.2, Math.min(1.2, vel * 0.22));
     let best = 0, bestC = -2;
-    for (let i = 0; i < N; i++) { const c = Math.cos(base + i * STEP); if (c > bestC) { bestC = c; best = i; } }
-    return best;
+    for (let i = 0; i < N; i++) { const c = Math.cos(coast + i * STEP); if (c > bestC) { bestC = c; best = i; } }
+    glideTo(best, 750, easeOut, true);
   };
+  addEventListener('pointerup', endDrag);
+  addEventListener('pointercancel', endDrag);
+  stage.addEventListener('pointerenter', () => { hover = true; });
+  stage.addEventListener('pointerleave', () => { hover = false; restUntil = Math.max(restUntil, performance.now() + 2500); });
 
-  // --- clicks, keyboard, dots, buttons ---------------------------------------------------
+  // --- clicks, keyboard, stations, buttons ---------------------------------------------------
   cards.forEach((card, i) => {
     card.addEventListener('click', (e) => {
       if (moved > 6) { e.preventDefault(); return; } // it was a drag
-      if (i !== active) { e.preventDefault(); select(i); }
+      if (i !== active || glide) { e.preventDefault(); glideTo(i, GLIDE, easeInOut, true); }
     });
-    card.addEventListener('focus', () => { if (i !== active) select(i); });
-    card.addEventListener('pointerenter', () => { hover = true; });
-    card.addEventListener('pointerleave', () => { hover = false; });
+    card.addEventListener('focus', () => { if (i !== active && i !== pending) glideTo(i, GLIDE, easeInOut, true); });
+  });
+  root.addEventListener('focusin', () => { focusInside = true; });
+  root.addEventListener('focusout', (e) => {
+    if (!root.contains(e.relatedTarget as Node)) { focusInside = false; restUntil = Math.max(restUntil, performance.now() + 2500); }
   });
   root.addEventListener('keydown', (e) => {
     if (!(e.target as HTMLElement).closest('[data-orbit-card]')) return;
@@ -136,63 +161,60 @@ export function initOrbit(root: HTMLElement) {
     const step = e.key === 'ArrowRight' ? (rtl ? -1 : 1) : e.key === 'ArrowLeft' ? (rtl ? 1 : -1) : 0;
     if (!step) return;
     e.preventDefault();
-    const next = (active + step + N) % N;
-    select(next);
+    const next = wrap((glide ? pending : active) + step);
+    glideTo(next, GLIDE, easeInOut, true);
     cards[next].focus({ preventScroll: true });
   });
-  dots.forEach((d, i) => d.addEventListener('click', () => select(i)));
-  root.querySelector('[data-orbit-prev]')!.addEventListener('click', () => select(active - 1));
-  root.querySelector('[data-orbit-next]')!.addEventListener('click', () => select(active + 1));
+  const ref = () => (glide ? pending : active);
+  dots.forEach((d, i) => d.addEventListener('click', () => glideTo(i, GLIDE, easeInOut, true)));
+  root.querySelector('[data-orbit-prev]')!.addEventListener('click', () => glideTo(ref() - 1, GLIDE, easeInOut, true));
+  root.querySelector('[data-orbit-next]')!.addEventListener('click', () => glideTo(ref() + 1, GLIDE, easeInOut, true));
+  pauseBtn.setAttribute('aria-pressed', String(userPaused));
   pauseBtn.addEventListener('click', () => {
     userPaused = !userPaused;
     pauseBtn.setAttribute('aria-pressed', String(userPaused));
+    if (!userPaused) restUntil = performance.now() + 2500;
   });
-  if (reduced) { userPaused = true; pauseBtn.setAttribute('aria-pressed', 'true'); }
 
-  new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(stage);
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible) restUntil = Math.max(restUntil, performance.now() + DWELL / 2);
+  }).observe(stage);
 
-  // --- frame loop ------------------------------------------------------------------------
-  let last = performance.now();
-  let drawn = NaN;
-  const frame = (now: number) => {
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    const before = base;
-    if (visible) {
-      if (target !== null) {
-        const k = reduced ? 1 : Math.min(1, dt * 5.5);
-        base += (target - base) * k;
-        if (Math.abs(target - base) < 0.0008) { base = target; target = null; }
-      } else if (!dragging) {
-        base += vel * dt;
-        vel *= Math.pow(0.04, dt); // inertia decays within ~1 s
-        const auto = !hover && !userPaused && motionAllowed();
-        if (auto) base += dt * ((Math.PI * 2) / 95); // one calm revolution every 95 s
-      }
-      window.__orbitSpin = Math.min(1, Math.abs(base - before) / Math.max(dt, 0.001) / 3);
-      // a paused ring needs no style writes
-      if (base !== drawn || resized) {
-        drawn = base;
-        resized = false;
-        for (let i = 0; i < N; i++) {
-          const th = base + i * STEP;
-          const s = Math.sin(th);
-          const c = Math.cos(th);
-          const f = (c + 1) / 2; // 0 back → 1 front
-          const el = cards[i];
-          el.style.transform = `translate(-50%, -50%) translate3d(${(s * Rx).toFixed(1)}px, ${(c * Ry - Ry * 0.32).toFixed(1)}px, ${(c * Rz).toFixed(1)}px) scale(${(0.7 + 0.3 * f).toFixed(3)})`;
-          el.style.setProperty('--f', f.toFixed(3));
-          el.style.zIndex = String(Math.round(f * 100));
-        }
-      }
-      const n = nearest();
-      if (n !== active) setActive(n);
+  // --- drawing ---------------------------------------------------------------------------------
+  const draw = () => {
+    if (base === drawn) return;
+    drawn = base;
+    for (let i = 0; i < N; i++) {
+      const th = base + i * STEP;
+      const s = Math.sin(th);
+      const c = Math.cos(th);
+      const f = (c + 1) / 2; // 0 back → 1 front
+      // the ring's centre is the emblem's centre (the stage centre), so everything turns around it
+      cards[i].style.transform = `translate(-50%, -50%) translate3d(${(s * Rx).toFixed(1)}px, ${(c * Ry).toFixed(1)}px, ${(c * Rz).toFixed(1)}px) scale(${(0.7 + 0.3 * f).toFixed(3)})`;
+      cards[i].style.setProperty('--f', f.toFixed(3));
     }
-    requestAnimationFrame(frame);
   };
-  setActive(0);
+
+  const frame = (now: number) => {
+    requestAnimationFrame(frame);
+    if (!visible) return;
+    if (glide) {
+      const p = glide.dur ? Math.min(1, (now - glide.t0) / glide.dur) : 1;
+      base = glide.from + (glide.to - glide.from) * glide.ease(p);
+      // the new caption fades in as its card approaches the front
+      if (!glide.swapped && p >= 0.6) { glide.swapped = true; showCaption(pending); }
+      if (p >= 1) { base = glide.to; glide = null; arrive(pending); }
+    } else if (autoOn() && now >= restUntil) {
+      glideTo(active + 1);
+    }
+    draw();
+  };
+
+  draw();
+  arrive(0);
   requestAnimationFrame(frame);
 
-  // announce only user-initiated changes
+  // announce only visitor-initiated changes
   live.addEventListener('animationend', () => live.setAttribute('aria-live', 'off'));
 }

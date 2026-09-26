@@ -309,7 +309,7 @@ const cards = projects.map((p) => {
       const canvas = section.querySelector<HTMLCanvasElement>('[data-vortex]');
       if (canvas) {
         const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 60));
-        idle(() => mountVortex(canvas).catch(() => { /* no WebGL: the CSS ink gradient remains */ }));
+        idle(() => mountVortex(canvas, section.querySelector<HTMLElement>('.orbit__core')).catch(() => { /* no WebGL: the CSS ink gradient remains */ }));
       }
     }, { rootMargin: '0px 0px 150px 0px' });
     io.observe(section);

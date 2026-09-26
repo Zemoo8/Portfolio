@@ -4,8 +4,7 @@
 //  · chapter links numbered like a table of contents; hover paints a brush stroke under the
 //    word, and the chapter you are reading keeps its stroke (scroll-spy → aria-current)
 //  · the active language sits inside a small brushed ensō
-//  · once you scroll, a sheet of paper with a torn (deckled) edge slides in behind it, and a thin
-//    rust stroke along that edge paints itself across as you read (CSS scroll timeline)
+//  · once you scroll, a clean sheet of paper slides in behind it (a soft shadow, no edge line)
 import { locales, localeMeta, path, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -23,10 +22,7 @@ const items = [
 ---
 
 <header class="nav" data-nav>
-  <div class="nav__band" aria-hidden="true">
-    <div class="nav__paper"></div>
-    <span class="nav__read"></span>
-  </div>
+  <div class="nav__band" aria-hidden="true"></div>
 
   <div class="nav__bar">
     <a class="nav__brand" href={home} aria-label={tr(ui.nav.home, lang)}>
@@ -105,43 +101,15 @@ const items = [
   /* the paper band that arrives once the page moves */
   .nav__band {
     position: absolute;
-    inset: 0 0 -0.9rem;
+    inset: 0;
     pointer-events: none;
-    filter: drop-shadow(0 8px 10px rgb(40 36 30 / 0.1));
+    background: var(--paper-grain), linear-gradient(180deg, #f8f3e4, var(--paper));
+    box-shadow: 0 10px 30px -18px rgb(40 36 30 / 0.35);
     opacity: 0;
-    transform: translateY(-110%);
+    transform: translateY(-105%);
     transition: transform 0.7s var(--ease-out), opacity 0.4s var(--ease-out);
   }
   .nav.is-scrolled .nav__band, .nav.is-open .nav__band { opacity: 1; transform: none; }
-  .nav__paper {
-    position: absolute;
-    inset: 0;
-    background: var(--paper-grain), linear-gradient(180deg, #f8f3e4, var(--paper));
-    /* solid sheet, torn along the bottom edge */
-    -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - 0.9rem) no-repeat, url('/ink/edge.png') bottom / 36rem 0.9rem repeat-x;
-    mask: linear-gradient(#000 0 0) top / 100% calc(100% - 0.9rem) no-repeat, url('/ink/edge.png') bottom / 36rem 0.9rem repeat-x;
-  }
-  /* reading progress: a rust brush stroke painting across the torn edge */
-  .nav__read {
-    position: absolute;
-    inset-inline: 0;
-    inset-block-end: 0.55rem;
-    block-size: 0.5rem;
-    background: var(--rust);
-    opacity: 0.75;
-    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
-    mask: url('/ink/under.png') center / 100% 100% no-repeat;
-    clip-path: inset(-50% 100% -50% 0);
-  }
-  @supports (animation-timeline: scroll()) {
-    .nav__read { animation: nav-read linear both; }
-    .nav__band > .nav__read { animation-timeline: scroll(root block); } /* apart from the shorthand */
-    [dir='rtl'] .nav__read { animation-name: nav-read-rtl; }
-    @media (prefers-reduced-motion: reduce) { .nav__read { animation-duration: auto !important; } }
-  }
-  @keyframes nav-read { from { clip-path: inset(-50% 100% -50% 0); } to { clip-path: inset(-50% 0 -50% 0); } }
-  @keyframes nav-read-rtl { from { clip-path: inset(-50% 0 -50% 100%); } to { clip-path: inset(-50% 0 -50% 0); } }
-  :global(.motion-off) .nav__read { animation-play-state: running !important; }
 
   .nav__bar {
     position: relative;
