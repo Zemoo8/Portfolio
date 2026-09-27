@@ -324,13 +324,6 @@ const within = route.startsWith('work/') ? 'work' : undefined;
     a.addEventListener('click', () => dialog.close());
   });
 
-  document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) =>
-    a.addEventListener('click', () => {
-      try { localStorage.setItem('lang', a.dataset.langLink!); } catch {}
-      if (location.hash) a.href = a.href.split('#')[0] + location.hash;
-    }),
-  );
-
   // ---- where you are ------------------------------------------------------------------------
   const root = document.documentElement;
   const links = [...nav.querySelectorAll<HTMLAnchorElement>('[data-rod-link]')];
@@ -363,6 +356,10 @@ const within = route.startsWith('work/') ? 'work' : undefined;
     if (ids.includes(s.id)) last = ids.indexOf(s.id);
     owner.set(s, last);
   }
+  // A chapter becomes the current one as it reaches 30 % of the way down the screen — below
+  // where a jump to it lands (scroll-margin in global.css). The name's colour follows whatever
+  // is under it, at the very top.
+  const READ_LINE = 0.3;
   let atBand: HTMLElement | undefined;
   let atEnd = false;
   const apply = () => {
@@ -370,16 +367,18 @@ const within = route.startsWith('work/') ? 'work' : undefined;
       setCurrent(owner.get(scenes[scenes.length - 1])!);
       return;
     }
-    if (!atBand) return;
-    root.dataset.navTone = atBand.dataset.tone!;
-    setCurrent(owner.get(atBand)!);
+    if (atBand) setCurrent(owner.get(atBand)!);
   };
   if (scenes.length) {
     const band = new IntersectionObserver((entries) => {
       for (const e of entries) if (e.isIntersecting) atBand = e.target as HTMLElement;
       apply();
-    }, { rootMargin: '-3% 0px -96% 0px' });
+    }, { rootMargin: `-${READ_LINE * 100}% 0px -${99 - READ_LINE * 100}% 0px` });
     scenes.forEach((s) => band.observe(s));
+    const tone = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) root.dataset.navTone = (e.target as HTMLElement).dataset.tone!;
+    }, { rootMargin: '-3% 0px -96% 0px' });
+    scenes.forEach((s) => tone.observe(s));
     // a last chapter shorter than the screen never reaches the top: the foot of the page counts
     const end = document.createElement('div');
     end.setAttribute('aria-hidden', 'true');
@@ -391,7 +390,7 @@ const within = route.startsWith('work/') ? 'work' : undefined;
   // ---- the ink line: each stretch is inked over its own chapter's scroll distance ------------
   const layout = () => {
     const max = Math.max(1, root.scrollHeight - innerHeight);
-    const lead = innerHeight * 0.04; // the chapter begins as it reaches the band near the top
+    const lead = innerHeight * READ_LINE; // the chapter begins as it reaches the reading line
     const starts = ids.map((id, k) => {
       if (within) return k <= ids.indexOf(within) ? 0 : max;
       const el = document.getElementById(id);
@@ -411,4 +410,43 @@ const within = route.startsWith('work/') ? 'work' : undefined;
   new ResizeObserver(relayout).observe(document.body);
   addEventListener('load', relayout, { once: true });
   document.fonts?.ready.then(relayout);
+
+  // ---- changing language keeps your place ---------------------------------------------------
+  // The other language's page is laid out a little differently (text lengths differ), so the
+  // place is kept as "this far through this scene" and found again there.
+  const KEEP = 'keep-place';
+  const place = () => {
+    const y = scrollY;
+    const i = scenes.findIndex((s) => { const r = s.getBoundingClientRect(); return r.top <= 1 && r.bottom > 0; });
+    if (i < 0) return { i: -1, f: y / Math.max(1, root.scrollHeight - innerHeight) };
+    const r = scenes[i].getBoundingClientRect();
+    return { i, f: -r.top / r.height };
+  };
+  const goTo = (k: { i: number; f: number }) => {
+    const max = root.scrollHeight - innerHeight;
+    const s = scenes[k.i];
+    const y = s ? s.getBoundingClientRect().top + scrollY + k.f * s.getBoundingClientRect().height : k.f * max;
+    scrollTo({ top: Math.min(max, Math.max(0, y)), behavior: 'instant' });
+  };
+  document.querySelectorAll<HTMLAnchorElement>('[data-lang-link]').forEach((a) =>
+    a.addEventListener('click', () => {
+      try {
+        localStorage.setItem('lang', a.dataset.langLink!);
+        sessionStorage.setItem(KEEP, JSON.stringify({ to: new URL(a.href).pathname, ...place() }));
+      } catch {}
+    }),
+  );
+  try {
+    const keep = JSON.parse(sessionStorage.getItem(KEEP) ?? 'null');
+    sessionStorage.removeItem(KEEP);
+    if (keep && keep.to === location.pathname && !location.hash) {
+      goTo(keep);
+      // fonts and late images can still shift the page a little: settle once more, unless the
+      // reader has already moved on
+      let moved = false;
+      const stop = () => { moved = true; };
+      ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((t) => addEventListener(t, stop, { once: true, passive: true }));
+      Promise.all([document.fonts?.ready, new Promise((r) => (document.readyState === 'complete' ? r(0) : addEventListener('load', r, { once: true })))]).then(() => { if (!moved) goTo(keep); });
+    }
+  } catch {}
 </script>

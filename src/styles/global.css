@@ -166,6 +166,9 @@ ul, ol { padding: 0; list-style: none; }
 }
 
 .section { padding-block: var(--section) 0; position: relative; }
+/* a jump to a chapter (the chapter scroll, the index, in-page links) lands with the chapter a
+   little way down the screen rather than hard against the top edge */
+main section[id] { scroll-margin-block-start: 20vh; }
 
 /* A parchment scroll floating over the painted world */
 .scroll {

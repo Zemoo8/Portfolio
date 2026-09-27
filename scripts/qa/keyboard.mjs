@@ -23,22 +23,32 @@ for (const lang of ['en', 'ar']) {
   check(`[${lang}] Tab after the name reaches the first chapter on the rod`, firstCh === 'work', `focus=${firstCh}`);
   await p.focus('[data-rod-link="about"]');
   await p.keyboard.press('Enter');
-  await p.waitForTimeout(1800);
+  try { await p.waitForFunction(() => document.querySelector('[data-rod-link="about"]').getAttribute('aria-current') === 'true', null, { timeout: 5000 }); } catch {}
   const inked = await p.evaluate(() => document.querySelector('[data-rod-link="about"]').getAttribute('aria-current'));
   check(`[${lang}] Enter on a chapter goes there and marks it current`, inked === 'true', `aria-current=${inked}`);
-  await p.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; scrollTo(0, 0); });
-  await p.waitForTimeout(400);
+  // back to the top at once (the page scrolls smoothly; a jump still under way must not carry on)
+  await p.waitForTimeout(1500);
+  await p.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; scrollTo({ top: 0, behavior: 'instant' }); });
+  await p.waitForFunction(() => scrollY === 0);
+  await p.waitForTimeout(300);
 
   // orbit: focus the 3rd card, it should become active; ArrowRight moves on
-  await p.focus('[data-orbit-card]:nth-of-type(3)');
-  await p.waitForTimeout(2200);
+  // (the orbit starts only as it nears the view, then glides 1.5 s: wait for the card to arrive)
   const third = await p.evaluate(() => document.querySelectorAll('[data-orbit-card]')[2].dataset.title);
+  const arrives = async (title) => {
+    const t0 = Date.now();
+    try { await p.waitForFunction((t) => document.querySelector('[data-orbit-card][data-active]')?.dataset.title === t, title, { timeout: 5000 }); } catch {}
+    return Date.now() - t0;
+  };
+  await p.focus('[data-orbit-card]:nth-of-type(3)');
+  const ms1 = await arrives(third);
   const act1 = await p.evaluate(() => document.querySelector('[data-orbit-card][data-active]')?.dataset.title);
-  check(`[${lang}] focusing an orbit card brings it to the front`, act1 === third, `active=${act1}`);
+  check(`[${lang}] focusing an orbit card brings it to the front`, act1 === third, `active=${act1} after ${ms1} ms`);
   await p.keyboard.press('ArrowRight');
-  await p.waitForTimeout(2200);
+  const nextTitle = await p.evaluate(() => document.activeElement.dataset.title);
+  const ms2 = await arrives(nextTitle);
   const act2 = await p.evaluate(() => [document.querySelector('[data-orbit-card][data-active]')?.dataset.title, document.activeElement.dataset.title]);
-  check(`[${lang}] ArrowRight rotates the orbit and moves focus`, !!act2[0] && act2[0] === act2[1] && act2[0] !== third, `active=${act2[0]} focus=${act2[1]}`);
+  check(`[${lang}] ArrowRight rotates the orbit and moves focus`, !!act2[0] && act2[0] === act2[1] && act2[0] !== third, `active=${act2[0]} focus=${act2[1]} after ${ms2} ms`);
   const pressed = await p.evaluate(() => { const bt = document.querySelector('[data-orbit-pause]'); bt.click(); return bt.getAttribute('aria-pressed'); });
   check(`[${lang}] orbit pause button toggles`, pressed === 'true');
 

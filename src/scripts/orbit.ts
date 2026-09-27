@@ -37,14 +37,54 @@ export function initOrbit(root: HTMLElement) {
   let dragging = false;
   let visible = true;
   let Rx = 400, Rz = 240, Ry = 40;
+  let drop = 0; // extra fall of the front of the ring, so the card in front clears the emblem
   let drawn = NaN;
+
+  // How far a card reaches sideways from the centre, on screen: its ring position plus half its
+  // (scaled) width, through the stage's perspective — at the widest point of the ring.
+  const reach = (rx: number, rz: number, half: number, persp: number) => {
+    let m = 0;
+    for (let k = 0; k <= 48; k++) {
+      const th = (k / 48) * Math.PI;
+      const c = Math.cos(th);
+      const x = (rx * Math.sin(th) + half * (0.7 + 0.3 * (c + 1) / 2)) * persp / (persp - rz * c);
+      m = Math.max(m, x);
+    }
+    return m;
+  };
+  // Room on either side of the emblem that is clear of the chapter scroll hanging at the page
+  // edge (Nav), keeping a little air before it; without the scroll the ring may reach the edges.
+  const room = () => {
+    const rod = document.querySelector<HTMLElement>('.rod');
+    if (!rod || !rod.getClientRects().length) return Infinity;
+    const r = rod.getBoundingClientRect();
+    const sr = stage.getBoundingClientRect();
+    const cx = sr.left + sr.width / 2;
+    return (r.left > cx ? r.left - cx : cx - r.right) - 28;
+  };
 
   const measure = () => {
     const w = stage.clientWidth;
     const h = stage.clientHeight;
+    const depth = w < 700 ? 0.9 : 0.62;
+    const half = cards[0].offsetWidth / 2;
+    const persp = parseFloat(getComputedStyle(stage).perspective) || 1800;
+    const free = room();
     Rx = Math.min(w * (w < 700 ? 0.3 : 0.37), 620);
-    Rz = Rx * (w < 700 ? 0.9 : 0.62);
+    while (Rx > 120 && reach(Rx, Rx * depth, half, persp) > free) Rx -= 6;
+    Rz = Rx * depth;
     Ry = Math.min(h * 0.22, 170);
+    // The card in front sits low enough that the whole emblem shows above it: its top edge, seen
+    // through the perspective (origin 30 % down the stage), lands just under the emblem.
+    const core = root.querySelector<HTMLElement>('.orbit__core');
+    const H = cards[0].offsetHeight;
+    const oy = h * 0.3;
+    const k = persp / (persp - Rz);
+    const clearLine = h / 2 + (core ? core.offsetHeight * 0.46 : 0) + 14;
+    drop = Math.max(0, (clearLine - oy) / k + oy - h / 2 - Ry + H / 2);
+    // …and whatever follows the stage moves down by as much as that card now reaches past it
+    const reachDown = oy + (h / 2 + Ry + drop + H / 2 - oy) * k;
+    stage.style.marginBlockEnd = `${Math.max(0, Math.round(reachDown - h + 20))}px`;
     drawn = NaN;
   };
   new ResizeObserver(measure).observe(stage);
@@ -191,7 +231,9 @@ export function initOrbit(root: HTMLElement) {
       const c = Math.cos(th);
       const f = (c + 1) / 2; // 0 back → 1 front
       // the ring's centre is the emblem's centre (the stage centre), so everything turns around it
-      cards[i].style.transform = `translate(-50%, -50%) translate3d(${(s * Rx).toFixed(1)}px, ${(c * Ry).toFixed(1)}px, ${(c * Rz).toFixed(1)}px) scale(${(0.7 + 0.3 * f).toFixed(3)})`;
+      // the front half of the ring falls a little further (smoothly, from nothing at the sides)
+      const y = c * Ry + (c > 0 ? c * c * drop : 0);
+      cards[i].style.transform = `translate(-50%, -50%) translate3d(${(s * Rx).toFixed(1)}px, ${y.toFixed(1)}px, ${(c * Rz).toFixed(1)}px) scale(${(0.7 + 0.3 * f).toFixed(3)})`;
       cards[i].style.setProperty('--f', f.toFixed(3));
     }
   };
