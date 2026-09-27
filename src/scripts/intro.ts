@@ -1,25 +1,40 @@
-// Moon-gate intro films: language tabs, silent autoplay, optional sound, captions, replay.
-// Which films exist is decided at build time (data-files), so missing ones are never fetched;
-// the painted view simply stays.
+// Intro films: the moon gate opens them in a gust of wind (gust.ts) onto a stage where the film
+// of the chosen language plays, with sound — opening it is the visitor's own choice. Language
+// tabs under the gate, optional captions, replay. Which films exist is decided at build time
+// (data-files), so missing ones are never fetched; until then the stage says "coming soon".
+import { initGust } from './gust';
+
 type Lang = 'en' | 'fr' | 'ar';
 type Files = Record<Lang, { mp4: boolean; webm: boolean; vtt: boolean; poster: boolean }>;
 
 export function initIntro(root: HTMLElement) {
   const base = root.dataset.base!;
   const files: Files = JSON.parse(root.dataset.files || '{}');
+  const dialog = root.querySelector<HTMLDialogElement>('[data-gust]')!;
   const video = root.querySelector<HTMLVideoElement>('[data-intro-video]')!;
   const placeholders = [...root.querySelectorAll<HTMLElement>('[data-intro-placeholder]')];
   const controls = root.querySelector<HTMLElement>('[data-intro-controls]')!;
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-intro-tab]')];
   const soundBtn = root.querySelector<HTMLButtonElement>('[data-intro-sound]')!;
   const ccBtn = root.querySelector<HTMLButtonElement>('[data-intro-cc]')!;
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let hasFilm = false;
 
-  const showView = () => {
+  const showSoon = () => {
+    hasFilm = false;
     video.pause();
     video.hidden = true;
     controls.hidden = true;
     placeholders.forEach((el) => (el.hidden = false));
+  };
+
+  const setSound = (on: boolean) => {
+    video.muted = !on;
+    soundBtn.textContent = on ? soundBtn.dataset.off! : soundBtn.dataset.on!;
+  };
+  const play = () => {
+    if (!hasFilm || !dialog.open) return;
+    setSound(true);
+    video.play().catch(() => { setSound(false); video.play().catch(() => {}); });
   };
 
   const load = (lang: Lang) => {
@@ -31,7 +46,7 @@ export function initIntro(root: HTMLElement) {
     video.pause();
     video.innerHTML = '';
     const f = files[lang];
-    if (!f?.mp4 && !f?.webm) return showView();
+    if (!f?.mp4 && !f?.webm) return showSoon();
 
     const src = (ext: string) => `${base}/intro-${lang}.${ext}`;
     if (f.webm) video.append(Object.assign(document.createElement('source'), { src: src('webm'), type: 'video/webm' }));
@@ -42,15 +57,15 @@ export function initIntro(root: HTMLElement) {
     else video.removeAttribute('poster');
     video.preload = 'metadata';
     video.load();
+    hasFilm = true;
     placeholders.forEach((el) => (el.hidden = true));
     controls.hidden = false;
     video.hidden = false;
-    if (!reduced && !document.documentElement.classList.contains('motion-off')) video.play().catch(() => {});
+    play();
   };
 
   soundBtn.addEventListener('click', () => {
-    video.muted = !video.muted;
-    soundBtn.textContent = video.muted ? soundBtn.dataset.on! : soundBtn.dataset.off!;
+    setSound(video.muted);
     if (!video.muted) { video.currentTime = 0; video.play(); }
   });
   ccBtn.addEventListener('click', () => {
@@ -73,6 +88,14 @@ export function initIntro(root: HTMLElement) {
       next.focus();
       next.click();
     });
+  });
+
+  initGust({
+    trigger: root.querySelector<HTMLElement>('[data-gust-open]')!,
+    dialog,
+    canvas: root.querySelector<HTMLCanvasElement>('[data-gust-air]')!,
+    onOpened: play,
+    onClosing: () => video.pause(),
   });
 
   load((root.dataset.lang as Lang) || 'en');

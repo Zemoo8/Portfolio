@@ -21,13 +21,13 @@ export const capabilities: { name: L; body: L; tools: string[]; proof: string[] 
     name: a('Scientific computing', 'Calcul scientifique', 'الحوسبة العلمية'),
     body: a('Estimation, simulation and honest evaluation.', 'Estimation, simulation et évaluation honnête.', 'التقدير والمحاكاة والتقييم الصادق.'),
     tools: ['Python', 'NumPy', 'SciPy', 'pandas', 'scikit-learn', 'MATLAB'],
-    proof: ['aegis-radar', 'books-intelligence'],
+    proof: ['radar-interceptor', 'books-intelligence'],
   },
   {
     name: a('3D, motion & video', '3D, motion & vidéo', 'الأبعاد الثلاثية والحركة والفيديو'),
     body: a('Real-time scenes and films rendered from code.', 'Des scènes temps réel et des films rendus à partir du code.', 'مشاهد آنية وأفلام مولَّدة بالشيفرة.'),
     tools: ['Unity', 'C#', 'Three.js', 'Remotion', 'Playwright'],
-    proof: ['subway-runner', 'aegis-radar', 'cheezy'],
+    proof: ['subway-runner', 'radar-interceptor', 'cheezy'],
   },
 ];
 

@@ -1,10 +1,13 @@
 ---
-// The moon gate: a circular window onto the ink landscape. It holds the three personal intro
-// films (EN / FR / AR), detected at build time:
+// The moon gate: a painted ensō around a round window in which the air emblem turns over the
+// misty temple. The gate is a button: it opens the intro film in a gust of wind (scripts/gust.ts)
+// — the storm tears out of the gate, fills the screen, and the film's screen is blown in.
+// The three personal intro films (EN / FR / AR) are detected at build time:
 //   public/media/intros/intro-<lang>.mp4   (+ optional .webm, .vtt; poster: intro-<lang>-poster.webp)
-// Missing films keep the painted view and are never requested (no 404s).
+// Until a film exists, the stage says it is in production; missing films are never requested.
 // Adding a file and rebuilding/redeploying is all it takes. See docs/README.md → "Intro films".
 import Brush from './Brush.astro';
+import Emblem from './Emblem.astro';
 import { locales, localeMeta, asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { exists } from '../lib/media';
@@ -20,20 +23,11 @@ const files = Object.fromEntries(
 <figure class="gate" data-intro data-base={base} data-lang={lang} data-files={JSON.stringify(files)}>
   <div class="gate__frame">
     <Brush kind="circle" seed={7} class="gate__enso" />
-    <div class="gate__window">
+    <button class="gate__window" type="button" aria-haspopup="dialog" aria-controls="gust" aria-expanded="false" aria-label={tr(ui.intro.open, lang)} data-gust-open>
       <img class="gate__view" src={asset('art/gate.webp')} alt="" width="900" height="900" fetchpriority="high" loading="eager" />
-      <div class="gate__mist" aria-hidden="true"></div>
-      <video class="gate__video" muted playsinline loop preload="none" hidden data-intro-video></video>
-    </div>
-    <p class="gate__tag" data-intro-placeholder>
-      <span>{tr(ui.intro.label, lang)}</span>
-      <span class="gate__tag-state">{tr(ui.intro.pending, lang)}</span>
-    </p>
-    <div class="gate__controls" hidden data-intro-controls>
-      <button type="button" data-intro-sound data-on={tr(ui.intro.sound, lang)} data-off={tr(ui.intro.mute, lang)}>{tr(ui.intro.sound, lang)}</button>
-      <button type="button" data-intro-cc aria-pressed="false" hidden>{tr(ui.intro.captions, lang)}</button>
-      <button type="button" data-intro-replay>{tr(ui.intro.replay, lang)}</button>
-    </div>
+      <span class="gate__mist" aria-hidden="true"></span>
+      <span class="gate__air" aria-hidden="true"><Emblem class="gate__emblem" spin /></span>
+    </button>
   </div>
 
   <figcaption class="gate__caption">
@@ -45,23 +39,49 @@ const files = Object.fromEntries(
       ))}
     </div>
   </figcaption>
+
+  <dialog class="gust" id="gust" aria-label={tr(ui.intro.label, lang)} data-gust>
+    <canvas class="gust__air" aria-hidden="true" data-gust-air></canvas>
+    <div class="gust__stage">
+      <div class="gust__screen">
+        <video class="gust__video" playsinline preload="none" hidden data-intro-video></video>
+        <div class="gust__soon" data-intro-placeholder>
+          <Emblem class="gust__emblem" spin />
+          <p class="gust__kicker">{tr(ui.intro.label, lang)}</p>
+          <p class="gust__title">{tr(ui.intro.soon, lang)}</p>
+          <p class="gust__note">{tr(ui.intro.pendingNote, lang)} <span>{tr(ui.intro.pending, lang)}.</span></p>
+        </div>
+      </div>
+      <div class="gust__controls" hidden data-intro-controls>
+        <button type="button" data-intro-sound data-on={tr(ui.intro.sound, lang)} data-off={tr(ui.intro.mute, lang)}>{tr(ui.intro.mute, lang)}</button>
+        <button type="button" data-intro-cc aria-pressed="false" hidden>{tr(ui.intro.captions, lang)}</button>
+        <button type="button" data-intro-replay>{tr(ui.intro.replay, lang)}</button>
+      </div>
+    </div>
+    <button class="ibtn ibtn--close gust__close" type="button" aria-label={tr(ui.nav.close, lang)} data-gust-close></button>
+  </dialog>
 </figure>
 
 <style>
   .gate { display: grid; justify-items: center; gap: 1.6rem; }
   .gate__frame { position: relative; inline-size: min(100%, 34rem); aspect-ratio: 1; display: grid; place-items: center; }
-  .gate__frame :global(.gate__enso) { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; z-index: 2; pointer-events: none; }
+  .gate__frame :global(.gate__enso) { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; z-index: 2; pointer-events: none; transition: rotate 1.4s var(--ease-out); }
   .gate__window {
     position: relative;
+    display: block;
     inline-size: 84%;
     aspect-ratio: 1;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
     overflow: hidden;
     background: var(--mist);
     box-shadow: inset 0 0 0 1px rgb(31 29 26 / 0.12), inset 0 20px 60px -30px rgb(31 29 26 / 0.45);
     isolation: isolate;
+    cursor: pointer;
   }
-  .gate__view, .gate__video { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .gate__window:focus-visible { outline-offset: 6px; }
+  .gate__view { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; opacity: 0.38; }
   .gate__view { transform-origin: 50% 40%; animation: gate-breathe 28s ease-in-out infinite alternate; }
   @keyframes gate-breathe { from { transform: scale(1.04) translate3d(-1.5%, 0, 0); } to { transform: scale(1.12) translate3d(1.5%, -1%, 0); } }
   .gate__mist {
@@ -71,58 +91,33 @@ const files = Object.fromEntries(
     animation: gate-mist 22s ease-in-out infinite alternate;
   }
   @keyframes gate-mist { from { translate: -10% 0; } to { translate: 10% -4%; } }
-  .gate__video { z-index: 2; }
-  /* the placeholder's label hangs beside the gate like the title slip of a scroll */
-  .gate__tag {
+
+  /* the air emblem, painted in ink in the middle of the gate; a hover stirs it */
+  .gate__air {
     position: absolute;
-    top: 50%;
-    right: -1.4rem;
-    translate: 0 -50%;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    writing-mode: vertical-rl;
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: var(--ink-2);
+    inset: 24%;
+    display: grid;
+    color: var(--ink);
+    opacity: 0.9;
+    transition: rotate 1.2s var(--ease-out), scale 1.2s var(--ease-out);
   }
-  .gate__tag::before {
-    content: '';
-    inline-size: 0.42rem;
-    block-size: 3.2rem;
-    background: var(--rust);
-    -webkit-mask: url('/ink/under.png') center / 3.2rem 0.42rem no-repeat;
-    mask: url('/ink/under.png') center / 3.2rem 0.42rem no-repeat;
-    rotate: 90deg;
-    scale: 1 1;
-  }
-  .gate__tag-state { font-family: var(--font-display); font-style: italic; font-size: 1rem; font-weight: 500; letter-spacing: 0.02em; text-transform: none; color: var(--rust); }
-  /* Arabic is not set vertically, and phones have no room beside the gate: there the label
-     becomes the first line of the caption instead */
+  .gate__air :global(.gate__emblem) { inline-size: 100%; block-size: 100%; filter: drop-shadow(0 6px 14px rgb(31 29 26 / 0.18)); }
+  .gate__window:hover .gate__air, .gate__window:focus-visible .gate__air { rotate: -100deg; scale: 1.05; }
+  .gate__frame:has(.gate__window:hover) :global(.gate__enso) { rotate: 8deg; }
+  /* on opening, the gust spins it up */
+  .gate__window:global(.is-stirring) .gate__air { animation: stir 1.1s cubic-bezier(0.5, 0, 0.75, 0) forwards; }
+  @keyframes stir { to { rotate: -900deg; scale: 1.14; } }
+  :global(.motion-off) .gate__air, :global(.reduced) .gate__air { transition: none; animation: none !important; }
+
+  /* Arabic and phones: the "in production" line leads the caption */
   .gate__tag-line { display: none; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-2); }
   .gate__tag-line span { font-family: var(--font-display); font-style: italic; font-size: 1rem; letter-spacing: 0.02em; text-transform: none; color: var(--rust); }
   :lang(ar) .gate__tag-line { letter-spacing: 0; text-transform: none; font-size: 0.9rem; }
   :lang(ar) .gate__tag-line span { font-style: normal; font-size: inherit; }
-  :lang(ar) .gate__tag { display: none; }
   :lang(ar) .gate__tag-line:not([hidden]) { display: block; }
   @media (max-width: 560px) {
-    .gate__tag { display: none; }
     .gate__tag-line:not([hidden]) { display: block; }
   }
-  .gate__tag[hidden] { display: none; }
-
-  .gate__controls { position: absolute; inset-block-end: 4%; z-index: 4; display: flex; gap: 0.4rem; }
-  .gate__controls[hidden] { display: none; }
-  /* film controls: small caps on a pale brush swash */
-  .gate__controls button { position: relative; isolation: isolate; padding: 0.7rem 1.2rem; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
-  .gate__controls button::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--paper); -webkit-mask: url('/ink/swash.png') center / 100% 100% no-repeat; mask: url('/ink/swash.png') center / 100% 100% no-repeat; }
-  .gate__controls button[aria-pressed='true'] { color: var(--paper); }
-  .gate__controls button[aria-pressed='true']::before { background: var(--ink); }
-  :lang(ar) .gate__controls button { letter-spacing: 0; text-transform: none; font-size: 0.8rem; }
 
   .gate__caption { display: grid; justify-items: center; gap: 0.9rem; text-align: center; }
   .gate__note { font-size: var(--step--1); color: var(--muted); max-inline-size: 22rem; }
@@ -146,6 +141,84 @@ const files = Object.fromEntries(
   .gate__tabs button:hover { color: var(--ink); }
   .gate__tabs button[aria-selected='true'] { color: var(--ink); }
   .gate__tabs button[aria-selected='true']::after { clip-path: inset(-50% 0 -50% 0); }
+
+  /* ---- the stage the gust opens --------------------------------------------------------- */
+  .gust {
+    position: fixed;
+    inset: 0;
+    inline-size: 100vw;
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--cloud);
+    overflow: hidden;
+  }
+  .gust::backdrop { background: transparent; }
+  .gust__air { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  /* without the storm (no WebGL, reduced motion, motion off) the stage fades in on ink */
+  .gust:global(.is-still) { background: radial-gradient(60% 60% at 50% 50%, var(--storm-2), var(--storm) 75%); animation: gust-fade 0.35s var(--ease-out); }
+  @keyframes gust-fade { from { opacity: 0; } }
+
+  .gust__stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.2rem;
+    padding: 4.5rem var(--gutter) 2rem;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .gust__stage > * { pointer-events: auto; }
+  /* the screen is blown in by the wind: it arrives turning, out of a blur, and settles */
+  .gust:global(.is-in) .gust__stage { opacity: 1; animation: blow-in 0.95s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  @keyframes blow-in {
+    from { opacity: 0; scale: 0.82; rotate: -7deg; filter: blur(16px); translate: 0 3vh; }
+    60% { opacity: 1; }
+    to { opacity: 1; scale: 1; rotate: 0deg; filter: blur(0); translate: 0 0; }
+  }
+  .gust:global(.is-still.is-in) .gust__stage { animation: gust-fade 0.35s var(--ease-out) both; }
+  /* closing: the wind takes the screen away first */
+  .gust:global(.is-out) .gust__stage { animation: blow-out 0.3s cubic-bezier(0.7, 0, 0.84, 0) both; }
+  @keyframes blow-out { from { opacity: 1; } to { opacity: 0; scale: 1.08; rotate: 5deg; filter: blur(12px); } }
+
+  .gust__screen {
+    position: relative;
+    inline-size: min(88vw, 1100px, calc((100dvh - 12rem) * 16 / 9));
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: radial-gradient(70% 90% at 50% 40%, rgb(29 38 40 / 0.5), rgb(10 12 11 / 0.66));
+    box-shadow: 0 0 0 1px rgb(238 240 236 / 0.16), 0 40px 90px -30px rgb(0 0 0 / 0.8);
+  }
+  .gust__video { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: contain; background: #000; }
+  .gust__soon { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 0.7rem; padding: 2rem; text-align: center; }
+  .gust__soon[hidden] { display: none; }
+  .gust__soon :global(.gust__emblem) { inline-size: clamp(4rem, 12vw, 7.5rem); block-size: auto; aspect-ratio: 1; color: var(--cloud); margin-block-end: 0.6rem; opacity: 0.92; }
+  .gust__kicker { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #e9a86a; }
+  :lang(ar) .gust__kicker { letter-spacing: 0; text-transform: none; font-size: 0.95rem; }
+  .gust__title { font-family: var(--font-display); font-style: italic; font-size: clamp(2.2rem, 1rem + 4vw, 4.2rem); line-height: 1; color: var(--cloud); }
+  :lang(ar) .gust__title { font-style: normal; line-height: 1.4; }
+  .gust__note { max-inline-size: 30rem; font-size: var(--step--1); color: #c9d1ce; }
+  .gust__note span { color: #e9a86a; }
+
+  .gust__controls { display: flex; gap: 0.4rem; }
+  .gust__controls[hidden] { display: none; }
+  .gust__controls button { position: relative; isolation: isolate; padding: 0.7rem 1.2rem; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--storm); }
+  .gust__controls button::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--cloud); -webkit-mask: url('/ink/swash.png') center / 100% 100% no-repeat; mask: url('/ink/swash.png') center / 100% 100% no-repeat; }
+  .gust__controls button[aria-pressed='true'] { color: var(--cloud); }
+  .gust__controls button[aria-pressed='true']::before { background: var(--rust); }
+  :lang(ar) .gust__controls button { letter-spacing: 0; text-transform: none; font-size: 0.8rem; }
+
+  .gust__close { position: absolute; inset-block-start: 1.2rem; inset-inline-end: var(--gutter); z-index: 2; color: var(--cloud); opacity: 0; transition: opacity 0.4s 0.5s, color var(--dur-2); }
+  .gust:global(.is-in) .gust__close { opacity: 1; }
+  .gust:global(.is-out) .gust__close { opacity: 0; transition-delay: 0s; }
+  .gust__close:hover { color: #e9a86a; }
 </style>
 
 <script>

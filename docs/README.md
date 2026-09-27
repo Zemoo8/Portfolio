@@ -69,7 +69,7 @@ Original project folders (`../AIEyes`, `../cheezy`, …) are only ever **read**.
 
 ## Intro films — how to add yours
 
-Place files in `public/media/intros/`, then rebuild/redeploy. Detection happens at build time: a missing film keeps the painted moon-gate view ("Intro film · in production") and is never requested.
+Place files in `public/media/intros/`, then rebuild/redeploy. Detection happens at build time: a missing film is never requested; clicking the moon gate (the air emblem) still opens the stage in its gust of wind, where it says "Coming soon — in production".
 
 | Language | Film | Optional |
 |---|---|---|
@@ -78,8 +78,8 @@ Place files in `public/media/intros/`, then rebuild/redeploy. Detection happens 
 | Arabic | `intro-ar.mp4` | `intro-ar.vtt`, `intro-ar-poster.webp` |
 
 **Recommended:**
-- **Frame:** the film plays inside the **circular moon gate** (`object-fit: cover`), so only a centred square is visible. Keep yourself in the middle third with headroom; deliver 1:1 (1080×1080) or 16:9 with the subject centred — nothing important near the edges.
-- **Length:** 20–45 s. The film loops silently until the visitor presses *Sound on*, so the first seconds must work without audio.
+- **Frame:** the film plays on a **16:9 screen** that the gust opens when the visitor clicks the moon gate (`object-fit: contain`, nothing cropped). Deliver 16:9 (1920×1080); the poster is shown before playback.
+- **Length:** 20–45 s. Opening the gate is the visitor's own choice, so the film starts **with sound** (if a browser refuses, it plays muted and *Sound on* is offered).
 - **Encoding:** H.264 High, CRF 21–23, `+faststart`, AAC audio 128 kbps. Aim for ≤ 8 MB. Example:
   `ffmpeg -i master.mov -vf "scale=1920:-2" -c:v libx264 -crf 22 -preset slow -movflags +faststart -c:a aac -b:a 128k intro-en.mp4`
 - **WebM:** not needed — MP4 (H.264) plays in every current browser; the site no longer ships WebM.

@@ -35,7 +35,7 @@ for (const id of scenes) {
   await goTo(`#${id}`, -40);
   await shot(`${String(k++).padStart(2, '0')}-${id}`);
 }
-for (const slug of ['ai-eyes', 'cheezy', 'aegis-radar']) {
+for (const slug of ['ai-eyes', 'cheezy', 'radar-interceptor']) {
   await p.goto(`${base}/${lang}/work/${slug}/`, { waitUntil: 'load' });
   await p.waitForTimeout(2600);
   await shot(`${String(k++).padStart(2, '0')}-case-${slug}`);

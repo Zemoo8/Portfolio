@@ -7,6 +7,12 @@ import { profile } from '../content/profile';
 interface Props { lang: Locale }
 const { lang } = Astro.props;
 const heading: L = { en: 'I learn by shipping.', fr: 'J’apprends en livrant.', ar: 'أتعلّم بالإنجاز.' };
+// Ahmed's motto, in his own words
+const motto: L = {
+  en: 'Nothing is gained without giving something of equal worth — so I work hard, and earn the right to play hard.',
+  fr: 'Rien ne s’obtient sans donner quelque chose d’égale valeur — alors je travaille dur, pour mériter de profiter pleinement.',
+  ar: 'لا شيء يُنال دون أن تُقدِّم ما يعادله قيمةً — لذلك أعمل بجدّ، لأستحقّ أن أستمتع بجدّ.',
+};
 const now: L = {
   en: 'Licence (L3) in Computer Science & Multimedia, Université Sesame',
   fr: 'Licence (L3) Informatique & Multimédia, Université Sesame',
@@ -24,6 +30,7 @@ const now: L = {
       <div class="about__body">
         {profile.about.map((para, i) => <p data-reveal style={`--i:${i}`}>{tr(para, lang)}</p>)}
       </div>
+      <p class="about__motto" data-reveal style="--i:3">{tr(motto, lang)}</p>
 
       <dl class="about__facts">
         <div data-reveal>
@@ -52,6 +59,31 @@ const now: L = {
   .about__title { font-size: var(--step-5); margin-block: 1.2rem 2rem; }
   .about__body { display: grid; gap: 1.1rem; font-size: var(--step-1); line-height: 1.6; color: var(--ink-2); max-inline-size: 38rem; }
   :lang(ar) .about__body { line-height: 1.95; }
+  /* the motto: set in the display face, led by a vermilion brush dash */
+  .about__motto {
+    position: relative;
+    margin-block-start: 2.2rem;
+    padding-inline-start: 3.2rem;
+    max-inline-size: 36rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-2);
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  :lang(ar) .about__motto { font-style: normal; line-height: 1.8; }
+  .about__motto::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0.62em;
+    inline-size: 2.3rem;
+    block-size: 0.6rem;
+    background: var(--seal);
+    -webkit-mask: url('/ink/dash.png') center / 100% 100% no-repeat;
+    mask: url('/ink/dash.png') center / 100% 100% no-repeat;
+  }
+  [dir='rtl'] .about__motto::before { scale: -1 1; }
   .about__facts { display: grid; margin-block-start: 2.6rem; border-block-start: 1px solid var(--line); }
   .about__facts > div { display: grid; grid-template-columns: 10rem 1fr; gap: 1.5rem; padding-block: 1rem; border-block-end: 1px solid var(--line); }
   .about__langs { display: grid; gap: 0.3rem; }

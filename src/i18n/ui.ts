@@ -37,6 +37,8 @@ export const ui = {
     replay: { en: 'Replay', fr: 'Revoir', ar: 'إعادة' },
     captions: { en: 'Captions', fr: 'Sous-titres', ar: 'ترجمة' },
     choose: { en: 'Film language', fr: 'Langue du film', ar: 'لغة الفيلم' },
+    open: { en: 'Open the intro film', fr: 'Ouvrir le film d’introduction', ar: 'افتح الفيلم التعريفي' },
+    soon: { en: 'Coming soon', fr: 'Bientôt', ar: 'قريبًا' },
   },
   work: {
     kicker: { en: 'Selected work', fr: 'Projets choisis', ar: 'أعمال مختارة' },

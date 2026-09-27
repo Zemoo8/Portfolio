@@ -2,7 +2,7 @@
 import { chromium } from 'playwright';
 import { AxeBuilder } from '@axe-core/playwright';
 const base = process.env.QA_BASE || 'http://localhost:4321';
-const routes = ['/en/', '/fr/', '/ar/', '/en/work/cheezy/', '/ar/work/ai-eyes/', '/en/work/aegis-radar/', '/404/'];
+const routes = ['/en/', '/fr/', '/ar/', '/en/work/cheezy/', '/ar/work/ai-eyes/', '/en/work/radar-interceptor/', '/404/'];
 const browser = await chromium.launch();
 let total = 0;
 for (const r of routes) {

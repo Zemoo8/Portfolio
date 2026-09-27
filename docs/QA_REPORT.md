@@ -27,7 +27,7 @@ Fixed in this round: films (H.264 only, re-encoded, new AI Eyes and Cheezy films
 | External links | 24 checked, 0 failing (LinkedIn answers bots with 999 — expected) |
 | Accessibility (axe-core, WCAG 2.2 AA + best practice) | **0 violations** on /en/, /fr/, /ar/, 3 case studies, 404 |
 | Keyboard | **15 / 15** scripted checks pass (EN + AR + mobile menu) |
-| Lighthouse (Perf · A11y · BP · SEO) | /en/ **90**·100·100·100 · /fr/ **90**·100·100·100 · /ar/ **86**·100·100·100 · /en/work/aegis-radar/ **94**·100·100·100 |
+| Lighthouse (Perf · A11y · BP · SEO) | /en/ **90**·100·100·100 · /fr/ **90**·100·100·100 · /ar/ **86**·100·100·100 · /en/work/radar-interceptor/ **94**·100·100·100 |
 | Lab vitals | LCP 2.7–3.5 s (LCP element: the 11 KB moon-gate painting, behind fonts/CSS on throttled 4G), CLS 0, TBT 0–10 ms |
 
 ## Tests performed
@@ -63,7 +63,7 @@ Fixed in this round: films (H.264 only, re-encoded, new AI Eyes and Cheezy films
 
 - **AI Eyes app footage** isn't included — the Android app needs a physical device. The slot `public/media/projects/aieyes/showcase-mobile.mp4` is wired and appears automatically.
 - **Sandy AI Lab** is shown without a live AI answer: the project's Groq key is expired.
-- **Books Price Intelligence** and **AEGIS**: the filmed versions aren't fully pushed to GitHub (Flask + React Books; IMM code in AEGIS). The case studies say so.
+- **Books Price Intelligence** and **Radar Interceptor**: the filmed versions aren't fully pushed to GitHub (Flask + React Books; IMM code in its `aegis` package). The case studies say so.
 - **Intro films**: not yet recorded — the painted moon gate stands in until `intro-<lang>.mp4` files are added.
 - **Cross-browser**: automated runs used Chromium. The code relies only on progressive extras (View Transitions, `:has()`, WebGL with a CSS fallback), but a manual pass on Safari iOS and Firefox is recommended.
 - **Real devices**: mobile checks were emulated (touch + mobile viewport).

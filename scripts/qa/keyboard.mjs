@@ -32,6 +32,16 @@ for (const lang of ['en', 'ar']) {
   await p.waitForFunction(() => scrollY === 0);
   await p.waitForTimeout(300);
 
+  // the moon gate opens the intro film in a gust; Escape blows it away and focus returns to the gate
+  await p.focus('[data-gust-open]');
+  await p.keyboard.press('Enter');
+  try { await p.waitForFunction(() => document.querySelector('[data-gust]').classList.contains('is-in'), null, { timeout: 5000 }); } catch {}
+  const gust = await p.evaluate(() => ({ open: document.querySelector('[data-gust]').open, focusIn: !!document.activeElement.closest('[data-gust]') }));
+  await p.keyboard.press('Escape');
+  try { await p.waitForFunction(() => !document.querySelector('[data-gust]').open, null, { timeout: 5000 }); } catch {}
+  const gustClosed = await p.evaluate(() => ({ open: document.querySelector('[data-gust]').open, back: document.activeElement.hasAttribute('data-gust-open') }));
+  check(`[${lang}] the gate opens the intro film with focus inside; Escape closes and returns focus`, gust.open && gust.focusIn && !gustClosed.open && gustClosed.back, JSON.stringify({ gust, gustClosed }));
+
   // orbit: focus the 3rd card, it should become active; ArrowRight moves on
   // (the orbit starts only as it nears the view, then glides 1.5 s: wait for the card to arrive)
   const third = await p.evaluate(() => document.querySelectorAll('[data-orbit-card]')[2].dataset.title);

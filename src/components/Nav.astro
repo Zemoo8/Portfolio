@@ -356,9 +356,9 @@ const within = route.startsWith('work/') ? 'work' : undefined;
     if (ids.includes(s.id)) last = ids.indexOf(s.id);
     owner.set(s, last);
   }
-  // A chapter becomes the current one as it reaches 30 % of the way down the screen — below
-  // where a jump to it lands (scroll-margin in global.css). The name's colour follows whatever
-  // is under it, at the very top.
+  // A chapter becomes the current one as it reaches 30 % of the way down the screen (a jump to it
+  // lands well past that: scroll-margin in global.css). The name's colour follows whatever is
+  // under it, at the very top.
   const READ_LINE = 0.3;
   let atBand: HTMLElement | undefined;
   let atEnd = false;

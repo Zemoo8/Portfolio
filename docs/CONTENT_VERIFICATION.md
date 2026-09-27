@@ -60,9 +60,9 @@ Statuses: **VERIFIED BY PRIMARY SOURCE** (code, official document) · **VERIFIED
 | AI Eyes: "gap left by Seeing AI, Lookout, Envision" | CV | **OMIT** (competitor claim not independently verified) |
 | AI Eyes: "under five seconds", "six tables", "seven APIs" | CV | **OMIT** (not verified in code) |
 | AI Eyes: CLAUDE.md mentions Claude vision API | `AIEyes/CLAUDE.md` | **OMIT** — planning doc; code uses Groq/Gemini |
-| AEGIS: Kalman filter + 3-mode IMM, NEES/NIS, sweeps | code: `src/aegis/filters.py` (`KalmanFilter`, `IMMEstimator`), `results/summary.json` | VERIFIED BY PRIMARY SOURCE — note: `src/aegis` is **local, not yet pushed**; public repo has `kalman_missile_sim.py`, CI, test, THEORY.md |
-| AEGIS: IMM 43.2 m vs raw 79.4 m RMSE (−45.6 %), tuned KF 66.9 m, 100 runs | `results/summary.json` (seed 20260816) | VERIFIED BY PRIMARY SOURCE |
-| AEGIS: CI + Monte Carlo regression test | GitHub tree: `.github/workflows/ci.yml`, `tests/test_monte_carlo.py` | VERIFIED BY PRIMARY SOURCE |
+| Radar Interceptor (code package `aegis`): Kalman filter + 3-mode IMM, NEES/NIS, sweeps | code: `src/aegis/filters.py` (`KalmanFilter`, `IMMEstimator`), `results/summary.json` | VERIFIED BY PRIMARY SOURCE — note: `src/aegis` is **local, not yet pushed**; public repo has `kalman_missile_sim.py`, CI, test, THEORY.md |
+| Radar Interceptor: IMM 43.2 m vs raw 79.4 m RMSE (−45.6 %), tuned KF 66.9 m, 100 runs | `results/summary.json` (seed 20260816) | VERIFIED BY PRIMARY SOURCE |
+| Radar Interceptor: CI + Monte Carlo regression test | GitHub tree: `.github/workflows/ci.yml`, `tests/test_monte_carlo.py` | VERIFIED BY PRIMARY SOURCE |
 | Books: requests/BS4 → pandas → SQLite → Flask → React/TS/Recharts; sklearn LinearRegression | local code + `frontend/package.json` | VERIFIED BY PRIMARY SOURCE |
 | Books: stack on GitHub | public repo = Streamlit + Plotly | **CONFLICTING (versions)** → disclosed on the case study |
 | Books: polite delay + descriptive User-Agent | `src/scraper.py` (`time.sleep`, `User-Agent`) | VERIFIED BY PRIMARY SOURCE |

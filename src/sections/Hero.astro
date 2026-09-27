@@ -49,7 +49,7 @@ const { lang } = Astro.props;
     align-items: center;
     gap: calc(var(--gutter) * 1.5);
     min-block-size: 100svh;
-    padding-block: 7.5rem 4rem;
+    padding-block: clamp(4.75rem, 9.5vh, 7.5rem) 4rem;
     overflow-x: clip;
   }
   .hero__text { position: relative; display: grid; gap: 1.4rem; justify-items: start; }
@@ -63,7 +63,7 @@ const { lang } = Astro.props;
     pointer-events: none;
   }
   .hero__name {
-    font-size: clamp(4rem, 1.4rem + 9.6vw, 12.5rem);
+    font-size: clamp(4rem, min(1.4rem + 9.6vw, 1rem + 19.5vh), 12.5rem);
     font-weight: 600;
     line-height: 0.86;
     letter-spacing: -0.03em;

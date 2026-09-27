@@ -150,7 +150,7 @@
   "notes": ""
  },
  {
-  "field": "project.aegis.imm_rmse",
+  "field": "project.radar.imm_rmse",
   "value": "IMM 43.22 m vs raw 79.44 m (−45.6 %), 100 runs",
   "source": "code output",
   "source_url_or_file": "math.project/results/summary.json",
@@ -160,7 +160,7 @@
   "notes": "src/aegis not yet pushed to GitHub"
  },
  {
-  "field": "project.aegis.ci",
+  "field": "project.radar.ci",
   "value": "GitHub Actions + Monte Carlo test",
   "source": "GitHub",
   "source_url_or_file": "https://github.com/Zemoo8/radar-target-tracking-and-missile-interception",

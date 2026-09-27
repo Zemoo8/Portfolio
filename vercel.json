@@ -5,7 +5,35 @@
   "outputDirectory": "dist",
   "trailingSlash": true,
   "headers": [
-    { "source": "/_astro/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
-    { "source": "/media/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }] }
+    {
+      "source": "/_astro/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/media/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/:lang(en|fr|ar)/work/aegis-radar/",
+      "destination": "/:lang/work/radar-interceptor/",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(en|fr|ar)/work/aegis-radar",
+      "destination": "/:lang/work/radar-interceptor/",
+      "permanent": true
+    }
   ]
 }

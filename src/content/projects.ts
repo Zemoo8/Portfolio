@@ -194,9 +194,9 @@ export const projects: Project[] = [
     },
   },
   {
-    slug: 'aegis-radar',
+    slug: 'radar-interceptor',
     index: '03',
-    title: 'AEGIS',
+    title: 'Radar Interceptor',
     size: 'major',
     tone: '#2fd58a',
     category: a('Estimation · Simulation', 'Estimation · Simulation', 'التقدير · المحاكاة'),
