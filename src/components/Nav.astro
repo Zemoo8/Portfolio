@@ -1,6 +1,6 @@
 ---
 // Navigation as a hanging scroll. On wide screens a slim paper scroll hangs down the edge of the
-// page (the right edge; the left in Arabic) with the chapters written down it. An ink line runs
+// page (the right edge; the left in Arabic) with the chapters written across it, one under another. An ink line runs
 // down the rod as you read and reaches each chapter's name exactly when that chapter begins; the
 // chapter you are in is inked with a brush swash. Each stretch of the line is a CSS scroll-driven
 // animation whose range is the scroll distance of its chapter — measured on load and on resize,
@@ -125,12 +125,12 @@ const within = route.startsWith('work/') ? 'work' : undefined;
       z-index: 50;
       inset-block: 1rem;
       inset-inline-end: 0.8rem;
-      inline-size: 2.6rem;
+      inline-size: var(--rod-w);
       display: flex;
       flex-direction: column;
       align-items: center;
       padding-block: 0.9rem 1rem;
-      background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f8f3e5 22%, #f7f1e3 78%, #e9dfc7);
+      background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f8f3e5 12%, #f7f1e3 88%, #e9dfc7);
       box-shadow: 0 22px 44px -26px rgb(40 36 30 / 0.6), 0 2px 6px -3px rgb(40 36 30 / 0.25);
     }
     /* the mounting: a hairline of saffron silk just inside each long edge */
@@ -147,62 +147,57 @@ const within = route.startsWith('work/') ? 'work' : undefined;
     .rod__roller {
       position: absolute;
       inset-block-start: -0.3rem;
-      inline-size: 3.5rem;
+      inset-inline: -0.45rem;
       block-size: 0.62rem;
       background: var(--ink);
       -webkit-mask: url('/ink/roller.png') center / 100% 100% no-repeat;
       mask: url('/ink/roller.png') center / 100% 100% no-repeat;
     }
-    .rod__roller--foot { inset-block: auto -0.34rem; inline-size: 3.7rem; block-size: 0.7rem; }
+    .rod__roller--foot { inset-block: auto -0.34rem; inset-inline: -0.55rem; block-size: 0.7rem; }
 
-    .rod > .rod__seg { flex: 1 1 0; min-block-size: 0.6rem; inline-size: 5px; margin-block: 0.45rem; }
+    .rod > .rod__seg { flex: 1 1 0; min-block-size: 0.8rem; inline-size: 5px; margin-block: 0.55rem; }
     .rod__roller + .rod__seg { margin-block-start: 0.2rem; }
   }
-  /* on shorter screens the writing is a little smaller, so the ink line keeps room to run */
-  @media (min-width: 1100px) and (min-height: 620px) and (max-height: 780px) {
-    .rod__ch { font-size: 1rem; }
-    .rod__langs { gap: 0; }
-    .rod__langs a { block-size: 1.6rem; }
-  }
 
-  /* a chapter: written down the scroll; the one you are in sits on a swash of ink */
+  /* a chapter, written across the scroll; the one you are in sits on a swash of ink */
   .rod__ch {
     position: relative;
     isolation: isolate;
     flex: none;
-    writing-mode: vertical-rl;
     font-family: var(--font-display);
     font-size: 1.12rem;
     font-weight: 600;
-    line-height: 1;
-    letter-spacing: 0.03em;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
     color: var(--muted);
-    padding-block: 0.15rem;
     transition: color 0.5s var(--ease-out);
   }
-  :lang(ar) .rod__ch { font-size: 1.12rem; letter-spacing: 0; }
+  :lang(ar) .rod__ch { font-size: 1.08rem; line-height: 1.5; letter-spacing: 0; }
   .rod__ch[data-state='past'] { color: var(--ink-2); }
   .rod__ch::before {
     content: '';
     position: absolute;
     z-index: -1;
-    inset: -1em -0.62em;
+    inset: -0.5em -0.72em;
     background: var(--ink);
     opacity: 0;
-    /* the swash, revealed by a soft-edged wash that travels down the stroke: it paints itself */
-    -webkit-mask: url('/ink/swash-v.png') center / 100% 100% no-repeat, linear-gradient(#000 40%, transparent 60%) 0 100% / 100% 260% no-repeat;
+    /* the swash, revealed by a soft-edged wash that travels along the stroke: it paints itself */
+    -webkit-mask: url('/ink/swash.png') center / 100% 100% no-repeat, linear-gradient(90deg, #000 40%, transparent 60%) 100% 0 / 260% 100% no-repeat;
     -webkit-mask-composite: source-in;
-    mask: url('/ink/swash-v.png') center / 100% 100% no-repeat, linear-gradient(#000 40%, transparent 60%) 0 100% / 100% 260% no-repeat;
+    mask: url('/ink/swash.png') center / 100% 100% no-repeat, linear-gradient(90deg, #000 40%, transparent 60%) 100% 0 / 260% 100% no-repeat;
     mask-composite: intersect;
     transition: opacity 0.45s var(--ease-out), -webkit-mask-position 0.9s var(--ease-out), mask-position 0.9s var(--ease-out);
   }
+  /* in Arabic the brush travels right to left */
+  [dir='rtl'] .rod__ch::before { scale: -1 1; }
   .rod__ch:hover { color: var(--ink); }
   .rod__ch:hover::before { opacity: 0.13; -webkit-mask-position: center, 0 0; mask-position: center, 0 0; }
   .rod__ch[aria-current] { color: var(--paper); font-style: italic; }
   :lang(ar) .rod__ch[aria-current] { font-style: normal; }
   .rod__ch[aria-current]::before { opacity: 1; -webkit-mask-position: center, 0 0; mask-position: center, 0 0; }
 
-  .rod__langs { display: grid; gap: 0.15rem; justify-items: center; margin-block-start: 0.2rem; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; }
+  .rod__langs { display: flex; gap: 0.1rem; justify-content: center; margin-block-start: 0.1rem; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; }
   .rod__langs a { position: relative; display: grid; place-items: center; inline-size: 1.85rem; block-size: 1.85rem; color: var(--muted); transition: color var(--dur-2); }
   .rod__langs a[lang='ar'] { font-family: var(--font-arabic-display); font-size: 0.95rem; letter-spacing: 0; }
   .rod__langs a:hover { color: var(--ink); }
@@ -226,33 +221,31 @@ const within = route.startsWith('work/') ? 'work' : undefined;
       display: flex;
       flex-direction: column;
       align-items: center;
-      inline-size: 2.3rem;
-      padding-block: 0.8rem 0.75rem;
-      background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f8f3e5 22%, #f7f1e3 78%, #e9dfc7);
+      padding: 0.6rem 0.85rem 0.5rem;
+      background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f8f3e5 14%, #f7f1e3 86%, #e9dfc7);
       box-shadow: 0 16px 30px -18px rgb(40 36 30 / 0.6), 0 2px 5px -3px rgb(40 36 30 / 0.25);
       color: var(--ink);
     }
     .slip__roller {
       position: absolute;
       inset-block-start: -0.28rem;
-      inline-size: 3.1rem;
+      inset-inline: -0.35rem;
       block-size: 0.56rem;
       background: var(--ink);
       -webkit-mask: url('/ink/roller.png') center / 100% 100% no-repeat;
       mask: url('/ink/roller.png') center / 100% 100% no-repeat;
     }
     .slip__label {
-      writing-mode: vertical-rl;
       font-family: var(--font-display);
-      font-size: 1.02rem;
+      font-size: 1.05rem;
       font-weight: 600;
       font-style: italic;
-      line-height: 1;
-      letter-spacing: 0.03em;
+      line-height: 1.25;
+      white-space: nowrap;
       transition: opacity 0.35s var(--ease-out), translate 0.35s var(--ease-out);
     }
-    :lang(ar) .slip__label { font-style: normal; letter-spacing: 0; }
-    .slip__label.is-changing { opacity: 0; translate: 0 -0.4em; }
+    :lang(ar) .slip__label { font-style: normal; line-height: 1.5; }
+    .slip__label.is-changing { opacity: 0; translate: 0 -0.3em; }
 
     .edge { display: block; position: fixed; z-index: 49; inset-block: 0; inset-inline-end: 0.18rem; inline-size: 4px; pointer-events: none; }
     .edge .rod__seg { block-size: 100%; }

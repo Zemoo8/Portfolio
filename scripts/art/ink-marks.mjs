@@ -8,7 +8,6 @@
 //   dash      — kicker and tag bullet
 //   rod       — the long hanging stroke of the navigation rod (baked upright)
 //   roller    — the short, loaded stroke a hanging scroll hangs from
-//   swash-v   — the swash turned upright: the current chapter on the rod
 // A directional turbulence displacement ("fibre") breaks every edge up like the hairs of a
 // dry brush. Deterministic (seeded). Usage: node scripts/art/ink-marks.mjs
 import fs from 'node:fs';
@@ -65,7 +64,7 @@ write('roller', svg('0 0 100 24', paths(line(88, 12, { width: 7, bristles: 14, s
 import sharp from 'sharp';
 const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24], rod: [1200, 24], roller: [200, 48] };
 // marks that are used upright are also baked turned a quarter clockwise (the stroke's start on top)
-const upright = { swash: ['swash-v', 0.5], rod: ['rod', 1] };
+const upright = { rod: ['rod', 1] };
 for (const [name, [w, h]] of Object.entries(bake)) {
   const src = fs.readFileSync(path.join(OUT, `${name}.svg`));
   const png = await sharp(src, { density: 72 * (w / Number(/viewBox="0 0 ([\d.]+)/.exec(src.toString())[1])) })
