@@ -10,7 +10,7 @@ import { locales, localeMeta, path } from '../i18n/config';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ahmed Baghouli</title>
-    <meta name="robots" content="noindex, follow" />
+    <meta name="robots" content="index, follow" />
     <link rel="canonical" href={new URL(path('en'), Astro.site).href} />
     {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(l), Astro.site).href} />)}
     <meta name="theme-color" content="#0c0c0b" />

@@ -28,10 +28,9 @@ interface Props {
   route?: string;
   ogImage?: string;
   jsonLd?: Record<string, unknown>;
-  noindex?: boolean;
 }
 
-const { lang, title, description, route = '', ogImage = `og/default-${lang}.jpg`, jsonLd, noindex = false } = Astro.props;
+const { lang, title, description, route = '', ogImage = `og/default-${lang}.jpg`, jsonLd } = Astro.props;
 const dir = localeMeta[lang].dir;
 const site = Astro.site!;
 const canonical = new URL(path(lang, route), site).href;
@@ -60,7 +59,7 @@ const person = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content={profile.name.en} />
-    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
+    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#f5efe1" />
     <meta name="color-scheme" content="light" />
     <link rel="canonical" href={canonical} />
