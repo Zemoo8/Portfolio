@@ -1,6 +1,7 @@
 // Scroll must be predictable: native scrolling, position-driven effects only.
 //  1) wheel input moves the page by exactly what was asked (no smoothing/inertia library)
-//  2) the o of the name travels by scroll position: the same place, however fast you got there
+//  2) the painted layers are CSS scroll-driven animations (compositor), and the same scroll
+//     position always gives the same layer offset, whatever the speed of getting there
 //  3) scrolling hard through the work chapter never rotates the orbit
 //  4) no scroll-speed "wind" canvas exists any more
 // Usage: node scripts/qa/scroll-calm.mjs [base-url]
@@ -15,6 +16,9 @@ const results = [];
 const check = (name, ok, info = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? '  — ' + info : ''}`);
 
 check('no scroll-speed wind canvas', !(await p.$('[data-wind]')));
+const tl = await p.evaluate(() => [...document.querySelectorAll('.world__depth')].map((el) => el.getAnimations()[0]?.timeline?.constructor?.name ?? 'none'));
+check('depth layers run on a ScrollTimeline', tl.length > 0 && tl.every((t) => t === 'ScrollTimeline'), tl.join(','));
+
 // 1) native wheel
 await p.mouse.move(700, 450);
 const y0 = await p.evaluate(() => scrollY);
@@ -23,16 +27,16 @@ await p.waitForTimeout(700);
 const y1 = await p.evaluate(() => scrollY);
 check('wheel moves the page by what was asked (no inertia)', Math.abs(y1 - y0 - 300) <= 2, `${y0} → ${y1}`);
 
-// 2) the o of the name travels by position: reached slowly or in one jump, it is in the same place
-const at = () => p.evaluate(() => document.querySelector('.traveller')?.style.transform || 'none');
+// 2) same position, same picture — reached slowly vs. in one jump
+const layerAt = () => p.evaluate(() => getComputedStyle(document.querySelectorAll('.world__depth')[3]).transform);
 await p.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; scrollTo(0, 0); });
-for (let y = 0; y <= 450; y += 75) { await p.evaluate((v) => scrollTo(0, v), y); await p.waitForTimeout(80); }
+for (let y = 0; y <= 900; y += 150) { await p.evaluate((v) => scrollTo(0, v), y); await p.waitForTimeout(80); }
 await p.waitForTimeout(300);
-const slow = await at();
+const slow = await layerAt();
 await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(200);
-await p.evaluate(() => scrollTo(0, 450)); await p.waitForTimeout(300);
-const fast = await at();
-check('the o travels by scroll position only', slow === fast && slow !== 'none', `${slow} vs ${fast}`);
+await p.evaluate(() => scrollTo(0, 900)); await p.waitForTimeout(300);
+const fast = await layerAt();
+check('layer offset depends on position only', slow === fast && slow !== 'none', `${slow} vs ${fast}`);
 
 // 3) the orbit ignores scrolling
 await p.evaluate(() => document.querySelector('#work').scrollIntoView());

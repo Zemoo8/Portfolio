@@ -214,9 +214,6 @@ export function initOrbit(root: HTMLElement) {
   draw();
   arrive(0);
   requestAnimationFrame(frame);
-  // the orbit starts when it scrolls near; a card focused before that still comes to the front
-  const focused = cards.indexOf(document.activeElement as HTMLAnchorElement);
-  if (focused > 0) { focusInside = true; glideTo(focused, GLIDE, easeInOut, true); }
 
   // announce only visitor-initiated changes
   live.addEventListener('animationend', () => live.setAttribute('aria-live', 'off'));

@@ -1,9 +1,10 @@
 ---
-// The introduction scene: one large circle — the same painting that sits inside the "o" of the
-// name, which travels here as you scroll (scripts/travel.ts) — and around it only a sentence and
-// the choice of language. The three personal films play inside the circle once they exist:
-//   public/media/intros/intro-<lang>.mp4   (+ optional .vtt; poster: intro-<lang>-poster.webp)
-// Detected at build time; missing films are never requested. See docs/README.md → "Intro films".
+// The moon gate: a circular window onto the ink landscape. It holds the three personal intro
+// films (EN / FR / AR), detected at build time:
+//   public/media/intros/intro-<lang>.mp4   (+ optional .webm, .vtt; poster: intro-<lang>-poster.webp)
+// Missing films keep the painted view and are never requested (no 404s).
+// Adding a file and rebuilding/redeploying is all it takes. See docs/README.md → "Intro films".
+import Brush from './Brush.astro';
 import { locales, localeMeta, asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { exists } from '../lib/media';
@@ -12,14 +13,22 @@ interface Props { lang: Locale }
 const { lang } = Astro.props;
 const base = asset('media/intros');
 const files = Object.fromEntries(
-  locales.map((l) => [l, { mp4: exists(`media/intros/intro-${l}.mp4`), webm: false, vtt: exists(`media/intros/intro-${l}.vtt`), poster: exists(`media/intros/intro-${l}-poster.webp`) }]),
+  locales.map((l) => [l, { mp4: exists(`media/intros/intro-${l}.mp4`), webm: exists(`media/intros/intro-${l}.webm`), vtt: exists(`media/intros/intro-${l}.vtt`), poster: exists(`media/intros/intro-${l}-poster.webp`) }]),
 );
 ---
 
 <figure class="gate" data-intro data-base={base} data-lang={lang} data-files={JSON.stringify(files)}>
-  <div class="gate__window" data-intro-window>
-    <img class="gate__view" src={asset('art/gate.webp')} alt="" width="900" height="900" loading="lazy" />
-    <video class="gate__video" muted playsinline loop preload="none" hidden data-intro-video></video>
+  <div class="gate__frame">
+    <Brush kind="circle" seed={7} class="gate__enso" />
+    <div class="gate__window">
+      <img class="gate__view" src={asset('art/gate.webp')} alt="" width="900" height="900" fetchpriority="high" loading="eager" />
+      <div class="gate__mist" aria-hidden="true"></div>
+      <video class="gate__video" muted playsinline loop preload="none" hidden data-intro-video></video>
+    </div>
+    <p class="gate__tag" data-intro-placeholder>
+      <span>{tr(ui.intro.label, lang)}</span>
+      <span class="gate__tag-state">{tr(ui.intro.pending, lang)}</span>
+    </p>
     <div class="gate__controls" hidden data-intro-controls>
       <button type="button" data-intro-sound data-on={tr(ui.intro.sound, lang)} data-off={tr(ui.intro.mute, lang)}>{tr(ui.intro.sound, lang)}</button>
       <button type="button" data-intro-cc aria-pressed="false" hidden>{tr(ui.intro.captions, lang)}</button>
@@ -28,8 +37,8 @@ const files = Object.fromEntries(
   </div>
 
   <figcaption class="gate__caption">
+    <p class="gate__tag-line" data-intro-placeholder>{tr(ui.intro.label, lang)} <span>· {tr(ui.intro.pending, lang)}</span></p>
     <p class="gate__note">{tr(ui.intro.pendingNote, lang)}</p>
-    <p class="gate__state" data-intro-placeholder>{tr(ui.intro.pending, lang)}</p>
     <div class="gate__tabs" role="tablist" aria-label={tr(ui.intro.choose, lang)}>
       {locales.map((l) => (
         <button type="button" role="tab" lang={l} aria-selected={l === lang ? 'true' : 'false'} data-intro-tab={l}>{localeMeta[l].name}</button>
@@ -39,55 +48,104 @@ const files = Object.fromEntries(
 </figure>
 
 <style>
-  .gate {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: end;
-    gap: 2rem 4vw;
-    inline-size: 100%;
-  }
+  .gate { display: grid; justify-items: center; gap: 1.6rem; }
+  .gate__frame { position: relative; inline-size: min(100%, 34rem); aspect-ratio: 1; display: grid; place-items: center; }
+  .gate__frame :global(.gate__enso) { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; z-index: 2; pointer-events: none; }
   .gate__window {
-    grid-column: 2;
     position: relative;
-    inline-size: min(74vh, 86vw);
+    inline-size: 84%;
     aspect-ratio: 1;
     border-radius: 50%;
     overflow: hidden;
-    background: #e9e4d6;
+    background: var(--mist);
+    box-shadow: inset 0 0 0 1px rgb(31 29 26 / 0.12), inset 0 20px 60px -30px rgb(31 29 26 / 0.45);
     isolation: isolate;
   }
-  :global(.o-travelling) .gate__window { visibility: hidden; }
   .gate__view, .gate__video { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
-  .gate__view { object-position: 50% 62%; opacity: 0.85; }
-  .gate__video { z-index: 2; }
-  .gate__controls { position: absolute; inset-block-end: 9%; inset-inline: 0; z-index: 3; display: flex; justify-content: center; gap: 1.2rem; }
-  .gate__controls[hidden] { display: none; }
-  .gate__controls button { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--paper); text-shadow: 0 1px 8px rgb(0 0 0 / 0.6); text-decoration: underline; text-underline-offset: 0.4em; }
-  .gate__controls button[aria-pressed='true'] { color: var(--amber); }
-
-  .gate__caption { grid-column: 1; grid-row: 1; align-self: end; display: grid; gap: 1.2rem; justify-items: start; padding-block-end: 8%; }
-  .gate__note { font-family: var(--font-display); font-style: italic; font-size: clamp(1.3rem, 1rem + 0.9vw, 1.9rem); line-height: 1.2; max-inline-size: 18rem; }
-  :lang(ar) .gate__note { font-style: normal; line-height: 1.7; font-size: 1.2rem; }
-  .gate__state { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rust); }
-  :lang(ar) .gate__state { letter-spacing: 0; font-size: 0.9rem; }
-  .gate__state[hidden] { display: none; }
-  .gate__tabs { display: flex; flex-direction: column; gap: 0.3rem; }
-  .gate__tabs button { position: relative; padding-block: 0.15rem; font-family: var(--font-display); font-size: 1.25rem; color: var(--muted); text-align: start; transition: color var(--dur-2), translate var(--dur-2) var(--ease-out); }
-  .gate__tabs button[lang='ar'] { font-family: var(--font-arabic-display); }
-  .gate__tabs button:hover { color: var(--ink); }
-  .gate__tabs button[aria-selected='true'] { color: var(--ink); translate: 0.4em 0; }
-  [dir='rtl'] .gate__tabs button[aria-selected='true'] { translate: -0.4em 0; }
-  .gate__tabs button[aria-selected='true']::before { content: '—'; position: absolute; inset-inline-end: 100%; margin-inline-end: 0.3em; color: var(--rust); }
-
-  @media (max-width: 860px) {
-    .gate { grid-template-columns: 1fr; justify-items: center; }
-    .gate__window { grid-column: 1; }
-    .gate__caption { grid-column: 1; grid-row: 2; justify-items: center; text-align: center; padding: 0; }
-    .gate__tabs { flex-direction: row; gap: 1.4rem; }
-    .gate__tabs button[aria-selected='true'] { translate: none; text-decoration: underline; text-underline-offset: 0.3em; }
-    .gate__tabs button[aria-selected='true']::before { content: none; }
+  .gate__view { transform-origin: 50% 40%; animation: gate-breathe 28s ease-in-out infinite alternate; }
+  @keyframes gate-breathe { from { transform: scale(1.04) translate3d(-1.5%, 0, 0); } to { transform: scale(1.12) translate3d(1.5%, -1%, 0); } }
+  .gate__mist {
+    position: absolute;
+    inset: 45% -30% -10%;
+    background: radial-gradient(closest-side, rgb(247 242 230 / 0.9), rgb(247 242 230 / 0));
+    animation: gate-mist 22s ease-in-out infinite alternate;
   }
+  @keyframes gate-mist { from { translate: -10% 0; } to { translate: 10% -4%; } }
+  .gate__video { z-index: 2; }
+  /* the placeholder's label hangs beside the gate like the title slip of a scroll */
+  .gate__tag {
+    position: absolute;
+    top: 50%;
+    right: -1.4rem;
+    translate: 0 -50%;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    writing-mode: vertical-rl;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ink-2);
+  }
+  .gate__tag::before {
+    content: '';
+    inline-size: 0.42rem;
+    block-size: 3.2rem;
+    background: var(--rust);
+    -webkit-mask: url('/ink/under.png') center / 3.2rem 0.42rem no-repeat;
+    mask: url('/ink/under.png') center / 3.2rem 0.42rem no-repeat;
+    rotate: 90deg;
+    scale: 1 1;
+  }
+  .gate__tag-state { font-family: var(--font-display); font-style: italic; font-size: 1rem; font-weight: 500; letter-spacing: 0.02em; text-transform: none; color: var(--rust); }
+  /* Arabic is not set vertically, and phones have no room beside the gate: there the label
+     becomes the first line of the caption instead */
+  .gate__tag-line { display: none; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-2); }
+  .gate__tag-line span { font-family: var(--font-display); font-style: italic; font-size: 1rem; letter-spacing: 0.02em; text-transform: none; color: var(--rust); }
+  :lang(ar) .gate__tag-line { letter-spacing: 0; text-transform: none; font-size: 0.9rem; }
+  :lang(ar) .gate__tag-line span { font-style: normal; font-size: inherit; }
+  :lang(ar) .gate__tag { display: none; }
+  :lang(ar) .gate__tag-line:not([hidden]) { display: block; }
+  @media (max-width: 560px) {
+    .gate__tag { display: none; }
+    .gate__tag-line:not([hidden]) { display: block; }
+  }
+  .gate__tag[hidden] { display: none; }
+
+  .gate__controls { position: absolute; inset-block-end: 4%; z-index: 4; display: flex; gap: 0.4rem; }
+  .gate__controls[hidden] { display: none; }
+  /* film controls: small caps on a pale brush swash */
+  .gate__controls button { position: relative; isolation: isolate; padding: 0.7rem 1.2rem; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
+  .gate__controls button::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--paper); -webkit-mask: url('/ink/swash.png') center / 100% 100% no-repeat; mask: url('/ink/swash.png') center / 100% 100% no-repeat; }
+  .gate__controls button[aria-pressed='true'] { color: var(--paper); }
+  .gate__controls button[aria-pressed='true']::before { background: var(--ink); }
+  :lang(ar) .gate__controls button { letter-spacing: 0; text-transform: none; font-size: 0.8rem; }
+
+  .gate__caption { display: grid; justify-items: center; gap: 0.9rem; text-align: center; }
+  .gate__note { font-size: var(--step--1); color: var(--muted); max-inline-size: 22rem; }
+  /* film languages: words; the chosen one is underlined with the brush */
+  .gate__tabs { display: flex; gap: 1.6rem; }
+  .gate__tabs button { position: relative; padding: 0.35rem 0.1rem; font-family: var(--font-display); font-size: 1.15rem; font-style: italic; color: var(--muted); transition: color var(--dur-2); }
+  .gate__tabs button[lang='ar'] { font-family: var(--font-arabic-display); font-style: normal; font-size: 1.05rem; }
+  .gate__tabs button::after {
+    content: '';
+    position: absolute;
+    inset-inline: -0.2em;
+    inset-block-end: -0.1rem;
+    block-size: 0.45rem;
+    background: var(--rust);
+    -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    mask: url('/ink/under.png') center / 100% 100% no-repeat;
+    clip-path: inset(-50% 100% -50% 0);
+    transition: clip-path 0.7s var(--ease-out);
+  }
+  [dir='rtl'] .gate__tabs button::after { clip-path: inset(-50% 0 -50% 100%); }
+  .gate__tabs button:hover { color: var(--ink); }
+  .gate__tabs button[aria-selected='true'] { color: var(--ink); }
+  .gate__tabs button[aria-selected='true']::after { clip-path: inset(-50% 0 -50% 0); }
 </style>
 
 <script>

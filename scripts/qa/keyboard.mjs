@@ -18,14 +18,13 @@ for (const lang of ['en', 'ar']) {
 
   // orbit: focus the 3rd card, it should become active; ArrowRight moves on
   await p.focus('[data-orbit-card]:nth-of-type(3)');
-  await p.waitForTimeout(2200);
-  const third = await p.evaluate(() => document.querySelectorAll('[data-orbit-card]')[2].dataset.title);
-  const act1 = await p.evaluate(() => document.querySelector('[data-orbit-card][data-active]')?.dataset.title);
-  check(`[${lang}] focusing an orbit card brings it to the front`, act1 === third, `active=${act1}`);
+  await p.waitForTimeout(1600);
+  const act1 = await p.evaluate(() => document.querySelector('[data-orbit-card][data-active]')?.dataset.index);
+  check(`[${lang}] focusing an orbit card brings it to the front`, act1 === '03', `active=${act1}`);
   await p.keyboard.press('ArrowRight');
-  await p.waitForTimeout(2200);
-  const act2 = await p.evaluate(() => [document.querySelector('[data-orbit-card][data-active]')?.dataset.title, document.activeElement.dataset.title]);
-  check(`[${lang}] ArrowRight rotates the orbit and moves focus`, !!act2[0] && act2[0] === act2[1] && act2[0] !== third, `active=${act2[0]} focus=${act2[1]}`);
+  await p.waitForTimeout(1600);
+  const act2 = await p.evaluate(() => [document.querySelector('[data-orbit-card][data-active]')?.dataset.index, document.activeElement.dataset.index]);
+  check(`[${lang}] ArrowRight rotates the orbit and moves focus`, act2[0] === act2[1] && act2[0] !== '03', `active=${act2[0]} focus=${act2[1]}`);
   const pressed = await p.evaluate(() => { const bt = document.querySelector('[data-orbit-pause]'); bt.click(); return bt.getAttribute('aria-pressed'); });
   check(`[${lang}] orbit pause button toggles`, pressed === 'true');
 
@@ -47,15 +46,13 @@ for (const lang of ['en', 'ar']) {
 }
 
 const m = await b.newPage({ viewport: { width: 390, height: 844 } });
-await m.goto(`${base}/en/`, { waitUntil: 'load' });
-await m.waitForTimeout(800);
-await m.focus('[data-index-open]');
+await m.goto(`${base}/en/`, { waitUntil: 'networkidle' });
+await m.focus('[data-menu-toggle]');
 await m.keyboard.press('Enter');
-await m.waitForTimeout(400);
-const open = await m.evaluate(() => ({ open: document.querySelector('[data-index]').open, focusIn: !!document.activeElement.closest('[data-index]') }));
-await m.keyboard.press('Escape');
 await m.waitForTimeout(300);
-const closed = await m.evaluate(() => ({ open: document.querySelector('[data-index]').open, focusIsOpener: document.activeElement.matches('[data-index-open]') }));
-check('index opens with focus inside, Escape closes and returns focus', open.open && open.focusIn && !closed.open && closed.focusIsOpener, JSON.stringify({ open, closed }));
+const open = await m.evaluate(() => ({ expanded: document.querySelector('[data-menu-toggle]').getAttribute('aria-expanded'), focusInMenu: !!document.activeElement.closest('[data-menu]') }));
+await m.keyboard.press('Escape');
+const closed = await m.evaluate(() => ({ expanded: document.querySelector('[data-menu-toggle]').getAttribute('aria-expanded'), focusIsToggle: document.activeElement.matches('[data-menu-toggle]') }));
+check('mobile menu opens with focus inside, Escape closes and returns focus', open.expanded === 'true' && open.focusInMenu && closed.expanded === 'false' && closed.focusIsToggle);
 await b.close();
 console.log(results.join('\n'));

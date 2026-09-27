@@ -2,19 +2,7 @@
 
 Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro preview`; Chromium via Playwright 1.61 (headless; GPU via ANGLE/D3D11 for WebGL); Lighthouse 12 (mobile, simulated throttling).
 
-## Round 4 — second creative pass (latest)
-
-| Area | Result |
-|---|---|
-| Accessibility (axe-core) | 0 violations on 7 pages |
-| Keyboard | 15 / 15 (index dialog, orbit focus/arrows/pause, lightbox) |
-| Films in Chrome | 19 / 19 play — case studies, orbit cards, the six home worlds |
-| Scroll behaviour | 4 / 4 — native wheel, the *o* travels by position only, the orbit ignores scrolling, no speed-driven effects |
-| Links | 0 broken |
-| Lighthouse (Perf · A11y · BP · SEO) | /en/ **94**·100·100·100 · /ar/ **84**·100·100·100 · /en/work/cheezy/ **94**·100·100·100 (after the ad images got intrinsic sizes) |
-| Visual review | every scene at 1440 × 900 (EN, AR) and 390 × 844 (EN); before/after in `docs/second-pass/` |
-
-## Round 3 — films, calm scrolling, painted interface
+## Round 3 — films, calm scrolling, painted interface (latest)
 
 | Area | Result |
 |---|---|

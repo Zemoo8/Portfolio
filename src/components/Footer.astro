@@ -1,26 +1,47 @@
 ---
-// The foot of the last scene: on the same dark ground as Contact, small and final.
 import { locales, localeMeta, path, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
+import { profile } from '../content/profile';
 
 interface Props { lang: Locale; route: string }
 const { lang, route } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
-<footer class="foot" data-tone="dark">
-  <p>© {year} · {tr(ui.footer.rights, lang)}</p>
-  <ul class="foot__langs" aria-label={tr(ui.nav.language, lang)}>
-    {locales.map((l) => (
-      <li><a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>{localeMeta[l].name}</a></li>
-    ))}
-  </ul>
-  <a class="foot__top" href="#main">{tr(ui.footer.top, lang)} <span aria-hidden="true">↑</span></a>
+<footer class="foot">
+  <div class="wrap foot__grid">
+    <p class="foot__sign display">{tr(profile.firstName, lang)} <em>{tr(profile.lastName, lang)}</em></p>
+    <ul class="foot__links">
+      <li><a class="link-u" href={profile.links.github} rel="me noopener" target="_blank">GitHub</a></li>
+      <li><a class="link-u" href={profile.links.linkedin} rel="me noopener" target="_blank">LinkedIn</a></li>
+      <li><a class="link-u" href={`mailto:${profile.email}`}>{tr(ui.contact.email, lang)}</a></li>
+    </ul>
+    <ul class="foot__langs" aria-label={tr(ui.nav.language, lang)}>
+      {locales.map((l) => (
+        <li><a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>{localeMeta[l].name}</a></li>
+      ))}
+    </ul>
+    <div class="foot__base label">
+      <span>© {year} · {tr(ui.footer.rights, lang)}</span>
+      <a class="link-u" href="#main">{tr(ui.footer.top, lang)} <span aria-hidden="true">↑</span></a>
+    </div>
+  </div>
 </footer>
 
 <style>
-  .foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1rem 2rem; padding: 1.6rem var(--gutter) 2rem; background: #141311; color: #8f887b; font-size: 0.82rem; border-block-start: 1px solid rgb(239 233 220 / 0.1); }
-  .foot__langs { display: flex; gap: 1.2rem; }
-  .foot__langs a[aria-current='true'] { color: #efe9dc; }
-  .foot a:hover { color: #efe9dc; }
+  .foot {
+    margin-block-start: var(--section);
+    padding-block: 3rem 1.6rem;
+    background: var(--paper-grain), linear-gradient(180deg, rgb(245 239 225 / 0.6), var(--paper) 40%);
+    border-block-start: 1px solid var(--line);
+  }
+  .foot__grid { display: grid; grid-template-columns: 1fr auto auto; gap: 2rem 4rem; align-items: start; }
+  .foot__sign { font-size: var(--step-3); font-weight: 600; line-height: 1; }
+  .foot__sign em { font-weight: 500; }
+  :lang(ar) .foot__sign em { font-style: normal; color: var(--ink-2); }
+  .foot__links, .foot__langs { display: grid; gap: 0.45rem; font-size: var(--step--1); font-weight: 500; }
+  .foot__langs a { color: var(--muted); }
+  .foot__langs a[aria-current='true'] { color: var(--ink); font-weight: 700; }
+  .foot__base { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-block-start: 1.5rem; border-block-start: 1px solid var(--line); }
+  @media (max-width: 720px) { .foot__grid { grid-template-columns: 1fr 1fr; } .foot__sign { grid-column: 1 / -1; } }
 </style>
