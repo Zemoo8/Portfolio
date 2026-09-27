@@ -170,6 +170,11 @@ ul, ol { padding: 0; list-style: none; }
    heading just under the top of the screen: the section's own top spacing scrolls out of view */
 main .section[id] { scroll-margin-block-start: calc(5.5rem - var(--section)); }
 main #work { scroll-margin-block-start: calc(5.5rem - clamp(6rem, 13vh, 9rem)); }
+/* on wider screens the Work chapter's centred heading can sit right at the top (the name is
+   off to the side): its label lands 1.3rem from the top edge */
+@media (min-width: 761px) {
+  main #work { scroll-margin-block-start: calc(1.3rem - 1.5rem - clamp(6rem, 13vh, 9rem)); }
+}
 main #contact { scroll-margin-block-start: calc(5.5rem - var(--section) - clamp(3rem, 8vw, 6rem)); }
 /* chapters on a parchment panel land with the panel's top edge — its saffron ribbon — flush with
    the top of the screen (1.5rem = the page's scroll-padding) */
