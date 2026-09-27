@@ -23,6 +23,7 @@ const year = new Date().getFullYear();
     </ul>
     <div class="foot__base label">
       <span>© {year} · {tr(ui.footer.rights, lang)}</span>
+      <button class="foot__motion" type="button" data-motion-toggle aria-pressed="true">{tr(ui.nav.motion, lang)}</button>
       <a class="link-u" href="#main">{tr(ui.footer.top, lang)} <span aria-hidden="true">↑</span></a>
     </div>
   </div>
@@ -43,5 +44,7 @@ const year = new Date().getFullYear();
   .foot__langs a { color: var(--muted); }
   .foot__langs a[aria-current='true'] { color: var(--ink); font-weight: 700; }
   .foot__base { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-block-start: 1.5rem; border-block-start: 1px solid var(--line); }
+  .foot__motion { margin-inline-start: auto; color: var(--muted); text-decoration: underline; text-underline-offset: 0.3em; }
+  .foot__motion:hover { color: var(--ink); }
   @media (max-width: 720px) { .foot__grid { grid-template-columns: 1fr 1fr; } .foot__sign { grid-column: 1 / -1; } }
 </style>

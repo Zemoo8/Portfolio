@@ -1,4 +1,4 @@
-// Keyboard-only checks: skip link, focus visibility, orbit, certificate lightbox, mobile menu.
+// Keyboard-only checks: skip link, chapter rod, focus visibility, orbit, certificate lightbox, mobile menu.
 import { chromium } from 'playwright';
 const base = process.env.QA_BASE || 'http://localhost:4321';
 const b = await chromium.launch();
@@ -15,6 +15,19 @@ for (const lang of ['en', 'ar']) {
   await p.goto(`${base}/${lang}/`, { waitUntil: 'networkidle' });
   await p.keyboard.press('Tab');
   check(`[${lang}] first Tab = skip link`, /skip|انتقل/i.test(await focused(p)), await focused(p));
+
+  // chapter rod: after the name, Tab reaches the chapters; Enter goes there and inks it as current
+  await p.keyboard.press('Tab');
+  await p.keyboard.press('Tab');
+  const firstCh = await p.evaluate(() => document.activeElement.dataset.rodLink ?? null);
+  check(`[${lang}] Tab after the name reaches the first chapter on the rod`, firstCh === 'work', `focus=${firstCh}`);
+  await p.focus('[data-rod-link="about"]');
+  await p.keyboard.press('Enter');
+  await p.waitForTimeout(1800);
+  const inked = await p.evaluate(() => document.querySelector('[data-rod-link="about"]').getAttribute('aria-current'));
+  check(`[${lang}] Enter on a chapter goes there and marks it current`, inked === 'true', `aria-current=${inked}`);
+  await p.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; scrollTo(0, 0); });
+  await p.waitForTimeout(400);
 
   // orbit: focus the 3rd card, it should become active; ArrowRight moves on
   await p.focus('[data-orbit-card]:nth-of-type(3)');

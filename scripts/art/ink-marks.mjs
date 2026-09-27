@@ -6,6 +6,9 @@
 //   arrow     — prev / next (points right; mirrored in CSS for "previous" and for RTL)
 //   cross     — close
 //   dash      — kicker and tag bullet
+//   rod       — the long hanging stroke of the navigation rod (baked upright)
+//   roller    — the short, loaded stroke a hanging scroll hangs from
+//   swash-v   — the swash turned upright: the current chapter on the rod
 // A directional turbulence displacement ("fibre") breaks every edge up like the hairs of a
 // dry brush. Deterministic (seeded). Usage: node scripts/art/ink-marks.mjs
 import fs from 'node:fs';
@@ -52,16 +55,27 @@ write('cross', svg('0 0 40 40', paths(diag([8, 7], [33, 33], 21)) + paths(diag([
 
 write('dash', svg('0 0 44 12', paths(line(38, 6, { width: 3.2, bristles: 7, seed: 9, dryness: 0.5, bow: 0.6, rise: -0.8 }), 3, 0), { stretch: true, filter: fibre(0.06, 0.6, 1.6, 11) }));
 
+write('rod', svg('0 0 1200 16', paths(line(1188, 8, { width: 3.4, bristles: 10, seed: 15, dryness: 0.6, bow: 2.2, rise: 0.6 }), 6, 0), { stretch: true, filter: fibre(0.006, 0.9, 2.4, 12) }));
+
+write('roller', svg('0 0 100 24', paths(line(88, 12, { width: 7, bristles: 14, seed: 17, dryness: 0.4, bow: 0.8, rise: -1 }), 6, 0), { stretch: true, filter: fibre(0.05, 0.5, 2.2, 13) }));
+
 // Bake every mark to a PNG alpha mask as well: an SVG with feTurbulence is re-rasterised by the
 // browser at every size it is used — measurable main-thread cost on pages with many marks.
 // CSS uses the PNGs; the SVGs stay as the editable source.
 import sharp from 'sharp';
-const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24] };
+const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24], rod: [1200, 24], roller: [200, 48] };
+// marks that are used upright are also baked turned a quarter clockwise (the stroke's start on top)
+const upright = { swash: ['swash-v', 0.5], rod: ['rod', 1] };
 for (const [name, [w, h]] of Object.entries(bake)) {
   const src = fs.readFileSync(path.join(OUT, `${name}.svg`));
-  await sharp(src, { density: 72 * (w / Number(/viewBox="0 0 ([\d.]+)/.exec(src.toString())[1])) })
+  const png = await sharp(src, { density: 72 * (w / Number(/viewBox="0 0 ([\d.]+)/.exec(src.toString())[1])) })
     .resize(w, h, { fit: 'fill' })
     .png({ compressionLevel: 9, palette: false })
-    .toFile(path.join(OUT, `${name}.png`));
+    .toBuffer();
+  if (name !== 'rod') fs.writeFileSync(path.join(OUT, `${name}.png`), png);
+  if (upright[name]) {
+    const [file, k] = upright[name];
+    await sharp(png).resize(Math.round(w * k), Math.round(h * k), { fit: 'fill' }).rotate(90).png({ compressionLevel: 9, palette: false }).toFile(path.join(OUT, `${file}.png`));
+  }
 }
 console.log('baked PNG masks');

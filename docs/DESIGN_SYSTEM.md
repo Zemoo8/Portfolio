@@ -42,10 +42,12 @@ Six brush marks drawn with the same bristle engine, given a directional "fibre" 
 | Mark | Used for |
 |---|---|
 | `swash` | primary button (`.btn`): the label sits on a loaded brush swash with a solid core (AA contrast); hover re-inks it in rust. `.btn--cloud` is the same stroke in cloud-white on the storm |
-| `under` | brush underline: secondary button (`.btn--ghost`), text links (`.link-u`), active nav chapter, active filter / film language / orbit station |
+| `under` | brush underline: secondary button (`.btn--ghost`), text links (`.link-u`), active filter / film language / orbit station |
 | `ring` | a small ensō around the active language, the film play/pause toggle, the case-study note |
 | `arrow`, `cross` | `.ibtn` prev / next / close (mirrored in CSS for "previous" and RTL) |
 | `dash` | leads every kicker and every tag (`.pill` is now small caps + a vermilion dash — no chips) |
+| `rod`, `roller` | the chapter scroll (`Nav`): the long dry stroke of its ink line (baked upright) and the rollers it hangs from |
+| `swash-v` | the swash turned upright: the chapter you are in, on the scroll |
 
 ## The air emblem (`src/lib/emblem.ts`, `EmblemSymbol.astro`, `Emblem.astro`)
 
@@ -57,7 +59,7 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 | Component | What it is |
 |---|---|
 | `Backdrop` | fixed painted world: sky · peaks · breeze · mist A · near · mist B, mist veil — each layer in a depth wrapper |
-| `Nav` | no bar — two corners: the name (home) and the chapter you are in, which opens a full-screen index with a preview per chapter (native `<dialog>`); the corners turn light over the dark storm (`data-tone` on every section) |
+| `Nav` | a **hanging scroll**, no bar. Wide screens (≥ 1100 × 620): a slim paper scroll with ink rollers hangs down the page edge (right; left in Arabic) with the five chapters written down it; an ink line runs down the rod and reaches each chapter's name exactly as that chapter begins (each stretch is a scroll-driven animation whose range is its chapter's scroll distance, measured on load/resize); the chapter you are in sits on an upright ink swash that paints itself down the stroke; languages at the foot. A case study is read inside *Work*: the line runs on from Work as you read it. Narrower screens: the scroll rolls up to its **title slip** in the corner (the current chapter, written vertically; it opens the full-screen index `<dialog>`) and the ink line runs down the screen edge. The name, top-left, is home and turns light over the storm (`data-tone`) |
 | `IntroFilm` | the **moon gate**: a painted ensō around a circular window onto the temple; the intro films play inside the circle. Until they exist, the label hangs vertically beside the gate like a scroll's title slip (in Arabic and on phones it is the caption's first line) |
 | `Work` (storm chapter) | six projects **orbiting the air emblem** over a WebGL smoke vortex; the front card plays its film. Below: a chapter plate (outlined italic numeral behind the title, italic tagline, cloud-white swash), brush arrows around an `01 / 06` counter, and the six projects as a station index |
 | `Credentials` | a rail of the real certificates, tilted like sheets on a table; word filters with an italic count; opens in `Lightbox` |
@@ -73,14 +75,14 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 | Paint-on | `Brush` strokes | dash offset 1 → 0 per bristle, staggered by bristle |
 | Unroll | `.scroll[data-unroll]` | `clip-path` opens top → bottom as the panel enters |
 | The painting builds | backdrop | the landscape is painted as you read: the top shows sky, distant ranges and back spires; scrolling raises the main peaks out of the mist (12–150vh), sets the temple on its crest (135–200vh), closes the framing peaks in (180–290vh), lifts the near ridges (260–400vh) and grows the pines (360–480vh); scrolling back takes it apart. Layers from `landscape.mjs` (`build-*.webp`), composited = the full painting; later stages load after the page |
-| Windows open | storm, panels, media | the Work chapter opens as a round arch rising from its top edge; parchment panels unroll with the page; the certificate rail, GitHub thumbnails and case-study films open through round windows |
+| The ink line | chapter scroll | the line on the scroll inks itself as you read, stretch by stretch, tied to scroll position; the current chapter's swash paints down the stroke (0.9 s) when you reach it. The earlier round-arch and round-window reveals were removed (they read as stock CSS wipes) |
 | Wind | open sky | ambient and time-based: three soft mist wisps cross the sky at a constant pace (95–150 s), mist banks breathe sideways — the same whether or not you scroll |
 | Orbit | projects | a rhythm, not a drift: one project rests in front for 6.5 s, then the ring glides (1.5 s, ease-in-out) to the next — the card in front, its film and the caption always agree. Drag settles on the nearest project in one motion; arrows / stations / keys glide there; the automatic turn waits while the pointer rests on the ring or focus is inside, and on pause. The ring and the smoke vortex both centre exactly on the emblem; the vortex turns at one constant pace (30 fps) and ignores the pointer |
 | Page change | cross-document | the next page is painted in: a brush swash grows from the centre until it covers the view (View Transitions + mask) |
 
 **Scrolling is the browser's own** (no smooth-scroll library, no inertia). Nothing responds to scroll *speed*; everything that follows the scroll is a function of scroll *position*, run by the compositor, so the same place on the page always looks the same.
 
-**Reduced motion** (OS setting) **or the motion switch** (nav, persisted): everything is shown immediately, no parallax/wind/drift/auto-rotation, the vortex renders a single still frame, films don't autoplay.
+**Reduced motion** (OS setting) **or the motion switch** (footer and index, persisted): everything is shown immediately, no parallax/wind/drift/auto-rotation, the vortex renders a single still frame, films don't autoplay.
 
 **Performance rules:** no per-frame scroll JavaScript (scroll-driven CSS; timelines kept out of the `animation` shorthand so minifiers can't fold them into a form browsers reject); the orbit skips style writes while paused; the vortex compiles its shader asynchronously (`KHR_parallel_shader_compile`), renders at ~0.5× resolution, and only runs while visible; ink marks are baked PNG masks; the painting ships 1000 w/2000 w variants; above-the-fold content never waits for JavaScript.
 
@@ -96,4 +98,4 @@ One `h1` per page, landmarks, skip link, visible `:focus-visible`; logical CSS p
 
 ## Breakpoints
 
-Fluid first; structural switches at **1020 px** (nav → menu), **960 px** (hero → single column), **900 px** (case-study columns), **800 px** (lightbox stacks), **700 px** (orbit tightens: smaller cards, rounder ellipse).
+Fluid first; structural switches at **1100 × 620 px** (chapter scroll ↔ title slip; the page keeps room beside the scroll), **960 px** (hero → single column), **900 px** (case-study columns), **800 px** (lightbox stacks), **700 px** (orbit tightens: smaller cards, rounder ellipse).

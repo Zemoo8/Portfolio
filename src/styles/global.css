@@ -156,6 +156,10 @@ ul, ol { padding: 0; list-style: none; }
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
+/* on wide screens the chapter scroll hangs at the edge (Nav): the page leaves room beside it */
+@media (min-width: 1100px) and (min-height: 620px) {
+  .wrap { padding-inline-end: max(var(--gutter), calc(4.1rem - (100vw - var(--max)) / 2)); }
+}
 
 .section { padding-block: var(--section) 0; position: relative; }
 
@@ -494,7 +498,7 @@ ul, ol { padding: 0; list-style: none; }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
 
 /* ==========================================================================
-   Windows that open as you scroll — tied to scroll position, never speed.
+   Panels that unroll as you scroll — tied to scroll position, never speed.
    Timelines stay in their own, more specific rules (minifiers fold them into the shorthand).
    Without scroll-driven animations or with reduced motion, everything is simply open.
    ========================================================================== */
@@ -504,17 +508,10 @@ ul, ol { padding: 0; list-style: none; }
     .js .scroll[data-unroll], .js .scroll[data-unroll].is-in { transition: none; animation: unroll linear both; }
     html.js body .scroll[data-unroll] { animation-timeline: view(); animation-range: entry 0% entry 75%; }
 
-    /* media arrive through round windows (moon gates) */
-    .case .mat, .item__thumb, .entry__cert, .creds__rail { animation: window-open linear both; }
-    html body .case .mat, html body .item__thumb, html body .entry__cert, html body .creds__rail { animation-timeline: view(); animation-range: entry 0% cover 40%; }
   }
 }
 @keyframes unroll {
   from { clip-path: inset(0 0 100% 0 round var(--radius-lg)); }
   to { clip-path: inset(0 0 0 0 round var(--radius-lg)); }
 }
-@keyframes window-open {
-  from { clip-path: circle(0% at 50% 60%); }
-  to { clip-path: circle(120% at 50% 50%); }
-}
-.motion-off .scroll[data-unroll], .motion-off .case .mat, .motion-off .item__thumb, .motion-off .entry__cert, .motion-off .creds__rail { animation: none; clip-path: none; }
+.motion-off .scroll[data-unroll] { animation: none; clip-path: none; }

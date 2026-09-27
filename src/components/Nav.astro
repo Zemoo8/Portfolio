@@ -1,8 +1,13 @@
 ---
-// Navigation without a bar. Two corners: the name (home), and the chapter you are in — which is
-// itself the button that opens a full-screen index, each chapter with a preview of what is
-// there. The corners take the colour of the scene beneath them (light or dark), so they read
-// on paper, on the storm and inside the project worlds.
+// Navigation as a hanging scroll. On wide screens a slim paper scroll hangs down the edge of the
+// page (the right edge; the left in Arabic) with the chapters written down it. An ink line runs
+// down the rod as you read and reaches each chapter's name exactly when that chapter begins; the
+// chapter you are in is inked with a brush swash. Each stretch of the line is a CSS scroll-driven
+// animation whose range is the scroll distance of its chapter — measured on load and on resize,
+// nothing runs per frame. The languages sit at the foot of the scroll.
+// On narrower screens the scroll rolls up into its title slip in the corner (the chapter you are
+// in; it opens the full-screen index) and the ink line runs down the very edge of the screen.
+// The name, top-left, is always home.
 import { locales, localeMeta, path, asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
@@ -10,40 +15,56 @@ import { profile } from '../content/profile';
 interface Props { lang: Locale; route: string }
 const { lang, route } = Astro.props;
 const home = path(lang);
-const items = [
+const chapters = [
   { id: 'work', label: ui.nav.work, preview: 'media/projects/aieyes/ad-film-poster-sm.webp' },
   { id: 'about', label: ui.nav.about, preview: 'media/profile/portrait-color.webp' },
   { id: 'path', label: ui.nav.path, preview: 'media/projects/cheezy/hero-sm.webp' },
   { id: 'credentials', label: ui.nav.credentials, preview: 'media/certificates/nvidia-deep-learning-sm.webp' },
   { id: 'contact', label: ui.nav.contact, preview: 'media/profile/portrait-ink.webp' },
 ];
+// a case study is read inside the Work chapter
+const within = route.startsWith('work/') ? 'work' : undefined;
 ---
 
-<header class="corners" data-nav>
-  <a class="corners__name" href={home} aria-label={tr(ui.nav.home, lang)}>{tr(profile.name, lang)}</a>
-  <div class="corners__right">
-    <div class="corners__langs" role="group" aria-label={tr(ui.nav.language, lang)}>
+<header class="masthead" data-nav data-within={within}>
+  <a class="masthead__name" href={home} aria-label={tr(ui.nav.home, lang)}>{tr(profile.name, lang)}</a>
+
+  <nav class="rod" aria-label={tr(ui.nav.chapters, lang)}>
+    <span class="rod__roller" aria-hidden="true"></span>
+    <span class="rod__seg" aria-hidden="true" data-seg><i></i></span>
+    {chapters.map((c) => (
+      <Fragment>
+        <a class="rod__ch" href={`${home}#${c.id}`} data-rod-link={c.id} data-state="future">{tr(c.label, lang)}</a>
+        <span class="rod__seg" aria-hidden="true" data-seg><i></i></span>
+      </Fragment>
+    ))}
+    <ul class="rod__langs" aria-label={tr(ui.nav.language, lang)}>
       {locales.map((l) => (
-        <a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined} title={localeMeta[l].name}>
-          <span aria-hidden="true">{localeMeta[l].label}</span><span class="sr-only">{localeMeta[l].name}</span>
-        </a>
+        <li>
+          <a href={path(l, route)} hreflang={l} lang={l} data-lang-link={l} aria-current={l === lang ? 'true' : undefined}>
+            <span aria-hidden="true">{localeMeta[l].label}</span><span class="sr-only">{localeMeta[l].name}</span>
+          </a>
+        </li>
       ))}
-    </div>
-    <button class="corners__now" type="button" aria-haspopup="dialog" aria-controls="index" data-index-open>
-      <span class="corners__chapter" data-chapter-label data-default={tr(ui.nav.index, lang)}>{tr(ui.nav.index, lang)}</span>
-      <span class="corners__lines" aria-hidden="true"><i></i><i></i></span>
-    </button>
-  </div>
+    </ul>
+    <span class="rod__roller rod__roller--foot" aria-hidden="true"></span>
+  </nav>
+
+  <button class="slip" type="button" aria-haspopup="dialog" aria-controls="index" data-index-open>
+    <span class="slip__roller" aria-hidden="true"></span>
+    <span class="slip__label" data-chapter-label data-default={tr(ui.nav.index, lang)}>{tr(ui.nav.index, lang)}</span>
+  </button>
+  <span class="edge" aria-hidden="true"><span class="rod__seg" data-edge><i></i></span></span>
 </header>
 
 <dialog class="index" id="index" aria-label={tr(ui.nav.index, lang)} data-index>
   <div class="index__inner">
     <nav class="index__list" aria-label="Primary">
-      {items.map((it) => (
+      {chapters.map((it) => (
         <a href={`${home}#${it.id}`} data-index-link data-preview={asset(it.preview)}>{tr(it.label, lang)}</a>
       ))}
     </nav>
-    <figure class="index__preview" aria-hidden="true"><img src={asset(items[0].preview)} alt="" loading="lazy" data-index-img /></figure>
+    <figure class="index__preview" aria-hidden="true"><img src={asset(chapters[0].preview)} alt="" loading="lazy" data-index-img /></figure>
     <div class="index__foot">
       <a class="link-u" href={`mailto:${profile.email}`}>{profile.email}</a>
       <a class="link-u" href={profile.links.linkedin} target="_blank" rel="noopener me">LinkedIn</a>
@@ -60,37 +81,186 @@ const items = [
 </dialog>
 
 <style>
-  .corners {
+  .masthead__name {
     position: fixed;
-    inset-block-start: 0;
-    inset-inline: 0;
     z-index: 50;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 1.3rem var(--gutter);
-    pointer-events: none;
+    inset-block-start: 1.3rem;
+    inset-inline-start: var(--gutter);
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
     color: var(--ink);
     transition: color 0.5s var(--ease-out);
   }
-  :global(html[data-nav-tone='dark']) .corners { color: var(--cloud); }
-  .corners > * { pointer-events: auto; }
-  .corners__name { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; letter-spacing: -0.005em; white-space: nowrap; }
-  .corners__right { display: flex; align-items: baseline; gap: 1.6rem; }
-  .corners__langs { display: flex; gap: 0.8rem; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; }
-  .corners__langs a { opacity: 0.72; transition: opacity var(--dur-2); }
-  .corners__langs a[lang='ar'] { font-family: var(--font-arabic-display); font-size: 0.95rem; letter-spacing: 0; }
-  .corners__langs a:hover, .corners__langs a[aria-current='true'] { opacity: 1; }
-  .corners__now { display: inline-flex; align-items: baseline; gap: 0.8rem; font-family: var(--font-display); font-style: italic; font-size: 1.3rem; }
-  :lang(ar) .corners__now { font-style: normal; }
-  .corners__chapter { transition: opacity 0.35s var(--ease-out), translate 0.35s var(--ease-out); }
-  .corners__chapter.is-changing { opacity: 0; translate: 0 -0.3em; }
-  .corners__lines { position: relative; inline-size: 1.6rem; block-size: 0.55rem; align-self: center; }
-  .corners__lines i { position: absolute; inset-inline: 0; block-size: 1.5px; background: currentColor; transition: inset-inline-start 0.5s var(--ease-out); }
-  .corners__lines i:first-child { inset-block-start: 0; }
-  .corners__lines i:last-child { inset-block-end: 0; inset-inline-start: 0.5rem; }
-  .corners__now:hover .corners__lines i:last-child { inset-inline-start: 0; }
+  :global(html[data-nav-tone='dark']) .masthead__name { color: var(--cloud); }
 
+  /* ---- the ink line: a dry brush stroke, inked from the top as its stretch is read ---------- */
+  .rod__seg {
+    position: relative;
+    display: block;
+    background: rgb(110 106 98 / 0.3);
+    -webkit-mask: url('/ink/rod.png') center / 100% 100% no-repeat;
+    mask: url('/ink/rod.png') center / 100% 100% no-repeat;
+  }
+  .rod__seg i { position: absolute; inset: 0; background: var(--ink); transform-origin: 50% 0; scale: 1 0; }
+  @supports (animation-timeline: scroll()) {
+    .rod__seg i { animation: rod-fill linear both; }
+    /* the timeline in its own, more specific rule — minifiers fold it into the shorthand otherwise */
+    .masthead .rod__seg > i { animation-timeline: scroll(root block); }
+    .masthead .rod__seg[data-full] > i { animation: none; scale: 1 1; }
+  }
+  @supports not (animation-timeline: scroll()) {
+    .rod__seg i { transition: scale 0.8s var(--ease-out); }
+    .rod__seg[data-past] i { scale: 1 1; }
+  }
+  @keyframes rod-fill { from { scale: 1 0; } to { scale: 1 1; } }
+
+  /* ---- wide screens: the hanging scroll ---------------------------------------------------- */
+  .rod, .slip, .edge { display: none; }
+  @media (min-width: 1100px) and (min-height: 620px) {
+    .rod {
+      position: fixed;
+      z-index: 50;
+      inset-block: 1rem;
+      inset-inline-end: 0.8rem;
+      inline-size: 2.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-block: 0.9rem 1rem;
+      background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f8f3e5 22%, #f7f1e3 78%, #e9dfc7);
+      box-shadow: 0 22px 44px -26px rgb(40 36 30 / 0.6), 0 2px 6px -3px rgb(40 36 30 / 0.25);
+    }
+    /* the mounting: a hairline of saffron silk just inside each long edge */
+    .rod::before {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      inset-inline: 3px;
+      border-inline: 1px solid transparent;
+      border-image: linear-gradient(180deg, var(--saffron), var(--amber) 60%, var(--rust)) 1;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .rod__roller {
+      position: absolute;
+      inset-block-start: -0.3rem;
+      inline-size: 3.5rem;
+      block-size: 0.62rem;
+      background: var(--ink);
+      -webkit-mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+      mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+    }
+    .rod__roller--foot { inset-block: auto -0.34rem; inline-size: 3.7rem; block-size: 0.7rem; }
+
+    .rod > .rod__seg { flex: 1 1 0; min-block-size: 0.6rem; inline-size: 5px; margin-block: 0.45rem; }
+    .rod__roller + .rod__seg { margin-block-start: 0.2rem; }
+  }
+  /* on shorter screens the writing is a little smaller, so the ink line keeps room to run */
+  @media (min-width: 1100px) and (min-height: 620px) and (max-height: 780px) {
+    .rod__ch { font-size: 1rem; }
+    .rod__langs { gap: 0; }
+    .rod__langs a { block-size: 1.6rem; }
+  }
+
+  /* a chapter: written down the scroll; the one you are in sits on a swash of ink */
+  .rod__ch {
+    position: relative;
+    isolation: isolate;
+    flex: none;
+    writing-mode: vertical-rl;
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    padding-block: 0.15rem;
+    transition: color 0.5s var(--ease-out);
+  }
+  :lang(ar) .rod__ch { font-size: 1.12rem; letter-spacing: 0; }
+  .rod__ch[data-state='past'] { color: var(--ink-2); }
+  .rod__ch::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -1em -0.62em;
+    background: var(--ink);
+    opacity: 0;
+    /* the swash, revealed by a soft-edged wash that travels down the stroke: it paints itself */
+    -webkit-mask: url('/ink/swash-v.png') center / 100% 100% no-repeat, linear-gradient(#000 40%, transparent 60%) 0 100% / 100% 260% no-repeat;
+    -webkit-mask-composite: source-in;
+    mask: url('/ink/swash-v.png') center / 100% 100% no-repeat, linear-gradient(#000 40%, transparent 60%) 0 100% / 100% 260% no-repeat;
+    mask-composite: intersect;
+    transition: opacity 0.45s var(--ease-out), -webkit-mask-position 0.9s var(--ease-out), mask-position 0.9s var(--ease-out);
+  }
+  .rod__ch:hover { color: var(--ink); }
+  .rod__ch:hover::before { opacity: 0.13; -webkit-mask-position: center, 0 0; mask-position: center, 0 0; }
+  .rod__ch[aria-current] { color: var(--paper); font-style: italic; }
+  :lang(ar) .rod__ch[aria-current] { font-style: normal; }
+  .rod__ch[aria-current]::before { opacity: 1; -webkit-mask-position: center, 0 0; mask-position: center, 0 0; }
+
+  .rod__langs { display: grid; gap: 0.15rem; justify-items: center; margin-block-start: 0.2rem; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; }
+  .rod__langs a { position: relative; display: grid; place-items: center; inline-size: 1.85rem; block-size: 1.85rem; color: var(--muted); transition: color var(--dur-2); }
+  .rod__langs a[lang='ar'] { font-family: var(--font-arabic-display); font-size: 0.95rem; letter-spacing: 0; }
+  .rod__langs a:hover { color: var(--ink); }
+  .rod__langs a[aria-current='true'] { color: var(--ink); }
+  .rod__langs a[aria-current='true']::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--rust);
+    -webkit-mask: url('/ink/ring.png') center / contain no-repeat;
+    mask: url('/ink/ring.png') center / contain no-repeat;
+  }
+
+  /* ---- narrower screens: the scroll rolled up to its title slip ---------------------------- */
+  @media (max-width: 1099.98px), (max-height: 619.98px) {
+    .slip {
+      position: fixed;
+      z-index: 50;
+      inset-block-start: 0.9rem;
+      inset-inline-end: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      inline-size: 2.3rem;
+      padding-block: 0.8rem 0.75rem;
+      background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f8f3e5 22%, #f7f1e3 78%, #e9dfc7);
+      box-shadow: 0 16px 30px -18px rgb(40 36 30 / 0.6), 0 2px 5px -3px rgb(40 36 30 / 0.25);
+      color: var(--ink);
+    }
+    .slip__roller {
+      position: absolute;
+      inset-block-start: -0.28rem;
+      inline-size: 3.1rem;
+      block-size: 0.56rem;
+      background: var(--ink);
+      -webkit-mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+      mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+    }
+    .slip__label {
+      writing-mode: vertical-rl;
+      font-family: var(--font-display);
+      font-size: 1.02rem;
+      font-weight: 600;
+      font-style: italic;
+      line-height: 1;
+      letter-spacing: 0.03em;
+      transition: opacity 0.35s var(--ease-out), translate 0.35s var(--ease-out);
+    }
+    :lang(ar) .slip__label { font-style: normal; letter-spacing: 0; }
+    .slip__label.is-changing { opacity: 0; translate: 0 -0.4em; }
+
+    .edge { display: block; position: fixed; z-index: 49; inset-block: 0; inset-inline-end: 0.18rem; inline-size: 4px; pointer-events: none; }
+    .edge .rod__seg { block-size: 100%; }
+    :global(html[data-nav-tone='dark']) .edge .rod__seg { background: rgb(238 240 236 / 0.22); }
+    :global(html[data-nav-tone='dark']) .edge .rod__seg i { background: var(--cloud); }
+  }
+
+  /* ---- the full-screen index (narrow screens) ----------------------------------------------- */
   .index {
     inline-size: 100vw;
     max-inline-size: none;
@@ -141,7 +311,6 @@ const items = [
   @media (max-width: 760px) {
     .index__inner { grid-template-columns: 1fr; }
     .index__preview { display: none; }
-    .corners__langs { display: none; }
   }
 </style>
 
@@ -169,26 +338,84 @@ const items = [
     }),
   );
 
-  // The scene under the corners decides their colour and the chapter shown.
+  // ---- where you are ------------------------------------------------------------------------
   const root = document.documentElement;
-  let current = '';
-  const setChapter = (name: string) => {
-    const text = name || label.dataset.default!;
-    if (text === current) return;
-    current = text;
+  const links = [...nav.querySelectorAll<HTMLAnchorElement>('[data-rod-link]')];
+  const ids = links.map((a) => a.dataset.rodLink!);
+  const segs = [...nav.querySelectorAll<HTMLElement>('[data-seg]')];
+  const within = nav.dataset.within ?? '';
+
+  let current = -2;
+  const setCurrent = (i: number) => {
+    if (i === current) return;
+    current = i;
+    links.forEach((a, k) => {
+      if (k === i) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+      a.dataset.state = k < i ? 'past' : k === i ? 'current' : 'future';
+    });
+    segs.forEach((s, k) => s.toggleAttribute('data-past', k <= i));
+    const text = i >= 0 ? links[i].textContent!.trim() : label.dataset.default!;
+    if (label.textContent === text) return;
     label.classList.add('is-changing');
     setTimeout(() => { label.textContent = text; label.classList.remove('is-changing'); }, 220);
   };
+
+  // Every scene belongs to the last chapter that began before it (the hero to none; the
+  // capabilities and GitHub scenes to Credentials; a case study to Work).
   const scenes = [...document.querySelectorAll<HTMLElement>('[data-tone]')];
-  if (scenes.length) {
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        const el = e.target as HTMLElement;
-        root.dataset.navTone = el.dataset.tone!;
-        setChapter(el.dataset.chapterName ?? '');
-      }
-    }, { rootMargin: '-3% 0px -96% 0px' });
-    scenes.forEach((s) => io.observe(s));
+  const owner = new Map<Element, number>();
+  let last = ids.indexOf(within);
+  for (const s of scenes) {
+    if (ids.includes(s.id)) last = ids.indexOf(s.id);
+    owner.set(s, last);
   }
+  let atBand: HTMLElement | undefined;
+  let atEnd = false;
+  const apply = () => {
+    if (atEnd && scenes.length) {
+      setCurrent(owner.get(scenes[scenes.length - 1])!);
+      return;
+    }
+    if (!atBand) return;
+    root.dataset.navTone = atBand.dataset.tone!;
+    setCurrent(owner.get(atBand)!);
+  };
+  if (scenes.length) {
+    const band = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) atBand = e.target as HTMLElement;
+      apply();
+    }, { rootMargin: '-3% 0px -96% 0px' });
+    scenes.forEach((s) => band.observe(s));
+    // a last chapter shorter than the screen never reaches the top: the foot of the page counts
+    const end = document.createElement('div');
+    end.setAttribute('aria-hidden', 'true');
+    end.style.cssText = 'block-size:1px;margin-block-start:-1px';
+    document.body.append(end);
+    new IntersectionObserver(([e]) => { atEnd = e.isIntersecting && scrollY > 0; apply(); }, { rootMargin: '0px 0px 48px 0px' }).observe(end);
+  }
+
+  // ---- the ink line: each stretch is inked over its own chapter's scroll distance ------------
+  const layout = () => {
+    const max = Math.max(1, root.scrollHeight - innerHeight);
+    const lead = innerHeight * 0.04; // the chapter begins as it reaches the band near the top
+    const starts = ids.map((id, k) => {
+      if (within) return k <= ids.indexOf(within) ? 0 : max;
+      const el = document.getElementById(id);
+      return el ? Math.min(max, Math.max(0, el.getBoundingClientRect().top + scrollY - lead)) : max;
+    });
+    const stops = [0, ...starts, max];
+    segs.forEach((s, k) => {
+      const a = stops[k];
+      const b = Math.max(stops[k + 1], a + 1);
+      s.toggleAttribute('data-full', stops[k + 1] <= 0);
+      (s.firstElementChild as HTMLElement).style.setProperty('animation-range', `${Math.round(a)}px ${Math.round(b)}px`);
+    });
+  };
+  let queued = 0;
+  const relayout = () => { cancelAnimationFrame(queued); queued = requestAnimationFrame(layout); };
+  relayout();
+  new ResizeObserver(relayout).observe(document.body);
+  addEventListener('load', relayout, { once: true });
+  document.fonts?.ready.then(relayout);
 </script>
