@@ -1,9 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// Set SITE_URL when deploying (e.g. SITE_URL=https://your-domain.com npm run build).
-// It drives canonical URLs, hreflang alternates, Open Graph URLs and the sitemap.
-const site = process.env.SITE_URL || 'http://localhost:4321';
+// Set SITE_URL for previews or alternate domains. Production metadata must never point at localhost.
+const site = process.env.SITE_URL || 'https://www.ahmedbaghouli.world';
 
 export default defineConfig({
   site,
