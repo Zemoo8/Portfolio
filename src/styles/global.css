@@ -171,6 +171,8 @@ ul, ol { padding: 0; list-style: none; }
 main .section[id] { scroll-margin-block-start: calc(5.5rem - var(--section)); }
 main #work { scroll-margin-block-start: calc(5.5rem - clamp(6rem, 13vh, 9rem)); }
 main #contact { scroll-margin-block-start: calc(5.5rem - var(--section) - clamp(3rem, 8vw, 6rem)); }
+/* chapters on a parchment panel: the panel's own padding scrolls out of view too */
+main #about, main #path, main #more { scroll-margin-block-start: calc(5.5rem - var(--section) - clamp(2rem, 1rem + 4vw, 5rem)); }
 
 /* A parchment scroll floating over the painted world */
 .scroll {

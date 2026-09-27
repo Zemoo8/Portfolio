@@ -15,7 +15,7 @@ uniform vec2 uCenter;
 uniform float uR0;
 uniform float uFar;
 uniform float uOpen;
-uniform float uSpin;
+uniform float uPhase;
 uniform float uFade;
 uniform float uK;
 
@@ -48,8 +48,10 @@ void main(){
   float edge = R * (1.0 + (tear - 0.5) * (0.45 + 0.35 * uOpen));
   float inside = 1.0 - smoothstep(edge - 34.0 * uK, edge + 6.0 * uK, r);
 
-  // the smoke itself: three arms turning around the eye, spun up by the gust
-  float spin = t * (0.1 + uSpin) + 1.9 / (rn + 0.38);
+  // the smoke itself: three arms turning around the eye. The turn so far (uPhase) is summed on
+  // the CPU frame by frame, so a change of speed only ever speeds it up or slows it down —
+  // multiplying the clock by a changing speed would make the angle leap.
+  float spin = uPhase + 1.9 / (rn + 0.38);
   float aa = a + spin;
   vec2 p = vec2(cos(aa), sin(aa)) * rn;
   vec2 q = vec2(fbm(p * 2.1 + t * 0.05), fbm(p * 2.1 - t * 0.04 + 5.2));
@@ -129,7 +131,7 @@ export function initGust({ trigger, dialog, canvas, onOpened, onClosing }: Optio
       const loc = gl.getAttribLocation(prog, 'p');
       gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      for (const n of ['uRes', 'uTime', 'uCenter', 'uR0', 'uFar', 'uOpen', 'uSpin', 'uFade', 'uK']) u[n] = gl.getUniformLocation(prog, n);
+      for (const n of ['uRes', 'uTime', 'uCenter', 'uR0', 'uFar', 'uOpen', 'uPhase', 'uFade', 'uK']) u[n] = gl.getUniformLocation(prog, n);
       return true;
     })());
   trigger.addEventListener('pointerenter', prepare, { once: true });
@@ -157,13 +159,13 @@ export function initGust({ trigger, dialog, canvas, onOpened, onClosing }: Optio
   let raf = 0;
   let time = 20;
   let last = 0;
-  let open = 0, spin = 0.1, fade = 0;
+  let open = 0, spin = 0.1, phase = 0, fade = 0;
   let tween: { from: number; to: number; t0: number; dur: number; done?: () => void } | null = null;
   const draw = () => {
     if (!gl) return;
     gl.uniform1f(u.uTime, time);
     gl.uniform1f(u.uOpen, open);
-    gl.uniform1f(u.uSpin, spin);
+    gl.uniform1f(u.uPhase, phase);
     gl.uniform1f(u.uFade, fade);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
@@ -179,9 +181,10 @@ export function initGust({ trigger, dialog, canvas, onOpened, onClosing }: Optio
       open = tween.from + (tween.to - tween.from) * easeInOut(x);
       if (x >= 1) { const done = tween.done; tween = null; done?.(); }
     }
-    // spin is strongest while the storm is moving, and eases off once it has filled the screen
-    const moving = tween ? 1 : 0;
-    spin += ((moving ? 2.6 : 0.12) - spin) * Math.min(1, dt * (moving ? 6 : 1.5));
+    // the swirl turns a little faster while the storm is moving and eases back to the storm
+    // chapter's calm pace once it has filled the screen — always smoothly
+    spin += ((tween ? 0.55 : 0.1) - spin) * Math.min(1, dt * 2.5);
+    phase += dt * spin;
     fade += ((dialog.open ? 1 : 0) - fade) * Math.min(1, dt * 10);
     draw();
   };
@@ -208,7 +211,7 @@ export function initGust({ trigger, dialog, canvas, onOpened, onClosing }: Optio
     }
     dialog.classList.remove('is-still');
     measure();
-    open = 0; fade = 0; spin = 1.2;
+    open = 0; fade = 0; spin = 0.1;
     // a breath of spin in the gate, then the storm tears out and fills the screen
     setTimeout(() => run(1, 1350, () => onOpened?.()), 180);
     setTimeout(() => dialog.classList.add('is-in'), 900);

@@ -79,7 +79,7 @@ Place files in `public/media/intros/`, then rebuild/redeploy. Detection happens 
 
 **Recommended:**
 - **Frame:** the film plays on a **16:9 screen** that the gust opens when the visitor clicks the moon gate (`object-fit: contain`, nothing cropped). Deliver 16:9 (1920×1080); the poster is shown before playback.
-- **Length:** 20–45 s. Opening the gate is the visitor's own choice, so the film starts **with sound** (if a browser refuses, it plays muted and *Sound on* is offered).
+- **Length:** aim for ~50 s (45–60 s). Opening the gate is the visitor's own choice, so the film starts **with sound** (if a browser refuses, it plays muted and *Sound on* is offered). The script, in the three languages, is in `docs/INTRO_FILM_SCRIPT.md`.
 - **Encoding:** H.264 High, CRF 21–23, `+faststart`, AAC audio 128 kbps. Aim for ≤ 8 MB. Example:
   `ffmpeg -i master.mov -vf "scale=1920:-2" -c:v libx264 -crf 22 -preset slow -movflags +faststart -c:a aac -b:a 128k intro-en.mp4`
 - **WebM:** not needed — MP4 (H.264) plays in every current browser; the site no longer ships WebM.
