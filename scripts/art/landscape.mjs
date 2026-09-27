@@ -265,6 +265,14 @@ await render(svg(stage.temple), 'public/art/build-temple.webp', true);
 await render(svg(stage.frame), 'public/art/build-frame.webp', true);
 await render(svg(`${ridges}${nearMist}`), 'public/art/build-ridges.webp', true);
 await render(svg(pines), 'public/art/build-pines.webp', true);
+// phones build the painting in three stages, not six (fewer full-screen layers to composite):
+// the main peaks, temple and framing peaks as one image, the ridges and pines as another
+const merge = async (parts, out) => {
+  const [first, ...rest] = parts.map((p) => `public/art/build-${p}-1000.webp`);
+  await sharp(first).composite(rest.map((input) => ({ input }))).webp({ quality: 82, alphaQuality: 80, effort: 6 }).toFile(out);
+};
+await merge(['main', 'temple', 'frame'], 'public/art/build-mid-1000.webp');
+await merge(['ridges', 'pines'], 'public/art/build-near-1000.webp');
 
 // preview
 // (sharp resizes before compositing, so composite to a buffer first)

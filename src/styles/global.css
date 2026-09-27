@@ -94,6 +94,7 @@ html {
   scroll-padding-block-start: 1.5rem;
 }
 html.motion-off { scroll-behavior: auto; }
+html.dialog-open { overflow: hidden; scrollbar-gutter: stable; }
 
 body {
   margin: 0;
@@ -532,3 +533,20 @@ main #about, main #path, main #more { scroll-margin-block-start: calc(-1.5rem - 
   to { clip-path: inset(0 0 0 0 round var(--radius-lg)); }
 }
 .motion-off .scroll[data-unroll] { animation: none; clip-path: none; }
+
+@media (max-width: 760px) {
+  .js .scroll[data-unroll], .js .scroll[data-unroll].is-in {
+    clip-path: none;
+    animation: none;
+    transition: none;
+  }
+  [data-parallax] {
+    animation: none !important;
+    translate: none !important;
+  }
+  .case__links a, .entry__link, .sheet__verify {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+  }
+}

@@ -96,6 +96,10 @@ const within = route.startsWith('work/') ? 'work' : undefined;
   }
   :global(html[data-nav-tone='dark']) .masthead__name { color: var(--cloud); }
 
+  @media (max-width: 760px) {
+    .masthead__name { position: absolute; }
+  }
+
   /* ---- the ink line: a dry brush stroke, inked from the top as its stretch is read ---------- */
   .rod__seg {
     position: relative;

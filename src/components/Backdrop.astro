@@ -7,6 +7,9 @@
 // from scripts/art/landscape.mjs and composite to exactly the full painting.
 // Without scroll-driven animations, with reduced motion, or with the motion switch off, the
 // finished painting is simply there. The wind (mist drifting past) is time-based. Decorative.
+// Phones build the same painting in three stages instead of six (the middle and near stages come
+// pre-merged: build-mid, build-near) and skip the wind wisps — far fewer full-screen layers for a
+// phone's GPU to composite on every scroll frame. Stages a screen doesn't show are never loaded.
 import { asset } from '../i18n/config';
 
 const layer = (name: string) => ({
@@ -15,6 +18,8 @@ const layer = (name: string) => ({
 });
 const stages = ['back', 'main', 'temple', 'frame'].map((n) => ({ n, ...layer(n) }));
 const near = ['ridges', 'pines'].map((n) => ({ n, ...layer(n) }));
+// the phone's merged stages (1000 w is plenty for a phone-sized painting)
+const phone = (n: string) => ({ n, src: asset(`art/build-${n}-1000.webp`) });
 ---
 
 <div class="world" aria-hidden="true" data-world>
@@ -22,9 +27,11 @@ const near = ['ridges', 'pines'].map((n) => ({ n, ...layer(n) }));
   {stages.map((s) => s.n === 'back'
     ? <img class={`build build--${s.n}`} src={s.src} srcset={s.srcset} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />
     : <img class={`build build--${s.n}`} data-src={s.src} data-srcset={s.srcset} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />)}
+  <img class="build build--mid" data-src={phone('mid').src} alt="" width="1000" height="625" decoding="async" />
   <div class="world__breeze"><i></i><i></i><i></i></div>
   <div class="world__mist world__mist--a"></div>
   {near.map((s) => <img class={`build build--${s.n}`} data-src={s.src} data-srcset={s.srcset} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />)}
+  <img class="build build--near" data-src={phone('near').src} alt="" width="1000" height="625" decoding="async" />
   <div class="world__mist world__mist--b"></div>
   <div class="world__veil" data-veil></div>
 </div>
@@ -32,9 +39,17 @@ const near = ['ridges', 'pines'].map((n) => ({ n, ...layer(n) }));
 <script>
   // Stages that are not yet painted at the top of the page load once the page itself has loaded,
   // so they never compete with the first view.
-  const paint = () => document.querySelectorAll<HTMLImageElement>('.world img[data-src]').forEach((i) => { i.srcset = i.dataset.srcset!; i.src = i.dataset.src!; });
+  // Only the stages this screen shows are loaded (a phone's merged stages, or the wide screen's six).
+  const paint = () =>
+    document.querySelectorAll<HTMLImageElement>('.world img[data-src]').forEach((i) => {
+      if (getComputedStyle(i).display === 'none') return;
+      if (i.dataset.srcset) i.srcset = i.dataset.srcset;
+      i.src = i.dataset.src!;
+      i.removeAttribute('data-src');
+    });
   const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 200));
   if (document.readyState === 'complete') idle(paint); else addEventListener('load', () => idle(paint), { once: true });
+  matchMedia('(max-width: 760px)').addEventListener('change', () => idle(paint));
 </script>
 
 <style>
@@ -120,4 +135,14 @@ const near = ['ridges', 'pines'].map((n) => ({ n, ...layer(n) }));
   @keyframes veil-in { to { opacity: 0.4; } }
 
   :global(.motion-off) .build, :global(.motion-off) .world__veil { animation: none; }
+
+  /* ---- phones: three stages, one mist bank, no wind wisps ----------------------------------- */
+  .build--mid, .build--near { display: none; }
+  @media (max-width: 760px) {
+    .build--main, .build--temple, .build--frame, .build--ridges, .build--pines, .world__breeze, .world__mist--a { display: none; }
+    .build--mid, .build--near { display: block; }
+    .world > .build { animation: none !important; opacity: 1; translate: none; scale: 1; }
+    .world__mist--b { animation: none; }
+    .build { will-change: auto; }
+  }
 </style>

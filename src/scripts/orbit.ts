@@ -219,6 +219,7 @@ export function initOrbit(root: HTMLElement) {
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
     if (visible) restUntil = Math.max(restUntil, performance.now() + DWELL / 2);
+    if (visible) schedule();
   }).observe(stage);
 
   // --- drawing ---------------------------------------------------------------------------------
@@ -238,8 +239,12 @@ export function initOrbit(root: HTMLElement) {
     }
   };
 
+  let raf = 0;
+  const schedule = () => {
+    if (!raf && visible) raf = requestAnimationFrame(frame);
+  };
   const frame = (now: number) => {
-    requestAnimationFrame(frame);
+    raf = 0;
     if (!visible) return;
     if (glide) {
       const p = glide.dur ? Math.min(1, (now - glide.t0) / glide.dur) : 1;
@@ -251,11 +256,12 @@ export function initOrbit(root: HTMLElement) {
       glideTo(active + 1);
     }
     draw();
+    schedule();
   };
 
   draw();
   arrive(0);
-  requestAnimationFrame(frame);
+  schedule();
 
   // announce only visitor-initiated changes
   live.addEventListener('animationend', () => live.setAttribute('aria-live', 'off'));

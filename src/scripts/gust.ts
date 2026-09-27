@@ -203,6 +203,7 @@ export function initGust({ trigger, dialog, canvas, onOpened, onClosing }: Optio
     trigger.classList.add('is-stirring');
     const ok = animated() && (await prepare());
     dialog.showModal();
+    document.documentElement.classList.add('dialog-open');
     trigger.setAttribute('aria-expanded', 'true');
     if (!ok) {
       dialog.classList.add('is-still', 'is-in');
@@ -225,6 +226,7 @@ export function initGust({ trigger, dialog, canvas, onOpened, onClosing }: Optio
     const finish = () => {
       halt();
       dialog.close();
+      document.documentElement.classList.remove('dialog-open');
       dialog.classList.remove('is-in', 'is-out', 'is-still');
       trigger.classList.remove('is-stirring');
       trigger.setAttribute('aria-expanded', 'false');

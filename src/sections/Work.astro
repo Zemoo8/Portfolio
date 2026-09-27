@@ -127,6 +127,7 @@ const cards = projects.map((p) => {
   .storm__canvas { opacity: 0; transition: opacity 1.2s var(--ease-out); }
   .storm__canvas:global(.is-ready) { opacity: 1; }
   .storm__canvas { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  @media (max-width: 760px) { .storm__canvas { display: none; } }
   .storm__head { display: grid; gap: 1rem; justify-items: center; text-align: center; }
   .storm__head .kicker { color: #e9a86a; }
   .storm__head h2 { font-size: var(--step-4); max-inline-size: 22ch; }
@@ -307,7 +308,7 @@ const cards = projects.map((p) => {
       const root = section.querySelector<HTMLElement>('[data-orbit]');
       if (root) initOrbit(root);
       const canvas = section.querySelector<HTMLCanvasElement>('[data-vortex]');
-      if (canvas) {
+      if (canvas && !matchMedia('(max-width: 760px)').matches) {
         const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 60));
         idle(() => mountVortex(canvas, section.querySelector<HTMLElement>('.orbit__core')).catch(() => { /* no WebGL: the CSS ink gradient remains */ }));
       }
