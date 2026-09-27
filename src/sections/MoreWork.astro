@@ -9,7 +9,7 @@ interface Props { lang: Locale }
 const { lang } = Astro.props;
 ---
 
-<section id="more" class="section wrap" aria-labelledby="more-title">
+<section id="more" class="section wrap" aria-labelledby="more-title" data-tone="light" data-chapter-name="GitHub">
   <div class="scroll more" data-unroll>
     <header class="section-head more__head">
       <p class="kicker" data-reveal>{tr(ui.more.kicker, lang)}</p>

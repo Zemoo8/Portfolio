@@ -65,4 +65,11 @@ export const credentialGroups: CredentialGroup[] = [
 export const credentialCount = credentialGroups.reduce((n, g) => n + g.items.length, 0);
 
 /** The Code It Up 5.0 certificate of competition (shown with the competitions). */
+/** The Sotetel internship attestation (shown with the internship; national ID number blurred). */
+export const internshipCertificate = {
+  title: { en: 'Internship certificate — Sotetel', fr: 'Attestation de stage — Sotetel', ar: 'شهادة تربّص — Sotetel' },
+  meta: { en: 'Sotetel · 16 June – 15 July 2025 · issued in Tunis, 21 August 2025', fr: 'Sotetel · 16 juin – 15 juillet 2025 · délivrée à Tunis le 21 août 2025', ar: 'Sotetel · من 16 جوان إلى 15 جويلية 2025 · صدرت بتونس في 21 أوت 2025' },
+  image: 'sotetel-internship',
+};
+
 export const competitionCertificate = { title: 'Code It Up 5.0 — Certificate of competition', issuer: 'IEEE ISET Bizerte Student Branch', image: 'code-it-up-5' };

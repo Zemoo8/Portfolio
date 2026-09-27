@@ -14,6 +14,7 @@ export const ui = {
     language: { en: 'Language', fr: 'Langue', ar: 'اللغة' },
     home: { en: 'Ahmed Baghouli — home', fr: 'Ahmed Baghouli — accueil', ar: 'أحمد بغولي — الرئيسية' },
     motion: { en: 'Animations on/off', fr: 'Animations activées/désactivées', ar: 'تشغيل الحركة أو إيقافها' },
+    index: { en: 'Index', fr: 'Sommaire', ar: 'الفهرس' },
   },
   hero: {
     scroll: { en: 'Scroll', fr: 'Défiler', ar: 'مرّر' },

@@ -18,10 +18,6 @@ const { lang } = Astro.props;
     <img class="portrait__color" src={asset('media/profile/portrait-color.webp')} width="432" height="577" alt="" aria-hidden="true" loading="lazy" decoding="async" />
   </div>
   <div class="portrait__enso" aria-hidden="true"><Brush kind="circle" seed={19} /></div>
-  <figcaption class="portrait__cap" aria-hidden="true">
-    <span class="portrait__place">Tunis</span>
-    <span class="portrait__coords">36.81° N · 10.18° E — 2026</span>
-  </figcaption>
 </figure>
 
 <style>
@@ -64,18 +60,5 @@ const { lang } = Astro.props;
   .js .portrait__disc { clip-path: circle(0% at 50% 50%); }
   .js .portrait.is-in .portrait__disc { clip-path: circle(50% at 50% 50%); transition: clip-path 1.6s cubic-bezier(0.7, 0, 0.2, 1) 0.25s; }
 
-  .portrait__cap {
-    position: absolute;
-    inset-block-end: -0.6rem;
-    inset-inline: 0;
-    display: flex;
-    justify-content: center;
-    align-items: baseline;
-    gap: 0.8rem;
-    direction: ltr;
-    color: var(--muted);
-  }
-  .portrait__place { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; color: var(--ink-2); }
-  .portrait__coords { font-size: 0.68rem; letter-spacing: 0.16em; }
   @media (prefers-reduced-motion: reduce) { .js .portrait__disc { clip-path: none; } }
 </style>

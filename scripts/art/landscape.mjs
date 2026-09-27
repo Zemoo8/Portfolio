@@ -217,35 +217,35 @@ const spireBack = [
   { x: 1320, w: 62, h: 440, p: 3.6 }, { x: 1960, w: 58, h: 400, p: 3.5 }, { x: 2280, w: 70, h: 450, p: 3.4 },
 ];
 
-const peaksLayer = svg(`
-  ${(() => { const p = spires(H * 0.86, spireBack, 60, 11); return wash('sb', p, '#a09b90', 0.55, H * 0.95, 0.2, 3) + moss(p, '#7d786e', 60, 9, H * 0.86 - 300); })()}
+// The mountains are built in stages as the page scrolls (Backdrop.astro), so each element is also
+// rendered as its own transparent layer. Composited in order they give exactly the full painting.
+const backSpires = spires(H * 0.86, spireBack, 60, 11);
+const mainSpires = spires(H * 0.93, spireList, 90, 21);
+// seat the temple on the actual crest of the tallest spire
+const crest = mainSpires.filter(([x]) => Math.abs(x - 1540) < 30).reduce((a, b) => (b[1] < a[1] ? b : a));
+const frameSpires = spires(H * 1.0, [{ x: 60, w: 80, h: 520, p: 3.2, lean: 0.5 }, { x: 2360, w: 90, h: 480, p: 3.0, lean: -0.5 }], 70, 33);
+
+const stage = {
+  back: `${wash('sb', backSpires, '#a09b90', 0.55, H * 0.95, 0.2, 3)}${moss(backSpires, '#7d786e', 60, 9, H * 0.86 - 300)}
   ${mist(W * 0.3, H * 0.83, 520, 90, 0.8, 40)}
-  ${mist(W * 0.78, H * 0.86, 560, 100, 0.8, 40)}
-  ${(() => {
-    const p = spires(H * 0.93, spireList, 90, 21);
-    // seat the temple on the actual crest of the tallest spire
-    const crest = p.filter(([x]) => Math.abs(x - 1540) < 30).reduce((a, b) => (b[1] < a[1] ? b : a));
-    return wash('sf', p, '#6e6a62', 0.84, H * 1.02, 0.34) + moss(p, '#2f2c28', 140, 4, H * 0.93 - 330) + temple(crest[0], crest[1] + 30, 1.05);
-  })()}
-  ${(() => {
-    const frame = [{ x: 60, w: 80, h: 520, p: 3.2, lean: 0.5 }, { x: 2360, w: 90, h: 480, p: 3.0, lean: -0.5 }];
-    const p = spires(H * 1.0, frame, 70, 33);
-    return wash('fr', p, '#4f4b45', 0.88, H * 1.08, 0.4) + moss(p, '#26241f', 70, 12, H - 300);
-  })()}
+  ${mist(W * 0.78, H * 0.86, 560, 100, 0.8, 40)}`,
+  main: `${wash('sf', mainSpires, '#6e6a62', 0.84, H * 1.02, 0.34)}${moss(mainSpires, '#2f2c28', 140, 4, H * 0.93 - 330)}`,
+  temple: temple(crest[0], crest[1] + 30, 1.05),
+  frame: `${wash('fr', frameSpires, '#4f4b45', 0.88, H * 1.08, 0.4)}${moss(frameSpires, '#26241f', 70, 12, H - 300)}
   ${mist(W * 0.15, H * 0.96, 520, 110, 0.9, 40)}
   ${mist(W * 0.55, H * 0.98, 700, 120, 0.92, 70)}
-  ${mist(W * 0.9, H * 0.97, 480, 100, 0.9, 40)}
-`);
+  ${mist(W * 0.9, H * 0.97, 480, 100, 0.9, 40)}`,
+};
+const peaksLayer = svg(`${stage.back}${stage.main}${stage.temple}${stage.frame}`);
 
 const nearLeft = range(H * 1.02, 260, 0.0032, 40.2).map(([x, y]) => [x, y + Math.max(0, (x - 700) * 0.6)]);
 const nearRight = range(H * 1.04, 240, 0.0028, 57.9).map(([x, y]) => [x, y + Math.max(0, (1800 - x) * 0.55)]);
-const nearLayer = svg(`
-  ${wash('nl', nearLeft, '#56524b', 0.9, H * 1.1, 0.4)}
-  ${wash('nr', nearRight, '#56524b', 0.86, H * 1.1, 0.4)}
-  ${pine(170, H * 0.88, 1.15, 1)}
-  ${pine(2230, H * 0.9, 1.0, -1)}
-  ${mist(W * 0.5, H * 1.02, 900, 120, 0.95, 70)}
-`);
+const ridges = `${wash('nl', nearLeft, '#56524b', 0.9, H * 1.1, 0.4)}
+  ${wash('nr', nearRight, '#56524b', 0.86, H * 1.1, 0.4)}`;
+const pines = `${pine(170, H * 0.88, 1.15, 1)}
+  ${pine(2230, H * 0.9, 1.0, -1)}`;
+const nearMist = mist(W * 0.5, H * 1.02, 900, 120, 0.95, 70);
+const nearLayer = svg(`${ridges}${pines}${nearMist}`);
 
 fs.mkdirSync('public/art', { recursive: true });
 const render = async (src, out, alpha) => {
@@ -258,6 +258,13 @@ const render = async (src, out, alpha) => {
 await render(skyLayer, 'public/art/sky.webp', false);
 await render(peaksLayer, 'public/art/peaks.webp', true);
 await render(nearLayer, 'public/art/near.webp', true);
+// the stages the scroll builds (see Backdrop.astro)
+await render(svg(stage.back), 'public/art/build-back.webp', true);
+await render(svg(stage.main), 'public/art/build-main.webp', true);
+await render(svg(stage.temple), 'public/art/build-temple.webp', true);
+await render(svg(stage.frame), 'public/art/build-frame.webp', true);
+await render(svg(`${ridges}${nearMist}`), 'public/art/build-ridges.webp', true);
+await render(svg(pines), 'public/art/build-pines.webp', true);
 
 // preview
 // (sharp resizes before compositing, so composite to a buffer first)

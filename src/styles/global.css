@@ -492,3 +492,29 @@ ul, ol { padding: 0; list-style: none; }
 }
 @keyframes vt-settle { to { opacity: 0.6; transform: scale(0.985); } }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+
+/* ==========================================================================
+   Windows that open as you scroll — tied to scroll position, never speed.
+   Timelines stay in their own, more specific rules (minifiers fold them into the shorthand).
+   Without scroll-driven animations or with reduced motion, everything is simply open.
+   ========================================================================== */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* parchment panels unroll with the page, not all at once */
+    .js .scroll[data-unroll], .js .scroll[data-unroll].is-in { transition: none; animation: unroll linear both; }
+    html.js body .scroll[data-unroll] { animation-timeline: view(); animation-range: entry 0% entry 75%; }
+
+    /* media arrive through round windows (moon gates) */
+    .case .mat, .item__thumb, .entry__cert, .creds__rail { animation: window-open linear both; }
+    html body .case .mat, html body .item__thumb, html body .entry__cert, html body .creds__rail { animation-timeline: view(); animation-range: entry 0% cover 40%; }
+  }
+}
+@keyframes unroll {
+  from { clip-path: inset(0 0 100% 0 round var(--radius-lg)); }
+  to { clip-path: inset(0 0 0 0 round var(--radius-lg)); }
+}
+@keyframes window-open {
+  from { clip-path: circle(0% at 50% 60%); }
+  to { clip-path: circle(120% at 50% 50%); }
+}
+.motion-off .scroll[data-unroll], .motion-off .case .mat, .motion-off .item__thumb, .motion-off .entry__cert, .motion-off .creds__rail { animation: none; clip-path: none; }

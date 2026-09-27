@@ -38,7 +38,7 @@ const jsonLd = {
 ---
 
 <Base lang={lang} title={`${p.title} — ${tr(profile.name, lang)}`} description={tr(p.tagline, lang)} route={`work/${p.slug}`} ogImage={ogImage} jsonLd={jsonLd}>
-  <article class="case" style={`--tone:${p.tone}`}>
+  <article class="case" style={`--tone:${p.tone}`} data-tone="light" data-chapter-name={p.title}>
     <header class="case__head wrap">
       <a class="case__back link-u" href={`${path(lang)}#work`}><span class="arrow" aria-hidden="true">←</span> {tr(ui.work.back, lang)}</a>
       <p class="kicker" data-reveal>{p.index} · {tr(p.category, lang)}</p>

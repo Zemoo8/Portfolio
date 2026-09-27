@@ -36,6 +36,7 @@ PUBLISH = {
     'soliya-dialogue-facilitation': None,
     'nasa-open-science': None,
     'code-it-up-5': None,
+    'sotetel-internship': None,  # scan Ahmed supplied; national ID number blurred before export
 }
 
 

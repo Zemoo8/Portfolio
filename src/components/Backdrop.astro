@@ -1,30 +1,41 @@
 ---
-// The painted world behind every page: procedural ink-wash layers (scripts/art/landscape.mjs).
-// Scrolling makes the camera "climb": each layer sinks at its own depth and the mist veil
-// thickens, so text deeper in the page sits on calm, misty paper. Both are CSS scroll-driven
-// animations — a pure function of scroll position, run by the compositor in step with native
-// scrolling. The wind is ambient and time-based: mist drifting slowly past the peaks, the same
-// whether or not you scroll. Decorative only.
+// The painted world behind every page — and it is painted as you read. At the top there is only
+// sky, the distant ranges and the back spires; scrolling raises the main peaks out of the mist,
+// sets the temple on its crest, closes the framing peaks in, lifts the near ridges and grows the
+// pines. Scroll back up and it comes apart again: every stage is a CSS scroll-driven animation of
+// position and opacity (compositor-run, tied to scroll POSITION, never speed). The layers come
+// from scripts/art/landscape.mjs and composite to exactly the full painting.
+// Without scroll-driven animations, with reduced motion, or with the motion switch off, the
+// finished painting is simply there. The wind (mist drifting past) is time-based. Decorative.
 import { asset } from '../i18n/config';
+
+const layer = (name: string) => ({
+  src: asset(`art/build-${name}.webp`),
+  srcset: `${asset(`art/build-${name}-1000.webp`)} 1000w, ${asset(`art/build-${name}.webp`)} 2000w`,
+});
+const stages = ['back', 'main', 'temple', 'frame'].map((n) => ({ n, ...layer(n) }));
+const near = ['ridges', 'pines'].map((n) => ({ n, ...layer(n) }));
 ---
 
 <div class="world" aria-hidden="true" data-world>
   <img class="world__sky" src={asset('art/sky.webp')} srcset={`${asset('art/sky-1000.webp')} 1000w, ${asset('art/sky.webp')} 2000w`} sizes="100vw" alt="" width="2000" height="1250" fetchpriority="low" decoding="async" />
-  <div class="world__depth" style="--depth:0.05">
-    <img src={asset('art/peaks.webp')} srcset={`${asset('art/peaks-1000.webp')} 1000w, ${asset('art/peaks.webp')} 2000w`} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />
-  </div>
-  <div class="world__depth" style="--depth:0.065">
-    <div class="world__breeze"><i></i><i></i><i></i></div>
-  </div>
-  <div class="world__depth" style="--depth:0.08">
-    <div class="world__mist world__mist--a"></div>
-  </div>
-  <div class="world__depth" style="--depth:0.11">
-    <img src={asset('art/near.webp')} srcset={`${asset('art/near-1000.webp')} 1000w, ${asset('art/near.webp')} 2000w`} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />
-  </div>
+  {stages.map((s) => s.n === 'back'
+    ? <img class={`build build--${s.n}`} src={s.src} srcset={s.srcset} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />
+    : <img class={`build build--${s.n}`} data-src={s.src} data-srcset={s.srcset} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />)}
+  <div class="world__breeze"><i></i><i></i><i></i></div>
+  <div class="world__mist world__mist--a"></div>
+  {near.map((s) => <img class={`build build--${s.n}`} data-src={s.src} data-srcset={s.srcset} sizes="100vw" alt="" width="2000" height="1250" decoding="async" />)}
   <div class="world__mist world__mist--b"></div>
   <div class="world__veil" data-veil></div>
 </div>
+
+<script>
+  // Stages that are not yet painted at the top of the page load once the page itself has loaded,
+  // so they never compete with the first view.
+  const paint = () => document.querySelectorAll<HTMLImageElement>('.world img[data-src]').forEach((i) => { i.srcset = i.dataset.srcset!; i.src = i.dataset.src!; });
+  const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 200));
+  if (document.readyState === 'complete') idle(paint); else addEventListener('load', () => idle(paint), { once: true });
+</script>
 
 <style>
   .world {
@@ -43,7 +54,7 @@ import { asset } from '../i18n/config';
     object-fit: cover;
     object-position: 50% 100%;
   }
-  .world__depth { position: absolute; inset: 0; will-change: transform; }
+  .build { will-change: translate, opacity; transform-origin: 50% 100%; }
 
   /* mist banks at the foot of the mountains, breathing sideways */
   .world__mist {
@@ -74,7 +85,6 @@ import { asset } from '../i18n/config';
   .world__breeze i:nth-child(1) { inset-block-start: 24%; animation-delay: -38s; }
   .world__breeze i:nth-child(2) { inset-block-start: 37%; inline-size: 44vw; block-size: max(2rem, 4.5vh); opacity: 0.8; animation-duration: 95s; animation-delay: -74s; }
   .world__breeze i:nth-child(3) { inset-block-start: 49%; inline-size: 70vw; opacity: 0.65; animation-duration: 150s; animation-delay: -12s; }
-  /* physical direction on purpose: the painting is the same in every language */
   @keyframes breeze { from { translate: -80vw 0; } to { translate: 110vw 0; } }
 
   .world__veil {
@@ -84,24 +94,30 @@ import { asset } from '../i18n/config';
     opacity: 0;
   }
 
-  /* scroll-driven: position in, position out — never velocity.
+  /* ---- the painting, built by scroll position -----------------------------------------------
+     Each stage runs over its own stretch of the page (in viewport heights of scrolling).
      The timeline lives in its own, more specific rule: CSS minifiers otherwise fold it into the
-     `animation` shorthand, a form browsers reject (the animation then silently never runs). */
+     `animation` shorthand, a form browsers reject. */
   @supports (animation-timeline: scroll()) {
-    .world__veil { animation: veil-in linear both; }
-    .world > .world__veil { animation-timeline: scroll(root block); animation-range: 0 100vh; }
     @media (prefers-reduced-motion: no-preference) {
-      .world__depth { animation: world-sink linear both; }
-      .world > .world__depth { animation-timeline: scroll(root block); animation-range: 0 220vh; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      /* the veil only fades (no movement), so it keeps following the page */
-      .world__veil { animation-duration: auto !important; }
+      .build { animation: build-in linear both; }
+      .world > .build { animation-timeline: scroll(root block); }
+      .world > .build--back { animation-range: 0vh 90vh; --o0: 0.5; --y0: 6%; }
+      .world > .build--main { animation-range: 12vh 150vh; --o0: 0; --y0: 24%; }
+      .world > .build--temple { animation-range: 135vh 200vh; --o0: 0; --y0: 3%; }
+      .world > .build--frame { animation-range: 180vh 290vh; --o0: 0; --y0: 0%; --s0: 1.1; }
+      .world > .build--ridges { animation-range: 260vh 400vh; --o0: 0; --y0: 32%; }
+      .world > .build--pines { animation-range: 360vh 480vh; --o0: 0; --y0: 30%; }
+      /* the veil gathers only once the painting is complete, behind the later chapters */
+      .world__veil { animation: veil-in linear both; }
+      .world > .world__veil { animation-timeline: scroll(root block); animation-range: 480vh 700vh; }
     }
   }
-  @keyframes world-sink { to { transform: translate3d(0, calc(220vh * var(--depth)), 0); } }
-  @keyframes veil-in { to { opacity: 0.62; } }
+  @keyframes build-in {
+    from { opacity: var(--o0, 0); translate: 0 var(--y0, 0%); scale: var(--s0, 1); }
+    to { opacity: 1; translate: 0 0; scale: 1; }
+  }
+  @keyframes veil-in { to { opacity: 0.4; } }
 
-  :global(.motion-off) .world__depth { animation: none; }
-  :global(.motion-off) .world__veil { animation-play-state: running !important; }
+  :global(.motion-off) .build, :global(.motion-off) .world__veil { animation: none; }
 </style>

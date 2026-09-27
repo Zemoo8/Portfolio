@@ -57,7 +57,7 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 | Component | What it is |
 |---|---|
 | `Backdrop` | fixed painted world: sky · peaks · breeze · mist A · near · mist B, mist veil — each layer in a depth wrapper |
-| `Nav` | a masthead, not a pill: typographic wordmark (no logo), chapters numbered like a table of contents with a brush stroke under the one you are reading (scroll-spy), languages with a brushed ensō around the current one; after scrolling, a clean paper band with a soft shadow slides in behind it |
+| `Nav` | no bar — two corners: the name (home) and the chapter you are in, which opens a full-screen index with a preview per chapter (native `<dialog>`); the corners turn light over the dark storm (`data-tone` on every section) |
 | `IntroFilm` | the **moon gate**: a painted ensō around a circular window onto the temple; the intro films play inside the circle. Until they exist, the label hangs vertically beside the gate like a scroll's title slip (in Arabic and on phones it is the caption's first line) |
 | `Work` (storm chapter) | six projects **orbiting the air emblem** over a WebGL smoke vortex; the front card plays its film. Below: a chapter plate (outlined italic numeral behind the title, italic tagline, cloud-white swash), brush arrows around an `01 / 06` counter, and the six projects as a station index |
 | `Credentials` | a rail of the real certificates, tilted like sheets on a table; word filters with an italic count; opens in `Lightbox` |
@@ -72,7 +72,8 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 | Rise out of mist | headings (`data-lines`) | each rendered line rises from a mask while un-blurring, 1.1 s `--ease-out`, 90 ms stagger (Arabic fades as one block — no line splitting) |
 | Paint-on | `Brush` strokes | dash offset 1 → 0 per bristle, staggered by bristle |
 | Unroll | `.scroll[data-unroll]` | `clip-path` opens top → bottom as the panel enters |
-| Depth | painted layers | CSS scroll-driven animation: layers sink at 0.05 / 0.065 / 0.08 / 0.11 of the first 220vh; mist veil thickens (≤ 0.62) over the first 100vh |
+| The painting builds | backdrop | the landscape is painted as you read: the top shows sky, distant ranges and back spires; scrolling raises the main peaks out of the mist (12–150vh), sets the temple on its crest (135–200vh), closes the framing peaks in (180–290vh), lifts the near ridges (260–400vh) and grows the pines (360–480vh); scrolling back takes it apart. Layers from `landscape.mjs` (`build-*.webp`), composited = the full painting; later stages load after the page |
+| Windows open | storm, panels, media | the Work chapter opens as a round arch rising from its top edge; parchment panels unroll with the page; the certificate rail, GitHub thumbnails and case-study films open through round windows |
 | Wind | open sky | ambient and time-based: three soft mist wisps cross the sky at a constant pace (95–150 s), mist banks breathe sideways — the same whether or not you scroll |
 | Orbit | projects | a rhythm, not a drift: one project rests in front for 6.5 s, then the ring glides (1.5 s, ease-in-out) to the next — the card in front, its film and the caption always agree. Drag settles on the nearest project in one motion; arrows / stations / keys glide there; the automatic turn waits while the pointer rests on the ring or focus is inside, and on pause. The ring and the smoke vortex both centre exactly on the emblem; the vortex turns at one constant pace (30 fps) and ignores the pointer |
 | Page change | cross-document | the next page is painted in: a brush swash grows from the centre until it covers the view (View Transitions + mask) |

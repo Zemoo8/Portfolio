@@ -3,7 +3,7 @@ import Brush from '../components/Brush.astro';
 import { formatMonth, tr, asset, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { experience, education, competitions, type Entry } from '../content/path';
-import { competitionCertificate } from '../content/credentials';
+import { competitionCertificate, internshipCertificate } from '../content/credentials';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
@@ -18,7 +18,7 @@ const groups = [
 ];
 ---
 
-<section id="path" class="section wrap" aria-labelledby="path-title">
+<section id="path" class="section wrap" aria-labelledby="path-title" data-tone="light" data-chapter-name={tr(ui.nav.path, lang)}>
   <div class="scroll path" data-unroll>
     <header class="section-head">
       <p class="kicker" data-reveal>{tr(ui.path.kicker, lang)}</p>
@@ -44,6 +44,20 @@ const groups = [
                     {e.tags?.map((t) => <span class="pill">{t}</span>)}
                     {e.link && <a class="link-u entry__link" href={e.link.href} target="_blank" rel="noopener">{e.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
                   </p>
+                )}
+                {e.org === 'Sotetel' && (
+                  <button
+                    class="entry__cert"
+                    type="button"
+                    data-lightbox
+                    data-group="internship"
+                    data-src={asset(`media/certificates/${internshipCertificate.image}.webp`)}
+                    data-title={tr(internshipCertificate.title, lang)}
+                    data-meta={tr(internshipCertificate.meta, lang)}
+                    aria-label={`${tr(ui.credentials.view, lang)}: ${tr(internshipCertificate.title, lang)}`}
+                  >
+                    <img src={asset(`media/certificates/${internshipCertificate.image}-sm.webp`)} width="334" height="490" alt="" loading="lazy" decoding="async" />
+                  </button>
                 )}
               </div>
             </li>
@@ -108,6 +122,7 @@ const groups = [
   }
   .entry__cert:hover, .entry__cert:focus-visible { transform: rotate(0) translateY(-4px); }
   .entry__cert img { inline-size: clamp(180px, 22vw, 260px); block-size: auto; }
+  .entry__cert img[height='490'] { inline-size: clamp(120px, 11vw, 160px); } /* a portrait-format attestation */
   @media (max-width: 960px) {
     .path__group { grid-template-columns: 1fr; }
     .entry { grid-template-columns: 1fr; }

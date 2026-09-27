@@ -8,7 +8,7 @@ interface Props { lang: Locale }
 const { lang } = Astro.props;
 ---
 
-<section id="contact" class="section contact wrap" aria-labelledby="contact-title">
+<section id="contact" class="section contact wrap" aria-labelledby="contact-title" data-tone="light" data-chapter-name={tr(ui.nav.contact, lang)}>
   <div class="contact__inner">
     <p class="kicker" data-reveal>{tr(ui.contact.kicker, lang)}</p>
     <h2 id="contact-title" class="display contact__title" data-lines>{tr(ui.contact.title, lang)}</h2>

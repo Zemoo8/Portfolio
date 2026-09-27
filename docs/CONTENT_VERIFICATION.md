@@ -96,6 +96,8 @@ Ahmed supplied the certificate documents themselves (PDFs + two images) during t
 
 **Competition certificate:** *Code It Up 5.0 — Certificate of competition* (IEEE ISET Bizerte Student Branch), from the supplied PDF; shown under Path → Competitions as **Participant** (the certificate states participation, no rank).
 
+**Internship certificate:** Sotetel *Attestation de stage* (image supplied by Ahmed, `IMG-20250904-WA0000.jpg`): internship from 16 June to 15 July 2025, issued in Tunis on 21 August 2025 — matches the Path entry (Jun 2025 — Jul 2025). VERIFIED BY PRIMARY SOURCE. Published with the **national ID card number blurred**; the unredacted scan stays in `assets-source/certificates/` (git-ignored).
+
 **Privacy of documents:** only trimmed WebP exports are published (`public/media/certificates/`). The PDFs and full-resolution renders stay in `assets-source/certificates/` (git-ignored, excluded from deploys). The photo on the Cambridge statement is blurred; its verification number is intentionally kept (it is what an employer needs to verify the result).
 
 ## Films (added after the redesign)

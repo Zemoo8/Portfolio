@@ -25,7 +25,7 @@ const cards = projects.map((p) => {
 });
 ---
 
-<section id="work" class="storm" aria-labelledby="work-title" data-storm>
+<section id="work" class="storm" aria-labelledby="work-title" data-storm data-tone="dark" data-chapter-name={tr(ui.nav.work, lang)}>
   <div class="storm__bg" aria-hidden="true">
     <canvas class="storm__canvas" data-vortex></canvas>
   </div>
@@ -49,7 +49,7 @@ const cards = projects.map((p) => {
             data-category={tr(p.category, lang)}
             data-year={p.year}
             data-tagline={tr(p.tagline, lang)}
-            data-tone={p.tone}
+            data-hue={p.tone}
             data-orbit-film={fl}
             style={`--tone:${p.tone}`}
           >
@@ -118,6 +118,26 @@ const cards = projects.map((p) => {
   }
   .storm::before { inset-block-end: 100%; background: linear-gradient(180deg, rgb(18 20 19 / 0), rgb(18 20 19 / 0.55) 60%, var(--storm)); }
   .storm::after { inset-block-start: 100%; background: linear-gradient(0deg, rgb(18 20 19 / 0), rgb(18 20 19 / 0.55) 60%, var(--storm)); }
+  /* the storm opens as a round window over the painting as you scroll into it */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .storm { animation: storm-open linear both; }
+      :global(html) .storm[data-storm] { animation-timeline: view(); animation-range: entry 0% entry 100%; }
+    }
+  }
+  /* an arch rises from the chapter's top edge and widens until the whole storm is open */
+  @keyframes storm-open {
+    0% { clip-path: circle(0vw at 50% 0%); }
+    55% { clip-path: circle(46vw at 50% 0%); }
+    100% { clip-path: circle(160vmax at 50% 0%); }
+  }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* the arch is the edge now; the soft band above would read as a second shape */
+      :global(html:not(.motion-off)) .storm::before { display: none; }
+    }
+  }
+  :global(.motion-off) .storm { animation: none; clip-path: none; }
   .storm__bg {
     position: absolute;
     inset: 0;

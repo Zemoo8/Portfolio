@@ -16,8 +16,8 @@ const results = [];
 const check = (name, ok, info = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? '  — ' + info : ''}`);
 
 check('no scroll-speed wind canvas', !(await p.$('[data-wind]')));
-const tl = await p.evaluate(() => [...document.querySelectorAll('.world__depth')].map((el) => el.getAnimations()[0]?.timeline?.constructor?.name ?? 'none'));
-check('depth layers run on a ScrollTimeline', tl.length > 0 && tl.every((t) => t === 'ScrollTimeline'), tl.join(','));
+const tl = await p.evaluate(() => [...document.querySelectorAll('.build')].map((el) => el.getAnimations()[0]?.timeline?.constructor?.name ?? 'none'));
+check('the painting builds on a ScrollTimeline', tl.length > 0 && tl.every((t) => t === 'ScrollTimeline'), tl.join(','));
 
 // 1) native wheel
 await p.mouse.move(700, 450);
@@ -28,7 +28,7 @@ const y1 = await p.evaluate(() => scrollY);
 check('wheel moves the page by what was asked (no inertia)', Math.abs(y1 - y0 - 300) <= 2, `${y0} → ${y1}`);
 
 // 2) same position, same picture — reached slowly vs. in one jump
-const layerAt = () => p.evaluate(() => getComputedStyle(document.querySelectorAll('.world__depth')[3]).transform);
+const layerAt = () => p.evaluate(() => (() => { const c = getComputedStyle(document.querySelectorAll('.build')[1]); return c.translate + ' ' + c.opacity; })());
 await p.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; scrollTo(0, 0); });
 for (let y = 0; y <= 900; y += 150) { await p.evaluate((v) => scrollTo(0, v), y); await p.waitForTimeout(80); }
 await p.waitForTimeout(300);
@@ -36,7 +36,7 @@ const slow = await layerAt();
 await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(200);
 await p.evaluate(() => scrollTo(0, 900)); await p.waitForTimeout(300);
 const fast = await layerAt();
-check('layer offset depends on position only', slow === fast && slow !== 'none', `${slow} vs ${fast}`);
+check('the painting depends on scroll position only', slow === fast && slow !== 'none', `${slow} vs ${fast}`);
 
 // 3) the orbit ignores scrolling
 await p.evaluate(() => document.querySelector('#work').scrollIntoView());
