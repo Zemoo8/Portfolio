@@ -6,6 +6,7 @@ import { initGust } from './gust';
 
 type Lang = 'en' | 'fr' | 'ar';
 type Files = Record<Lang, { mp4: boolean; webm: boolean; vtt: boolean; poster: boolean }>;
+const mediaVersion = 'v2';
 
 export function initIntro(root: HTMLElement) {
   const base = root.dataset.base!;
@@ -78,7 +79,7 @@ export function initIntro(root: HTMLElement) {
     const f = files[lang];
     if (!f?.mp4 && !f?.webm) return showSoon();
 
-    const src = (ext: string) => `${base}/intro-${lang}.${ext}`;
+    const src = (ext: string) => `${base}/intro-${lang}.${ext}?${mediaVersion}`;
     if (f.webm) video.append(Object.assign(document.createElement('source'), { src: src('webm'), type: 'video/webm' }));
     if (f.mp4) video.append(Object.assign(document.createElement('source'), { src: src('mp4'), type: 'video/mp4' }));
     if (f.vtt) {
