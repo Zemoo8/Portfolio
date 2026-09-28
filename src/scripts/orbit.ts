@@ -23,6 +23,7 @@ export function initOrbit(root: HTMLElement) {
   const N = cards.length;
   const STEP = (Math.PI * 2) / N;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lowPower = matchMedia('(pointer: coarse)').matches || (navigator.hardwareConcurrency || 8) <= 4;
   const wrap = (i: number) => ((i % N) + N) % N;
   const norm = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
   let wake = 0;
@@ -32,7 +33,7 @@ export function initOrbit(root: HTMLElement) {
   let pending = 0; // card the ring is heading to
   let glide: { from: number; to: number; t0: number; dur: number; ease: (t: number) => number; swapped: boolean } | null = null;
   let restUntil = performance.now() + DWELL;
-  let userPaused = reduced;
+  let userPaused = reduced || lowPower;
   let hover = false;
   let focusInside = false;
   let dragging = false;

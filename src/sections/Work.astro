@@ -308,7 +308,7 @@ const cards = projects.map((p) => {
       const root = section.querySelector<HTMLElement>('[data-orbit]');
       if (root) initOrbit(root);
       const canvas = section.querySelector<HTMLCanvasElement>('[data-vortex]');
-      if (canvas && !matchMedia('(max-width: 760px)').matches) {
+      if (canvas && !matchMedia('(max-width: 760px), (pointer: coarse)').matches) {
         const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 60));
         idle(() => mountVortex(canvas, section.querySelector<HTMLElement>('.orbit__core')).catch(() => { /* no WebGL: the CSS ink gradient remains */ }));
       }
