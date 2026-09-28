@@ -10,6 +10,7 @@
     "check": "astro check",
     "media:films": "node scripts/media/run.mjs films",
     "media:stills": "node scripts/media/run.mjs stills",
+    "showcase": "node scripts/media/build-portfolio-showcase.mjs",
     "media:build": "node scripts/media/build-media.mjs",
     "media:inventory": "node scripts/media/inventory.mjs",
     "media:certs": "python scripts/media/build-certificates.py",

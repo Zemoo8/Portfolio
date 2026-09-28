@@ -43,6 +43,14 @@ const files = Object.fromEntries(
   <dialog class="gust" id="gust" aria-label={tr(ui.intro.label, lang)} data-gust>
     <canvas class="gust__air" aria-hidden="true" data-gust-air></canvas>
     <div class="gust__stage">
+      <div class="gust__language">
+        <span>{tr(ui.intro.choose, lang)}</span>
+        <div class="gate__tabs" role="tablist" aria-label={tr(ui.intro.choose, lang)}>
+          {locales.map((l) => (
+            <button type="button" role="tab" lang={l} aria-selected={l === lang ? 'true' : 'false'} data-intro-tab={l}>{localeMeta[l].name}</button>
+          ))}
+        </div>
+      </div>
       <div class="gust__screen">
         <video class="gust__video" playsinline preload="none" hidden data-intro-video></video>
         <div class="gust__soon" data-intro-placeholder>
@@ -207,6 +215,13 @@ const files = Object.fromEntries(
   .gust__note { max-inline-size: 30rem; font-size: var(--step--1); color: #c9d1ce; }
   .gust__note span { color: #e9a86a; }
 
+  .gust__language { display: grid; justify-items: center; gap: 0.25rem; color: #c9d1ce; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  .gust__language .gate__tabs { gap: 1.2rem; }
+  .gust__language .gate__tabs button { color: #c9d1ce; }
+  .gust__language .gate__tabs button[aria-selected='true'] { color: var(--cloud); }
+  .gust__language .gate__tabs button::after { background: #e9a86a; }
+  :lang(ar) .gust__language { letter-spacing: 0; text-transform: none; font-size: 0.85rem; }
+
   .gust__controls { display: flex; gap: 0.4rem; }
   .gust__controls[hidden] { display: none; }
   .gust__controls button { position: relative; isolation: isolate; padding: 0.7rem 1.2rem; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--storm); }
@@ -214,6 +229,19 @@ const files = Object.fromEntries(
   .gust__controls button[aria-pressed='true'] { color: var(--cloud); }
   .gust__controls button[aria-pressed='true']::before { background: var(--rust); }
   :lang(ar) .gust__controls button { letter-spacing: 0; text-transform: none; font-size: 0.8rem; }
+
+  /* Keep the caption track clear on short landscape screens, where the normal height budget is negative. */
+  @media (orientation: landscape) and (max-height: 620px) {
+    .gust__stage { display: flex; flex-direction: column; justify-content: center; gap: 0.85rem; padding: 2rem var(--gutter) 0.25rem; overflow-y: auto; }
+    .gust__language { gap: 0; font-size: 0; }
+    .gust__language > span { display: none; }
+    .gust__language .gate__tabs { gap: 0.7rem; }
+    .gust__language .gate__tabs button { padding-block: 0.1rem; font-size: 0.85rem; }
+    .gust__screen { flex: 0 0 auto; inline-size: min(88vw, calc((100dvh - 8.5rem) * 16 / 9)); max-block-size: calc(100dvh - 8.5rem); }
+    .gust__controls { gap: 0.15rem; padding: 0.1rem 0.35rem; background: rgb(18 20 19 / 0.96); border-radius: 4px; }
+    .gust__controls button { padding: 0.35rem 0.65rem; font-size: 0.58rem; }
+    :lang(ar) .gust__controls button { font-size: 0.7rem; }
+  }
 
   .gust__close { position: absolute; inset-block-start: 1.2rem; inset-inline-end: var(--gutter); z-index: 2; color: var(--cloud); opacity: 0; transition: opacity 0.4s 0.5s, color var(--dur-2); }
   .gust:global(.is-in) .gust__close { opacity: 1; }

@@ -25,6 +25,7 @@ export function initOrbit(root: HTMLElement) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wrap = (i: number) => ((i % N) + N) % N;
   const norm = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+  let wake = 0;
 
   let base = 0; // ring angle; card i is in front when base + i·STEP ≡ 0
   let active = -1; // card resting in front
@@ -84,7 +85,8 @@ export function initOrbit(root: HTMLElement) {
     drop = Math.max(0, (clearLine - oy) / k + oy - h / 2 - Ry + H / 2);
     // …and whatever follows the stage moves down by as much as that card now reaches past it
     const reachDown = oy + (h / 2 + Ry + drop + H / 2 - oy) * k;
-    stage.style.marginBlockEnd = `${Math.max(0, Math.round(reachDown - h + 20))}px`;
+    const margin = `${Math.max(0, Math.round(reachDown - h + 20))}px`;
+    if (stage.style.marginBlockEnd !== margin) stage.style.marginBlockEnd = margin;
     drawn = NaN;
   };
   new ResizeObserver(measure).observe(stage);
@@ -141,6 +143,7 @@ export function initOrbit(root: HTMLElement) {
     release();
     caption.classList.remove('is-shown');
     glide = { from: base, to, t0: performance.now(), dur: reduced ? 0 : dur, ease, swapped: false };
+    schedule();
   };
 
   // --- pointer: drag the ring, then settle on the nearest project in one motion ---------------
@@ -167,6 +170,7 @@ export function initOrbit(root: HTMLElement) {
     vel = vel * 0.6 + v * 0.4;
     lastX = e.clientX;
     lastT = now;
+    schedule();
   });
   const endDrag = () => {
     if (!dragging) return;
@@ -180,8 +184,8 @@ export function initOrbit(root: HTMLElement) {
   };
   addEventListener('pointerup', endDrag);
   addEventListener('pointercancel', endDrag);
-  stage.addEventListener('pointerenter', () => { hover = true; });
-  stage.addEventListener('pointerleave', () => { hover = false; restUntil = Math.max(restUntil, performance.now() + 2500); });
+  stage.addEventListener('pointerenter', () => { hover = true; schedule(); });
+  stage.addEventListener('pointerleave', () => { hover = false; restUntil = Math.max(restUntil, performance.now() + 2500); schedule(); });
 
   // --- clicks, keyboard, stations, buttons ---------------------------------------------------
   cards.forEach((card, i) => {
@@ -191,9 +195,9 @@ export function initOrbit(root: HTMLElement) {
     });
     card.addEventListener('focus', () => { if (i !== active && i !== pending) glideTo(i, GLIDE, easeInOut, true); });
   });
-  root.addEventListener('focusin', () => { focusInside = true; });
+  root.addEventListener('focusin', () => { focusInside = true; schedule(); });
   root.addEventListener('focusout', (e) => {
-    if (!root.contains(e.relatedTarget as Node)) { focusInside = false; restUntil = Math.max(restUntil, performance.now() + 2500); }
+    if (!root.contains(e.relatedTarget as Node)) { focusInside = false; restUntil = Math.max(restUntil, performance.now() + 2500); schedule(); }
   });
   root.addEventListener('keydown', (e) => {
     if (!(e.target as HTMLElement).closest('[data-orbit-card]')) return;
@@ -214,12 +218,14 @@ export function initOrbit(root: HTMLElement) {
     userPaused = !userPaused;
     pauseBtn.setAttribute('aria-pressed', String(userPaused));
     if (!userPaused) restUntil = performance.now() + 2500;
+    schedule();
   });
 
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
     if (visible) restUntil = Math.max(restUntil, performance.now() + DWELL / 2);
     if (visible) schedule();
+    else { cancelAnimationFrame(raf); raf = 0; clearTimeout(wake); wake = 0; }
   }).observe(stage);
 
   // --- drawing ---------------------------------------------------------------------------------
@@ -241,7 +247,15 @@ export function initOrbit(root: HTMLElement) {
 
   let raf = 0;
   const schedule = () => {
-    if (!raf && visible) raf = requestAnimationFrame(frame);
+    if (!visible || raf || !motionAllowed()) return;
+    if (glide || dragging || (autoOn() && performance.now() >= restUntil)) {
+      raf = requestAnimationFrame(frame);
+      return;
+    }
+    if (autoOn()) {
+      clearTimeout(wake);
+      wake = window.setTimeout(() => { wake = 0; schedule(); }, Math.max(0, restUntil - performance.now()) + 1);
+    }
   };
   const frame = (now: number) => {
     raf = 0;
