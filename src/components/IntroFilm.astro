@@ -18,15 +18,36 @@ const base = asset('media/intros');
 const files = Object.fromEntries(
   locales.map((l) => [l, { mp4: exists(`media/intros/intro-${l}.mp4`), webm: exists(`media/intros/intro-${l}.webm`), vtt: exists(`media/intros/intro-${l}.vtt`), poster: exists(`media/intros/intro-${l}-poster.webp`) }]),
 );
+// Once a film exists, the gate says so: a brushed arrow and a play seal invite the click.
+const hasFilm = files[lang].mp4 || files[lang].webm;
 ---
 
-<figure class="gate" data-intro data-base={base} data-lang={lang} data-files={JSON.stringify(files)}>
+<figure class="gate" data-intro data-base={base} data-lang={lang} data-files={JSON.stringify(files)} data-has-film={hasFilm ? '' : undefined}>
   <div class="gate__frame">
+    {hasFilm && (
+      <p class="gate__hint" aria-hidden="true">
+        <span class="gate__hint-text">{tr(ui.intro.hint, lang)} <em>· {tr(ui.intro.length, lang)}</em></span>
+        <svg class="gate__hint-arrow" viewBox="0 0 120 96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <filter id="gate-hint-ink" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.06 0.3" numOctaves="2" seed="4" /><feDisplacementMap in="SourceGraphic" scale="2.2" xChannelSelector="R" yChannelSelector="G" /></filter>
+          <g filter="url(#gate-hint-ink)">
+            <path class="gate__hint-stroke" d="M10 10 C 44 8, 86 20, 98 70" stroke-width="3.2" pathLength="1" />
+            <path class="gate__hint-head" d="M84 60 L 99 76 L 108 55" stroke-width="3" pathLength="1" />
+          </g>
+        </svg>
+      </p>
+    )}
+    {hasFilm && <span class="gate__pulse" aria-hidden="true"></span>}
     <Brush kind="circle" seed={7} class="gate__enso" />
     <button class="gate__window" type="button" aria-haspopup="dialog" aria-controls="gust" aria-expanded="false" aria-label={tr(ui.intro.open, lang)} data-gust-open>
       <img class="gate__view" src={asset('art/gate.webp')} alt="" width="900" height="900" fetchpriority="high" loading="eager" />
       <span class="gate__mist" aria-hidden="true"></span>
       <span class="gate__air" aria-hidden="true"><Emblem class="gate__emblem" spin /></span>
+      {hasFilm && (
+        <span class="gate__seal" aria-hidden="true">
+          <svg viewBox="0 0 16 16"><path d="M5 3.2 L 13 8 L 5 12.8 Z" fill="currentColor" /></svg>
+          {tr(ui.intro.play, lang)}
+        </span>
+      )}
     </button>
   </div>
 
@@ -53,6 +74,7 @@ const files = Object.fromEntries(
       </div>
       <div class="gust__screen">
         <video class="gust__video" playsinline preload="none" hidden data-intro-video></video>
+        <p class="gust__cc" hidden data-intro-cc-text><span></span></p>
         <div class="gust__soon" data-intro-placeholder>
           <Emblem class="gust__emblem" spin />
           <p class="gust__kicker">{tr(ui.intro.label, lang)}</p>
@@ -61,6 +83,7 @@ const files = Object.fromEntries(
         </div>
       </div>
       <div class="gust__controls" hidden data-intro-controls>
+        <button type="button" data-intro-pause data-pause={tr(ui.intro.pause, lang)} data-resume={tr(ui.intro.resume, lang)}>{tr(ui.intro.pause, lang)}</button>
         <button type="button" data-intro-sound data-on={tr(ui.intro.sound, lang)} data-off={tr(ui.intro.mute, lang)}>{tr(ui.intro.mute, lang)}</button>
         <button type="button" data-intro-cc aria-pressed="false" hidden>{tr(ui.intro.captions, lang)}</button>
         <button type="button" data-intro-replay>{tr(ui.intro.replay, lang)}</button>
@@ -116,6 +139,85 @@ const files = Object.fromEntries(
   .gate__window:global(.is-stirring) .gate__air { animation: stir 1.1s cubic-bezier(0.5, 0, 0.75, 0) forwards; }
   @keyframes stir { to { rotate: -900deg; scale: 1.14; } }
   :global(.motion-off) .gate__air, :global(.reduced) .gate__air { transition: none; animation: none !important; }
+
+  /* ---- the invitation: a brushed arrow, a play seal and a slow breath around the gate ------ */
+  .gate__hint {
+    position: absolute;
+    z-index: 3;
+    inset-block-start: 1%;
+    inset-inline-end: 84%;
+    display: grid;
+    justify-items: end;
+    inline-size: max-content;
+    pointer-events: none;
+    color: var(--rust);
+  }
+  .gate__hint-text { font-family: var(--font-display); font-style: italic; font-size: clamp(1.15rem, 0.9rem + 0.7vw, 1.55rem); line-height: 1.1; color: var(--ink); white-space: nowrap; }
+  .gate__hint-text em { font-size: 0.72em; color: var(--rust); }
+  :lang(ar) .gate__hint-text { font-family: var(--font-arabic-display); font-style: normal; font-size: clamp(1.05rem, 0.85rem + 0.6vw, 1.35rem); line-height: 1.6; }
+  :lang(ar) .gate__hint-text em { font-style: normal; }
+  .gate__hint-arrow { inline-size: clamp(4.2rem, 3rem + 3vw, 6rem); margin-block-start: 0.2rem; margin-inline-end: -2.2rem; overflow: visible; }
+  [dir='rtl'] .gate__hint-arrow { scale: -1 1; }
+  .gate__hint-stroke, .gate__hint-head { stroke-dasharray: 1; stroke-dashoffset: 1; animation: hint-draw 0.9s var(--ease-out) forwards; }
+  .gate__hint-stroke { animation-delay: 1.4s; }
+  .gate__hint-head { animation-delay: 2.1s; animation-duration: 0.35s; }
+  @keyframes hint-draw { to { stroke-dashoffset: 0; } }
+  .gate__hint-text { animation: hint-in 0.9s 1.1s var(--ease-out) both; }
+  @keyframes hint-in { from { opacity: 0; translate: 0 6px; } }
+  .gate__hint-arrow { animation: hint-nudge 2.6s 3s ease-in-out infinite; }
+  @keyframes hint-nudge { 50% { translate: 4px 5px; } }
+  [dir='rtl'] .gate__hint-arrow { animation-name: hint-nudge-rtl; }
+  @keyframes hint-nudge-rtl { 50% { translate: -4px 5px; } }
+
+  /* on narrow screens the gate is centred, so the invitation sits above it and points down */
+  @media (max-width: 900px) {
+    .gate__hint { inset-block-start: auto; inset-block-end: 97%; inset-inline: 0; justify-items: center; inline-size: auto; }
+    .gate__hint-arrow { inline-size: 3.2rem; margin: 0; rotate: 28deg; }
+    [dir='rtl'] .gate__hint-arrow { rotate: -28deg; }
+    .gate { padding-block-start: 4.2rem; }
+  }
+
+  .gate__seal {
+    position: absolute;
+    z-index: 2;
+    inset-block-end: 13%;
+    inset-inline: 0;
+    margin-inline: auto;
+    inline-size: max-content;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.15rem 0.55rem 0.95rem;
+    isolation: isolate;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cloud);
+    transition: scale 0.5s var(--ease-out);
+  }
+  .gate__seal::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--rust); -webkit-mask: url('/ink/swash.png') center / 100% 100% no-repeat; mask: url('/ink/swash.png') center / 100% 100% no-repeat; }
+  .gate__seal svg { inline-size: 0.85rem; block-size: 0.85rem; }
+  :lang(ar) .gate__seal { letter-spacing: 0; text-transform: none; font-size: 0.85rem; }
+  .gate__window:hover .gate__seal, .gate__window:focus-visible .gate__seal { scale: 1.08; }
+
+  .gate__pulse {
+    position: absolute;
+    inset: 8%;
+    z-index: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: gate-pulse 3.2s var(--ease-out) 2.4s infinite;
+  }
+  @keyframes gate-pulse {
+    from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rust) 42%, transparent); }
+    to { box-shadow: 0 0 0 1.6rem color-mix(in srgb, var(--rust) 0%, transparent); }
+  }
+  /* once the film has been opened, the gate stops calling */
+  .gate:global(.is-seen) .gate__pulse { animation: none; }
+  :global(.motion-off) .gate__pulse, :global(.reduced) .gate__pulse { animation: none; }
+  :global(.motion-off) :is(.gate__hint-stroke, .gate__hint-head, .gate__hint-text, .gate__hint-arrow),
+  :global(.reduced) :is(.gate__hint-stroke, .gate__hint-head, .gate__hint-text, .gate__hint-arrow) { animation: none; stroke-dashoffset: 0; }
 
   /* Arabic and phones: the "in production" line leads the caption */
   .gate__tag-line { display: none; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-2); }
@@ -204,7 +306,27 @@ const files = Object.fromEntries(
     background: radial-gradient(70% 90% at 50% 40%, rgb(29 38 40 / 0.5), rgb(10 12 11 / 0.66));
     box-shadow: 0 0 0 1px rgb(238 240 236 / 0.16), 0 40px 90px -30px rgb(0 0 0 / 0.8);
   }
-  .gust__video { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: contain; background: #000; }
+  .gust__video { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: contain; background: #000; cursor: pointer; }
+  /* captions are drawn here rather than by the browser, so they always sit inside the film,
+     clear of the controls, at most two lines at a time */
+  .gust__screen { container-type: inline-size; }
+  .gust__cc {
+    position: absolute;
+    inset-inline: 7%;
+    inset-block-end: 6%;
+    margin: 0;
+    text-align: center;
+    pointer-events: none;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: clamp(0.8rem, 2.4cqi, 1.45rem);
+    line-height: 1.5;
+    white-space: pre-line;
+    color: var(--cloud);
+  }
+  .gust__cc[hidden] { display: none; }
+  .gust__cc span { padding: 0.14em 0.6em; border-radius: 4px; background: rgb(12 14 13 / 0.68); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .gust__cc[lang='ar'] { font-family: var(--font-arabic); font-size: clamp(0.9rem, 2.6cqi, 1.6rem); line-height: 1.75; }
   .gust__soon { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 0.7rem; padding: 2rem; text-align: center; }
   .gust__soon[hidden] { display: none; }
   .gust__soon :global(.gust__emblem) { inline-size: clamp(4rem, 12vw, 7.5rem); block-size: auto; aspect-ratio: 1; color: var(--cloud); margin-block-end: 0.6rem; opacity: 0.92; }

@@ -17,7 +17,37 @@ export function initIntro(root: HTMLElement) {
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-intro-tab]')];
   const soundBtn = root.querySelector<HTMLButtonElement>('[data-intro-sound]')!;
   const ccBtn = root.querySelector<HTMLButtonElement>('[data-intro-cc]')!;
+  const ccText = root.querySelector<HTMLElement>('[data-intro-cc-text]')!;
+  const pauseBtn = root.querySelector<HTMLButtonElement>('[data-intro-pause]')!;
   let hasFilm = false;
+  let captionsOn = false;
+
+  // Captions: the track stays 'hidden' so the browser never draws it; we draw the active cue
+  // ourselves, two lines at a time, advancing through longer cues in step with the speech.
+  const renderCaption = () => {
+    const track = video.textTracks[0];
+    const cue = captionsOn && track?.activeCues?.[0] as VTTCue | undefined;
+    if (!cue) { ccText.hidden = true; return; }
+    const lines = cue.text.split('\n').filter(Boolean);
+    const groups: string[][] = [];
+    for (let i = 0; i < lines.length; i += 2) groups.push(lines.slice(i, i + 2));
+    const weights = groups.map((g) => g.join(' ').length);
+    const total = weights.reduce((a, b) => a + b, 0) || 1;
+    const progress = (video.currentTime - cue.startTime) / Math.max(cue.endTime - cue.startTime, 0.01);
+    let acc = 0, idx = 0;
+    for (; idx < groups.length - 1; idx++) { acc += weights[idx] / total; if (progress < acc) break; }
+    ccText.firstElementChild!.textContent = groups[idx].join('\n');
+    ccText.hidden = false;
+  };
+  video.addEventListener('timeupdate', renderCaption);
+  video.addEventListener('seeked', renderCaption);
+
+  const syncPause = () => { pauseBtn.textContent = video.paused ? pauseBtn.dataset.resume! : pauseBtn.dataset.pause!; };
+  video.addEventListener('play', syncPause);
+  video.addEventListener('pause', syncPause);
+  const togglePause = () => { if (video.paused) video.play().catch(() => {}); else video.pause(); };
+  pauseBtn.addEventListener('click', togglePause);
+  video.addEventListener('click', togglePause);
 
   const showSoon = () => {
     hasFilm = false;
@@ -51,8 +81,16 @@ export function initIntro(root: HTMLElement) {
     const src = (ext: string) => `${base}/intro-${lang}.${ext}`;
     if (f.webm) video.append(Object.assign(document.createElement('source'), { src: src('webm'), type: 'video/webm' }));
     if (f.mp4) video.append(Object.assign(document.createElement('source'), { src: src('mp4'), type: 'video/mp4' }));
-    if (f.vtt) video.append(Object.assign(document.createElement('track'), { kind: 'captions', srclang: lang, label: lang.toUpperCase(), src: src('vtt') }));
+    if (f.vtt) {
+      const track = Object.assign(document.createElement('track'), { kind: 'captions', srclang: lang, label: lang.toUpperCase(), src: src('vtt') });
+      video.append(track);
+      track.track.mode = 'hidden';
+      track.track.addEventListener('cuechange', renderCaption);
+    }
     ccBtn.hidden = !f.vtt;
+    ccText.lang = lang;
+    ccText.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    ccText.hidden = true;
     if (f.poster) video.poster = `${base}/intro-${lang}-poster.webp`;
     else video.removeAttribute('poster');
     video.preload = 'metadata';
@@ -69,11 +107,9 @@ export function initIntro(root: HTMLElement) {
     if (!video.muted) { video.currentTime = 0; video.play(); }
   });
   ccBtn.addEventListener('click', () => {
-    const t = video.textTracks[0];
-    if (!t) return;
-    const on = t.mode !== 'showing';
-    t.mode = on ? 'showing' : 'hidden';
-    ccBtn.setAttribute('aria-pressed', String(on));
+    captionsOn = !captionsOn;
+    ccBtn.setAttribute('aria-pressed', String(captionsOn));
+    renderCaption();
   });
   root.querySelector('[data-intro-replay]')!.addEventListener('click', () => { video.currentTime = 0; video.play(); });
 
@@ -94,9 +130,14 @@ export function initIntro(root: HTMLElement) {
     trigger: root.querySelector<HTMLElement>('[data-gust-open]')!,
     dialog,
     canvas: root.querySelector<HTMLCanvasElement>('[data-gust-air]')!,
-    onOpened: play,
+    onOpened: () => {
+      play();
+      root.classList.add('is-seen');
+      try { localStorage.setItem('intro-seen', '1'); } catch {}
+    },
     onClosing: () => video.pause(),
   });
 
+  try { if (localStorage.getItem('intro-seen')) root.classList.add('is-seen'); } catch {}
   load((root.dataset.lang as Lang) || 'en');
 }
