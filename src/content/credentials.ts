@@ -9,7 +9,7 @@ const a = (en: string, fr: string, ar: string): L => ({ en, fr, ar });
 export type Credential = {
   title: string;
   issuer: string;
-  date: string; // YYYY-MM (from the certificate)
+  date?: string; // YYYY-MM (from the certificate)
   image: string; // public/media/certificates/<image>.webp
   verify?: string;
   highlight?: L;
@@ -51,10 +51,12 @@ export const credentialGroups: CredentialGroup[] = [
         title: 'B2 First — Pass at Grade B, 176',
         issuer: 'Cambridge English',
         date: '2026-08', // LinkedIn issue date; the statement shows the exam session (25 July 2026)
-        image: 'cambridge-statement-upload',
+        image: 'b2-diplome',
         verify: 'https://www.cambridgeenglish.org/verifiers/',
         highlight: a('Listening 190 — the top of the scale for this exam', 'Compréhension orale 190 — le maximum de l’échelle pour cet examen', 'الاستماع 190 — أعلى درجة في سلّم هذا الامتحان'),
       },
+      { title: 'Chess diploma', issuer: 'Chess', image: 'diplome-chess' },
+      { title: 'Chess attestation', issuer: 'Chess', image: 'attestation-chess' },
       { title: '2026 Aspire Leaders Program', issuer: 'Aspire Institute', date: '2026-09', image: 'aspire-leaders' },
       { title: 'Introduction to Online Dialogue Facilitation', issuer: 'Soliya', date: '2026-09', image: 'soliya-dialogue-facilitation' },
       { title: 'Open Science Essentials', issuer: 'NASA', date: '2026-07', image: 'nasa-open-science' },

@@ -32,6 +32,9 @@ PUBLISH = {
     'cisco-c-essentials-1': None,
     'datacamp-github-concepts': None,
     'cambridge-statement-upload': None,  # the version Ahmed uploaded (photo blurred)
+    'b2-diplome': None,
+    'diplome-chess': None,
+    'attestation-chess': None,
     'aspire-leaders': None,
     'soliya-dialogue-facilitation': None,
     'nasa-open-science': None,
