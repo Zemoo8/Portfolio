@@ -46,14 +46,14 @@ void main(){
   smoke += wisps * (0.4 + arms);
   smoke += 0.14 * n * smoothstep(1.4, 0.0, r);
 
-  vec3 ink = vec3(0.066, 0.075, 0.074);
-  vec3 teal = vec3(0.105, 0.155, 0.163);
+  vec3 ink = vec3(0.071, 0.067, 0.063);
+  vec3 teal = vec3(0.17, 0.145, 0.105);
   vec3 bg = mix(ink, teal, smoothstep(1.6, 0.1, r));
   // canvas-like texture on the dark ground
   float weave = noise(gl_FragCoord.xy * 0.9) * 0.5 + noise(gl_FragCoord.xy * 0.35) * 0.5;
   bg += (weave - 0.5) * 0.035;
 
-  vec3 cloud = vec3(0.92, 0.945, 0.935);
+  vec3 cloud = vec3(0.95, 0.915, 0.83);
   vec3 col = mix(bg, cloud, clamp(smoke * 0.9, 0.0, 1.0) * 0.88);
   col *= 1.0 - 0.4 * smoothstep(0.9, 1.9, r);
   gl_FragColor = vec4(col, 1.0);

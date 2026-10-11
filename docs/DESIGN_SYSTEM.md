@@ -104,3 +104,14 @@ One `h1` per page, landmarks, skip link, visible `:focus-visible`; logical CSS p
 ## Breakpoints
 
 Fluid first; structural switches at **1100 × 620 px** (chapter scroll ↔ title slip; the page keeps room beside the scroll), **960 px** (hero → single column), **900 px** (case-study columns), **800 px** (lightbox stacks), **700 px** (orbit tightens: smaller cards, rounder ellipse).
+
+## One world (2026-10-11)
+
+Ahmed: "I want every section compatible with the other". Every chapter is now a mounted thing in one palette — warm black silk (`#121110`), pale gold (`#f0d7a1`), gold leaf, paper, ink, vermilion — on the pale painted wall:
+
+| Chapter | Mounted as |
+|---|---|
+| Hero | a night hanging scroll between two rollers: the name in pale and gold, the film gate a pale moon in its ink ring, buttons strokes of gold, the far country in gold along the foot (`Hero.astro` overrides the palette tokens for everything on it; `data-tone="dark"`) |
+| Work | the storm kept (the smoke vortex — "that tornado" — he likes), on the same warm black with gold accents; films framed in black lacquer and a line of brocade |
+| About | an album lying open: a gold-leaf leaf with the screen's pine and the portrait in its moon window, a paper leaf with the words, three slips along the foot, languages as seals cut in outline; opens from the spine |
+| Path · Credentials · Capabilities · More · Contact | night scroll with the road · handscroll · hanging scrolls with seals · gold folding screen · night with moon and lanterns |

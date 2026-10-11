@@ -103,6 +103,11 @@ const cards = projects.map((p) => {
     position: relative;
     margin-block-start: clamp(3rem, 8vh, 6rem);
     padding-block: clamp(6rem, 13vh, 9rem) clamp(6rem, 14vh, 10rem);
+    /* the same night as the Path scroll and the last chapter: warm black silk, pale gold */
+    --storm: #121110;
+    --storm-2: #221f19;
+    --cloud: #f3eee2;
+    --gold: #f0d7a1;
     color: var(--cloud);
     background-color: var(--storm); /* solid ink ground: text contrast never depends on the canvas */
     isolation: isolate;
@@ -116,8 +121,8 @@ const cards = projects.map((p) => {
     block-size: clamp(90px, 16vh, 180px);
     pointer-events: none;
   }
-  .storm::before { inset-block-end: 100%; background: linear-gradient(180deg, rgb(18 20 19 / 0), rgb(18 20 19 / 0.55) 60%, var(--storm)); }
-  .storm::after { inset-block-start: 100%; background: linear-gradient(0deg, rgb(18 20 19 / 0), rgb(18 20 19 / 0.55) 60%, var(--storm)); }
+  .storm::before { inset-block-end: 100%; background: linear-gradient(180deg, rgb(18 17 16 / 0), rgb(18 17 16 / 0.55) 60%, var(--storm)); }
+  .storm::after { inset-block-start: 100%; background: linear-gradient(0deg, rgb(18 17 16 / 0), rgb(18 17 16 / 0.55) 60%, var(--storm)); }
   .storm__bg {
     position: absolute;
     inset: 0;
@@ -129,7 +134,7 @@ const cards = projects.map((p) => {
   .storm__canvas { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
   @media (max-width: 760px) { .storm__canvas { display: none; } }
   .storm__head { display: grid; gap: 1rem; justify-items: center; text-align: center; }
-  .storm__head .kicker { color: #e9a86a; }
+  .storm__head .kicker { color: var(--gold); }
   .storm__head h2 { font-size: var(--step-4); max-inline-size: 22ch; }
 
   /* ---- stage ---- */
@@ -173,10 +178,11 @@ const cards = projects.map((p) => {
     position: relative;
     display: block;
     inline-size: 100%;
-    padding: 0.45rem;
-    border-radius: 12px;
-    background: var(--paper-grain), #f7f2e5;
-    box-shadow: 0 30px 50px -24px rgb(0 0 0 / 0.75), 0 0 0 1px rgb(255 255 255 / 0.2) inset;
+    /* framed as the folding screen frames its pictures: black lacquer and a line of brocade */
+    padding: 0.32rem;
+    border-radius: 5px;
+    background: #17130e;
+    box-shadow: 0 30px 50px -24px rgb(0 0 0 / 0.75), 0 0 0 1.5px rgb(150 116 48 / 0.9);
   }
   .orbit__mat::after {
     /* recedes into ink toward the back of the orbit */
@@ -184,12 +190,12 @@ const cards = projects.map((p) => {
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: #0f1110;
+    background: #100f0d;
     opacity: calc((1 - var(--f, 1)) * 0.62);
     pointer-events: none;
     transition: opacity 0.2s;
   }
-  .orbit__media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 7px; background: #1b1d1c; }
+  .orbit__media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 3px; background: #1c1a17; }
   .orbit__media img, .orbit__media :global(video) { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
   .orbit__media--figure { background: #fbfaf6; }
   .orbit__media--figure img { object-fit: contain; }
@@ -207,8 +213,8 @@ const cards = projects.map((p) => {
     white-space: nowrap;
     text-shadow: 0 2px 12px rgb(0 0 0 / 0.6);
   }
-  .orbit__num { font-family: var(--font-sans); font-size: 0.7em; font-weight: 600; color: #e9a86a; letter-spacing: 0.08em; }
-  .orbit__card[data-active] .orbit__mat { box-shadow: 0 0 0 2px #e9a86a, 0 34px 60px -24px rgb(0 0 0 / 0.8); }
+  .orbit__num { font-family: var(--font-sans); font-size: 0.7em; font-weight: 600; color: var(--gold); letter-spacing: 0.08em; }
+  .orbit__card[data-active] .orbit__mat { box-shadow: 0 0 0 2px var(--gold), 0 34px 60px -24px rgb(0 0 0 / 0.8); }
   .orbit__card:focus-visible { outline: none; }
   .orbit__card:focus-visible .orbit__mat { outline: 2px solid var(--amber); outline-offset: 4px; }
 
@@ -229,31 +235,31 @@ const cards = projects.map((p) => {
     font-style: italic;
     line-height: 0.8;
     color: transparent;
-    -webkit-text-stroke: 1px rgb(233 168 106 / 0.32);
+    -webkit-text-stroke: 1px rgb(240 215 161 / 0.32);
     pointer-events: none;
     user-select: none;
   }
-  .orbit__meta { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #b9c2bf; }
+  .orbit__meta { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #c9c4b6; }
   :lang(ar) .orbit__meta { letter-spacing: 0; text-transform: none; font-size: 0.9rem; }
-  .orbit__meta span + span::before { content: ''; display: inline-block; inline-size: 1.4em; block-size: 0.45em; margin-inline-end: 0.9rem; background: #e9a86a; -webkit-mask: url('/ink/dash.png') center / 100% 100% no-repeat; mask: url('/ink/dash.png') center / 100% 100% no-repeat; }
+  .orbit__meta span + span::before { content: ''; display: inline-block; inline-size: 1.4em; block-size: 0.45em; margin-inline-end: 0.9rem; background: var(--gold); -webkit-mask: url('/ink/dash.png') center / 100% 100% no-repeat; mask: url('/ink/dash.png') center / 100% 100% no-repeat; }
   .orbit__title { font-size: var(--step-4); line-height: 0.95; }
-  .orbit__tagline { font-family: var(--font-display); font-style: italic; font-size: var(--step-2); color: #d3dad7; max-inline-size: 30rem; line-height: 1.25; }
+  .orbit__tagline { font-family: var(--font-display); font-style: italic; font-size: var(--step-2); color: #ddd8cb; max-inline-size: 30rem; line-height: 1.25; }
   :lang(ar) .orbit__tagline { font-style: normal; font-size: var(--step-1); line-height: 1.7; }
   /* on the storm the swash is a stroke of cloud-white */
   :global(.btn--cloud) { --btn-ink: var(--cloud); color: var(--ink); margin-block-start: 0.6rem; }
-  :global(.btn--cloud:hover), :global(.btn--cloud:focus-visible) { --btn-ink: #e9a86a; }
+  :global(.btn--cloud:hover), :global(.btn--cloud:focus-visible) { --btn-ink: var(--gold); }
 
   /* steering: brush arrows around a counter */
   .orbit__controls { display: grid; gap: 1.6rem; justify-items: end; }
   .orbit__steer { display: flex; align-items: center; gap: 0.8rem; color: var(--cloud); }
-  .orbit__steer .ibtn:hover { color: #e9a86a; }
+  .orbit__steer .ibtn:hover { color: var(--gold); }
   .orbit__count { display: flex; align-items: baseline; gap: 0.35rem; font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; line-height: 1; color: var(--cloud); direction: ltr; }
-  .orbit__of { font-size: 1.05rem; font-style: italic; color: #8e9894; }
+  .orbit__of { font-size: 1.05rem; font-style: italic; color: #9a9588; }
 
   /* stations: the ring's six projects as an index; the one in front gets the brush */
   .orbit__index { display: grid; gap: 0.15rem; min-inline-size: min(100%, 19rem); }
-  .orbit__index button { position: relative; display: flex; align-items: baseline; gap: 0.9rem; inline-size: 100%; padding: 0.42rem 0.1rem; color: #aab3b0; text-align: start; transition: color var(--dur-2); }
-  .orbit__station-num { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05rem; color: #b98f63; min-inline-size: 1.6rem; }
+  .orbit__index button { position: relative; display: flex; align-items: baseline; gap: 0.9rem; inline-size: 100%; padding: 0.42rem 0.1rem; color: #b5b0a2; text-align: start; transition: color var(--dur-2); }
+  .orbit__station-num { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05rem; color: #c9ab72; min-inline-size: 1.6rem; }
   .orbit__station-name { position: relative; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
   :lang(ar) .orbit__station-name { letter-spacing: 0; text-transform: none; font-size: 0.92rem; }
   .orbit__station-name::after {
@@ -262,7 +268,7 @@ const cards = projects.map((p) => {
     inset-inline: -0.3em -0.5em;
     inset-block-end: -0.62em;
     block-size: 0.5rem;
-    background: #e9a86a;
+    background: var(--gold);
     -webkit-mask: url('/ink/under.png') center / 100% 100% no-repeat;
     mask: url('/ink/under.png') center / 100% 100% no-repeat;
     clip-path: inset(-50% 100% -50% 0);
@@ -271,7 +277,7 @@ const cards = projects.map((p) => {
   [dir='rtl'] .orbit__station-name::after { clip-path: inset(-50% 0 -50% 100%); }
   .orbit__index button:hover { color: var(--cloud); }
   .orbit__index button[aria-current='true'] { color: var(--cloud); }
-  .orbit__index button[aria-current='true'] .orbit__station-num { color: #e9a86a; }
+  .orbit__index button[aria-current='true'] .orbit__station-num { color: var(--gold); }
   .orbit__index button[aria-current='true'] .orbit__station-name::after { clip-path: inset(-50% 0 -50% 0); }
   .orbit__index button:hover .orbit__station-name::after { clip-path: inset(-50% 0 -50% 0); opacity: 0.45; }
   .orbit__index button[aria-current='true']:hover .orbit__station-name::after { opacity: 1; }
@@ -281,8 +287,8 @@ const cards = projects.map((p) => {
   :lang(ar) .orbit__pause { letter-spacing: 0; text-transform: none; font-size: 0.88rem; }
   .orbit__pause::before { content: ''; display: inline-block; inline-size: 0.5em; block-size: 0.7em; margin-inline-end: 0.6em; border-inline: 2px solid currentColor; vertical-align: -0.05em; }
   .orbit__pause[aria-pressed='true']::before { inline-size: 0; block-size: 0; border-inline: 0; border-block: 0.38em solid transparent; border-inline-start: 0.62em solid currentColor; }
-  .orbit__pause:hover, .orbit__pause[aria-pressed='true'] { color: #e9a86a; }
-  .orbit__hint { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: #8e9894; }
+  .orbit__pause:hover, .orbit__pause[aria-pressed='true'] { color: var(--gold); }
+  .orbit__hint { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: #9a9588; }
   :lang(ar) .orbit__hint { font-style: normal; font-size: 0.9rem; }
 
   @media (max-width: 900px) {
