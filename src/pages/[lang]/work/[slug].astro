@@ -174,7 +174,7 @@ const jsonLd = [
     <a class="case__next wrap" href={path(lang, `work/${next.slug}`)}>
       <span class="kicker">{tr(ui.work.next, lang)} · {next.index}</span>
       <span class="case__next-title display">{next.title} <span class="arrow" aria-hidden="true">→</span></span>
-      <Brush seed={90 + i} length={900} class="case__next-stroke" />
+      <Brush seed={90 + i} length={900} class="case__next-stroke" color="var(--gold)" />
     </a>
   </article>
 </Base>
@@ -196,7 +196,8 @@ const jsonLd = [
     gap: 1.1rem;
     justify-items: start;
     padding-block: 8.5rem 3.4rem;
-    padding-inline: calc(var(--gutter) + clamp(0.6rem, 2.4vw, 3rem));
+    /* (--end: the room the page leaves at its far edge for the chapter scroll: see .wrap in global.css) */
+    padding-inline: calc(var(--gutter) + clamp(0.6rem, 2.4vw, 3rem)) calc(var(--end) + clamp(0.6rem, 2.4vw, 3rem));
     margin-block-end: 2.6rem;
     color: var(--ink);
   }
@@ -205,7 +206,8 @@ const jsonLd = [
     content: '';
     position: absolute;
     z-index: -1;
-    inset: 4.4rem calc(var(--gutter) * 0.4) 0;
+    inset-block: 4.4rem 0;
+    inset-inline: calc(var(--gutter) * 0.4) calc(var(--end) - var(--over));
     background: radial-gradient(80% 90% at 74% 30%, #26221b, #121110 72%);
     box-shadow: inset 0 0 0 1px rgb(240 215 161 / 0.13), inset 0 0 0 8px #121110, inset 0 0 0 9px rgb(240 215 161 / 0.2), 0 30px 54px -38px rgb(20 18 14 / 0.8);
     pointer-events: none;
@@ -216,7 +218,7 @@ const jsonLd = [
     position: absolute;
     z-index: -1;
     inset-block-end: 9px;
-    inset-inline-end: 6%;
+    inset-inline-end: calc(var(--end) + 2%);
     inline-size: clamp(8rem, 16vw, 16rem);
     aspect-ratio: 400 / 424;
     background: url('/art/road-rocks.png') center bottom / contain no-repeat;
@@ -293,7 +295,42 @@ const jsonLd = [
   .case__caveat p { display: flex; gap: 1rem; align-items: flex-start; max-inline-size: 50rem; padding: 1.2rem 1.4rem; border-radius: 14px; background: rgb(247 242 230 / 0.85); box-shadow: 0 0 0 1px var(--line); color: var(--ink-2); font-size: var(--step--1); line-height: 1.6; }
   .case__caveat-mark { flex: none; inline-size: 1.7rem; block-size: 1.7rem; background: var(--rust); -webkit-mask: url('/ink/ring.png') center / contain no-repeat; mask: url('/ink/ring.png') center / contain no-repeat; }
 
-  .case__next { display: grid; gap: 0.6rem; justify-items: start; margin-block-start: var(--section); padding-block: 2rem 1rem; }
+  /* the page closes as it opened: the way on to the next project is night silk and gold */
+  .case__next {
+    --gold: #f0d7a1;
+    --ink: #f3eee2;
+    --muted: #a5a399;
+    --rust: #fff1cc;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    gap: 0.6rem;
+    justify-items: start;
+    margin-block-start: var(--section);
+    padding-block: clamp(2.4rem, 5vw, 4rem) clamp(2rem, 4vw, 3.2rem);
+    padding-inline: calc(var(--gutter) + clamp(0.6rem, 2.4vw, 3rem)) calc(var(--end) + clamp(0.6rem, 2.4vw, 3rem));
+    color: var(--gold);
+  }
+  .case__next::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    inset-inline: calc(var(--gutter) * 0.4) calc(var(--end) - var(--over));
+    background: radial-gradient(80% 120% at 74% 30%, #26221b, #121110 72%);
+    box-shadow: inset 0 0 0 1px rgb(240 215 161 / 0.13), inset 0 0 0 8px #121110, inset 0 0 0 9px rgb(240 215 161 / 0.2), 0 30px 54px -38px rgb(20 18 14 / 0.8);
+  }
+  .case__next :global(.kicker) { color: var(--gold); }
+  /* between the two: the films in the folding screen's frame (black lacquer, a line of brocade),
+     the written parts as leaves of paper in the same frame */
+  .case { --end: var(--gutter); --over: calc(var(--gutter) * 0.6); }
+  .case :global(.mat) { padding: 0.34rem; border-radius: 5px; background: #17130e; box-shadow: 0 0 0 1.5px rgb(150 116 48 / 0.9), 0 30px 50px -30px rgb(40 30 12 / 0.7); }
+  .case :global(.scroll) { border-radius: 0; box-shadow: inset 0 0 0 3px #17130e, inset 0 0 0 5px rgb(120 90 34 / 0.9), 0 30px 50px -34px rgb(40 30 12 / 0.5); }
+  .case :global(.scroll)::before { display: none; }
+  @media (min-width: 1100px) and (min-height: 620px) {
+    /* (beside the chapter scroll the silk reaches only a little past the text) */
+    .case { --end: max(var(--gutter), calc(var(--rod-w) + 2.2rem - (100vw - var(--max)) / 2)); --over: 0.5rem; }
+  }
   .case__next-title { font-size: clamp(3rem, 1.5rem + 6vw, 7.5rem); font-weight: 600; transition: color var(--dur-2); }
   .case__next:hover .case__next-title { color: var(--rust); }
   .case__next:hover .arrow { transform: translateX(12px); }
