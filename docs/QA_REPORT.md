@@ -2,7 +2,23 @@
 
 Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro preview`; Chromium via Playwright 1.61 (headless; GPU via ANGLE/D3D11 for WebGL); Lighthouse 12 (mobile, simulated throttling).
 
-## Round 3 — films, calm scrolling, painted interface (latest)
+## Round 4 — 2026-10-11: search, loading, phone films, CV (latest)
+
+Nothing visual changed apart from the CV button in Contact. Checked on the live site (`www.ahmedbaghouli.world`) after deploying.
+
+| Area | Result |
+|---|---|
+| Canonical domain | Every page, the sitemap and `robots.txt` name `https://www.ahmedbaghouli.world` (a stale `SITE_URL` on Vercel had pointed them at the `vercel.app` address, which redirects back — Google indexed nothing) |
+| Fonts | 5 font files / 145 KB on `/en/` (before: 7 / 185 KB). The Latin Extended faces had no `unicode-range`, so every page fetched them first and the headline's real font one round trip later; the first-screen faces are now preloaded |
+| Films on phones | Screens ≤ 760 px get `<key>-phone.mp4` (960 px): 21.6 MB → 8.3 MB across the seven wide films. `/en/work/cheezy/` on a phone: 4.0 MB → 1.95 MB. Desktop unchanged. Verified in Chrome: a 390 px viewport plays the 960 px file, a 1440 px viewport the full one |
+| Analytics | Vercel Web Analytics was enabled on the project but its script was not in the pages. Now loaded on Vercel builds only; `POST /_vercel/insights/view` → 200 (the script ignores headless/automated browsers, and content blockers stop it) |
+| Structured data | `WebSite` + `Person` on every page, `ProfilePage` on the home pages, `CreativeWork` + `BreadcrumbList` on case studies; 404 is `noindex` with no canonical; sitemap carries `x-default` |
+| Accessibility (axe-core) | 0 violations on 7 pages; the moon-gate button's name now starts with its visible label ("Play — Intro film"), the one Lighthouse flag |
+| Keyboard · films · links | 21 / 21 · 14 / 14 play · 0 broken internal links |
+| Lighthouse | A11y 100 · BP 100 · SEO 100. Performance on `/en/` measured 58–81 before and 61–91 after over three alternating runs each — this machine's runs vary too much to claim a change; `/en/work/cheezy/` 93 → 96 |
+| CV | `public/cv/ahmed-baghouli-cv.pdf`: Ahmed's CV with the phone line deleted from the page content (checked: no phone number readable in the file; the six links still work) |
+
+## Round 3 — films, calm scrolling, painted interface
 
 | Area | Result |
 |---|---|

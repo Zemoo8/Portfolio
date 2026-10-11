@@ -1,10 +1,10 @@
 # Ahmed Baghouli — portfolio
 
-A trilingual (English · Français · العربية) portfolio built with Astro. Static output, no server, no database, no third-party requests at runtime.
+A trilingual (English · Français · العربية) portfolio built with Astro. Static output, no server, no database, no third-party requests at runtime (on Vercel the pages load Vercel Web Analytics from the site's own origin — cookieless page-view counts; see `Base.astro`).
 
 - **Home** `/<lang>/` — hero with the moon-gate intro film, the work orbit (six projects around the air emblem), about, path, credentials (real certificates), capabilities, more work, contact.
 - **Look:** a sumi-e ink painting of an air temple on parchment — see `docs/DESIGN_SYSTEM.md`.
-- **Live:** https://ahmed-baghouli.vercel.app
+- **Live:** https://www.ahmedbaghouli.world
 - **Case studies** `/<lang>/work/<slug>/` — six projects, each with real recorded films and screenshots.
 - `/` detects the visitor's language (remembered choice → browser language → English).
 
@@ -29,13 +29,14 @@ Requires Node ≥ 22.18 (the OG script imports TypeScript content directly).
 The site is static — any static host works.
 
 ```bash
-SITE_URL=https://your-domain.tld npm run build   # PowerShell: $env:SITE_URL="https://…"; npm run build
+npm run build                                    # canonical domain: https://www.ahmedbaghouli.world
+SITE_URL=https://your-domain.tld npm run build   # another domain — PowerShell: $env:SITE_URL="https://…"; npm run build
 ```
 
-`SITE_URL` feeds canonical URLs, hreflang, Open Graph URLs and the sitemap. Without it they point at `http://localhost:4321`.
+The site URL feeds canonical URLs, hreflang, Open Graph URLs, `robots.txt` and the sitemap. It defaults to `https://www.ahmedbaghouli.world` (`astro.config.mjs`); `SITE_URL` overrides it.
 
-- **Vercel (current):** project `ahmed-baghouli`, env var `SITE_URL=https://ahmed-baghouli.vercel.app`. Redeploy from `site/` with `npx vercel deploy --prod --yes` (`.vercelignore` keeps sources and captures out of the upload).
-- **Netlify / Cloudflare Pages:** build command `npm run build`, output `dist`, env var `SITE_URL`.
+- **Vercel (current):** project `ahmed-baghouli`, domain `www.ahmedbaghouli.world` (the apex and `ahmed-baghouli.vercel.app` redirect to it). Do **not** set `SITE_URL` there: pointing it at the `vercel.app` address made every page declare a canonical that redirects straight back, and Google indexed nothing. Redeploy from `site/` with `npx vercel deploy --prod --yes` (`.vercelignore` keeps sources and captures out of the upload).
+- **Netlify / Cloudflare Pages:** build command `npm run build`, output `dist`, env var `SITE_URL` set to the public domain.
 - **GitHub Pages:** same build; `dist/404.html` is served for unknown routes automatically.
 
 Deep routes (e.g. `/fr/work/cheezy/`) are real files, so refresh works everywhere.
@@ -123,6 +124,8 @@ The credential gallery shows the **real documents**. Data: `src/content/credenti
 
 `src/content/profile.ts`: name, role, email, links, statement, about paragraphs, languages, interests. The phone number from the CV is intentionally **not** published.
 
+**CV download.** The Contact section links `public/cv/ahmed-baghouli-cv.pdf` when that file exists (delete it and rebuild to remove the link). It is a copy of `../CV - English.pdf` made by `npm run media:cv` (`scripts/media/build-cv.py`): the phone line is deleted from the page content, everything else is the original, and the script refuses to write a file in which a phone number can still be read. After editing the CV, run it again, look at the PDF, and redeploy. The file is served with `X-Robots-Tag: noindex` (`vercel.json`), so it is offered to visitors but kept out of search results.
+
 ## Regenerating everything
 
 ```bash
@@ -131,10 +134,12 @@ npm run og                             # social cards + intro posters
 npm run art                            # repaint the landscape (seeded, deterministic)
 node scripts/art/ink-marks.mjs         # brush marks for buttons / links / arrows (public/ink, SVG + baked PNG)
 node scripts/art/favicon.mjs           # brushed-ensō favicons
-node scripts/media/encode-films.mjs    # every showcase film as H.264 MP4 (+ 960 px orbit cut, posters)
+node scripts/media/encode-films.mjs    # every showcase film as H.264 MP4 (+ 960 px orbit cut, phone version, posters)
+node scripts/media/encode-films.mjs --phone   # only the 960 px phone versions, from the finished films
 node scripts/qa/films.mjs              # every film must actually play in Chrome
 node scripts/qa/scroll-calm.mjs        # scrolling stays native and position-driven
 npm run media:certs                    # certificate WebPs from assets-source/certificates
+npm run media:cv                       # the public CV (no phone number) from ../CV - English.pdf
 npm run qa:a11y && npm run qa:keys && npm run qa:links
 MSYS_NO_PATHCONV=1 npm run qa:shots -- /en/ home 360x800 1440x900   # Git Bash on Windows needs MSYS_NO_PATHCONV
 ```
