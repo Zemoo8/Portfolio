@@ -82,8 +82,68 @@ export function initInk() {
   document.addEventListener('visibilitychange', sync);
   document.addEventListener('motionchange', sync);
 
-  // ---- a page opens: ink lifts off the stroke under its title ----------------------------------
+  // ---- lettering that turns to ink -------------------------------------------------------------
+  // The words are drawn again, exactly where they stand, on a picture the size of the ink canvas;
+  // the worker lays ink wherever the picture is opaque and lets it rise.
+  const stamp = (el: Element, ink: number, lift: number) => {
+    if (!active()) return;
+    const { w, h } = size();
+    const picture = new OffscreenCanvas(w, h);
+    const ctx = picture.getContext('2d')!;
+    ctx.scale(w / innerWidth, h / innerHeight);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    if ('filter' in ctx) ctx.filter = 'blur(1.8px)'; // wet ink has no hard edge: a soft cloud, not a second copy
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const parent = node.parentElement;
+      let text = node.textContent ?? '';
+      if (!parent || !text.trim() || parent.closest('.sr-only')) continue;
+      range.selectNodeContents(node);
+      const rects = range.getClientRects();
+      if (rects.length !== 1) continue; // only words that stand on one line can be redrawn in place
+      const r = rects[0];
+      if (r.width < 2 || r.bottom < 0 || r.top > innerHeight) continue;
+      const cs = getComputedStyle(parent);
+      if (cs.textTransform === 'uppercase') text = text.toUpperCase();
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      if ('letterSpacing' in ctx) ctx.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing;
+      ctx.direction = cs.direction === 'rtl' ? 'rtl' : 'ltr';
+      const m = ctx.measureText(text);
+      const baseline = r.top + (r.height - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2 + m.fontBoundingBoxAscent;
+      ctx.fillText(text, r.left, baseline);
+      x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom);
+    }
+    if (x0 === Infinity) return;
+    const bitmap = picture.transferToImageBitmap();
+    show();
+    worker.postMessage({ stamp: { picture: bitmap, ink, lift, x0: x0 / innerWidth, y0: 1 - y1 / innerHeight, x1: x1 / innerWidth, y1: 1 - y0 / innerHeight } }, [bitmap]);
+  };
+  /** Once the words have risen into place (their own arrival has finished). */
+  const whenRisen = (el: Element, then: () => void) => {
+    const line = el.querySelector<HTMLElement>('.line-mask > span') ?? (el as HTMLElement);
+    const there = () => { const cs = getComputedStyle(line); return cs.opacity === '1' && (cs.transform === 'none' || cs.transform === 'matrix(1, 0, 0, 1, 0, 0)'); };
+    let tries = 0;
+    const wait = () => { if (there()) setTimeout(then, 260); else if (++tries < 40) setTimeout(wait, 120); };
+    wait();
+  };
+
+  // a chapter's heading, a moment after it has arrived: its ink is still wet
+  const headings = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      headings.unobserve(e.target);
+      whenRisen(e.target, () => stamp(e.target, 0.26, 12));
+    }
+  }, { threshold: 0.6 });
+
+  // ---- a page opens: ink lifts off its title, and off the stroke under it ----------------------
   function firstStroke() {
+    document.querySelectorAll('main [data-lines]').forEach((h) => headings.observe(h));
+    const title = document.querySelector('.hero__name, .case__title');
+    if (title && scrollY < 40) whenRisen(title, () => stamp(title, 0.3, 15));
     const line = document.querySelector<SVGElement>('.hero__stroke, .case__stroke');
     if (!line || scrollY > 40 || !active()) return;
     const r = line.getBoundingClientRect();

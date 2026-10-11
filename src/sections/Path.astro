@@ -1,9 +1,16 @@
 ---
-import Brush from '../components/Brush.astro';
-import { formatMonth, tr, asset, type Locale } from '../i18n/config';
+// The path, painted as one stalk of ink bamboo (lib/bamboo.ts). Bamboo grows a joint at a time, so
+// each step of the way hangs from a joint: the newest growth at the top — a pale shoot for what
+// comes next — down to the root where it began. The steps keep their three groups (work,
+// competitions, studies), each newest first; they alternate from side to side, and across the
+// stalk from each one its date is written large. Every segment is painted as its step arrives.
+import { formatMonth, tr, asset, type Locale, type L } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { experience, education, competitions, type Entry } from '../content/path';
 import { competitionCertificate, internshipCertificate } from '../content/credentials';
+import { profile } from '../content/profile';
+import { cane, joint, leaves, shoot, grass } from '../lib/bamboo';
+import type { Bristle } from '../lib/brush';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
@@ -12,10 +19,27 @@ const when = (e: Entry) => {
   if (!e.end) return s;
   return `${s} — ${e.end === 'present' ? tr(ui.path.present, lang) : formatMonth(e.end, lang)}`;
 };
-const groups = [
-  { title: ui.path.experience, items: experience },
-  { title: ui.path.education, items: education },
+
+type Cert = { src: string; thumb: string; title: string; meta: string; group: string; w: number; h: number };
+type Step = { group?: L; mark: string; org: string; role?: string; place?: string; body: string[]; tags?: string[]; link?: Entry['link']; cert?: Cert; next?: boolean };
+const cert = (image: string, title: string, meta: string, group: string, w: number, h: number): Cert => ({
+  src: asset(`media/certificates/${image}.webp`), thumb: asset(`media/certificates/${image}-sm.webp`), title, meta, group, w, h,
+});
+const fromEntry = (e: Entry, group?: L): Step => ({
+  group, mark: when(e), org: e.org, role: tr(e.role, lang), place: tr(e.place, lang), body: e.body.map((b) => tr(b, lang)), tags: e.tags, link: e.link,
+  cert: e.org === 'Sotetel' ? cert(internshipCertificate.image, tr(internshipCertificate.title, lang), tr(internshipCertificate.meta, lang), 'internship', 334, 490) : undefined,
+});
+const steps: Step[] = [
+  // what comes next, in Ahmed's own words (About): the shoot the stalk has not grown yet
+  { next: true, mark: tr(ui.path.next, lang), org: '', body: [tr(profile.about[2], lang)] },
+  ...experience.map((e, i) => fromEntry(e, i === 0 ? ui.path.experience : undefined)),
+  ...competitions.map((c, i): Step => ({
+    group: i === 0 ? ui.path.competitions : undefined, mark: tr(c.result, lang), org: c.name, body: [tr(c.detail, lang)],
+    cert: c.name === 'Code It Up 5.0' ? cert(competitionCertificate.image, competitionCertificate.title, competitionCertificate.issuer, 'competition', 304, 214) : undefined,
+  })),
+  ...education.map((e, i) => fromEntry(e, i === 0 ? ui.path.education : undefined)),
 ];
+const late = (bs: Bristle[], by: number) => bs.map((b) => ({ ...b, delay: b.delay + by }));
 ---
 
 <section id="path" class="section wrap" aria-labelledby="path-title" data-tone="light" data-chapter-name={tr(ui.nav.path, lang)}>
@@ -25,94 +49,148 @@ const groups = [
       <h2 id="path-title" class="sr-only">{tr(ui.path.kicker, lang)}</h2>
     </header>
 
-    {groups.map((g, gi) => (
-      <div class="path__group">
-        <h3 class="path__label display" data-reveal>{tr(g.title, lang)}</h3>
-        <ol class="path__list">
-          {g.items.map((e, i) => (
-            <li class="entry" data-reveal style={`--i:${i}`}>
-              <p class="entry__when label"><time>{when(e)}</time></p>
-              <div class="entry__main">
-                <h4 class="entry__org">{e.org}</h4>
-                <p class="entry__role">{tr(e.role, lang)}</p>
-                <p class="entry__place label">{tr(e.place, lang)}</p>
-              </div>
-              <div class="entry__body">
-                {e.body.map((b) => <p>{tr(b, lang)}</p>)}
-                {(e.tags || e.link) && (
-                  <p class="entry__tags">
-                    {e.tags?.map((t) => <span class="pill">{t}</span>)}
-                    {e.link && <a class="link-u entry__link" href={e.link.href} target="_blank" rel="noopener">{e.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
-                  </p>
-                )}
-                {e.org === 'Sotetel' && (
-                  <button
-                    class="entry__cert"
-                    type="button"
-                    data-lightbox
-                    data-group="internship"
-                    data-src={asset(`media/certificates/${internshipCertificate.image}.webp`)}
-                    data-title={tr(internshipCertificate.title, lang)}
-                    data-meta={tr(internshipCertificate.meta, lang)}
-                    aria-label={`${tr(ui.credentials.view, lang)}: ${tr(internshipCertificate.title, lang)}`}
-                  >
-                    <img src={asset(`media/certificates/${internshipCertificate.image}-sm.webp`)} width="334" height="490" alt="" loading="lazy" decoding="async" />
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ol>
-        <Brush seed={40 + gi} length={1100} width={4} class="path__stroke" />
-      </div>
-    ))}
+    <ol class="stalk">
+      {steps.map((s, i) => {
+        const c = cane(31 + i * 7);
+        const hair = (b: Bristle) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay}`} />;
+        // leaves grow up from the joint on the side this step is written on — into the empty paper
+        // under the date of the step above; not every joint has them
+        const leafy = !s.next && i % 3 !== 0;
+        const fan = leafy ? leaves(5 + i * 3, 3 + (i % 3)) : null;
+        return (
+          <li class:list={['step', i % 2 ? 'step--far' : 'step--near', s.next && 'step--next']}>
+            <div class="step__cane" aria-hidden="true" data-reveal-brush>
+              <svg class="cane" viewBox="0 0 44 200" preserveAspectRatio="none">
+                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  {s.next
+                    ? <g class="shoot">{shoot(77).map(hair)}</g>
+                    : <Fragment><g class="wash">{c.wash.map(hair)}</g><g class="edge">{late(c.edges, 0.15).map(hair)}</g></Fragment>}
+                </g>
+              </svg>
+              {!s.next && (
+                <svg class="knot" viewBox="0 0 44 12">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    {joint(60 + i).map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay}`} />)}
+                  </g>
+                </svg>
+              )}
+              {fan && (
+                <svg class="fan" viewBox="0 0 170 130">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    {fan.twig.map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay * 0.4 + 0.5}`} />)}
+                    {fan.fan.flatMap((lf, k) => lf.map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay * 0.3 + 0.75 + k * 0.16}`} />))}
+                  </g>
+                </svg>
+              )}
+              {i === steps.length - 1 && (
+                <svg class="tuft" viewBox="0 0 220 70">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    {grass(140).flatMap((blade, k) => blade.map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${0.9 + k * 0.07}`} />))}
+                  </g>
+                </svg>
+              )}
+            </div>
 
-    <div class="path__group">
-      <h3 class="path__label display" data-reveal>{tr(ui.path.competitions, lang)}</h3>
-      <ol class="path__list">
-        {competitions.map((c, i) => (
-          <li class="entry" data-reveal style={`--i:${i}`}>
-            <p class="entry__when label">{tr(c.result, lang)}</p>
-            <div class="entry__main"><h4 class="entry__org">{c.name}</h4></div>
-            <div class="entry__body">
-              <p>{tr(c.detail, lang)}</p>
-              {c.name === 'Code It Up 5.0' && (
-                <button
-                  class="entry__cert"
-                  type="button"
-                  data-lightbox
-                  data-group="competition"
-                  data-src={asset(`media/certificates/${competitionCertificate.image}.webp`)}
-                  data-title={competitionCertificate.title}
-                  data-meta={competitionCertificate.issuer}
-                  aria-label={`${tr(ui.credentials.view, lang)}: ${competitionCertificate.title}`}
-                >
-                  <img src={asset(`media/certificates/${competitionCertificate.image}-sm.webp`)} width="304" height="214" alt="" loading="lazy" decoding="async" />
+            <p class="step__mark display" aria-hidden="true" data-reveal>{s.mark}</p>
+
+            <div class="step__text" data-reveal>
+              {s.group && <p class="step__group kicker">{tr(s.group, lang)}</p>}
+              <p class="step__when label">{s.next ? s.mark : <time>{s.mark}</time>}</p>
+              {s.org && <h3 class="step__org">{s.org}</h3>}
+              {s.role && <p class="step__role">{s.role}</p>}
+              {s.place && <p class="step__place label">{s.place}</p>}
+              {s.body.length > 0 && <div class="step__body">{s.body.map((b) => <p>{b}</p>)}</div>}
+              {(s.tags || s.link) && (
+                <p class="step__tags">
+                  {s.tags?.map((t) => <span class="pill">{t}</span>)}
+                  {s.link && <a class="link-u entry__link" href={s.link.href} target="_blank" rel="noopener">{s.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
+                </p>
+              )}
+              {s.cert && (
+                <button class="step__cert" type="button" data-lightbox data-group={s.cert.group} data-src={s.cert.src} data-title={s.cert.title} data-meta={s.cert.meta} aria-label={`${tr(ui.credentials.view, lang)}: ${s.cert.title}`}>
+                  <img src={s.cert.thumb} width={s.cert.w} height={s.cert.h} alt="" loading="lazy" decoding="async" />
                 </button>
               )}
             </div>
           </li>
-        ))}
-      </ol>
-    </div>
+        );
+      })}
+    </ol>
   </div>
 </section>
 
 <style>
-  .path__group { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); gap: 1rem var(--gutter); padding-block: 1.6rem 0; }
-  .path__label { font-size: var(--step-3); }
-  .path__list { display: grid; }
-  .path :global(.path__stroke) { grid-column: 1 / -1; inline-size: 100%; block-size: 16px; opacity: 0.55; margin-block: 1.2rem 0.6rem; }
-  .entry { display: grid; grid-template-columns: 10rem minmax(0, 4fr) minmax(0, 6fr); gap: 1rem var(--gutter); padding-block: 0 2rem; }
-  .entry + .entry { padding-block-start: 2rem; border-block-start: 1px solid var(--line); }
-  .entry__org { font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; line-height: 1.05; }
-  .entry__role { color: var(--ink-2); margin-block-start: 0.3rem; font-weight: 500; }
-  .entry__place { margin-block-start: 0.3rem; }
-  .entry__body { display: grid; gap: 0.8rem; color: var(--ink-2); }
-  .entry__tags { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.4rem; margin-block-start: 0.3rem; }
-  .entry__link { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
-  .entry__cert {
-    justify-self: start;
+  /* three columns: a step, the stalk, and across the stalk the step's date written large */
+  .stalk { --cane: 44px; margin-block-start: 1.5rem; }
+  .step {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--cane) minmax(0, 1fr);
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+    min-block-size: 13rem;
+  }
+  .step__cane { grid-column: 2; grid-row: 1; position: relative; }
+  .step__text { grid-row: 1; grid-column: 1; padding-block: 1.1rem 3.4rem; text-align: end; justify-self: end; max-inline-size: 34rem; }
+  .step__mark { grid-row: 1; grid-column: 3; padding-block-start: 0.5rem; align-self: start; }
+  .step--far .step__text { grid-column: 3; text-align: start; justify-self: start; }
+  .step--far .step__mark { grid-column: 1; text-align: end; }
+
+  /* ---- the stalk ---- */
+  .cane { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; }
+  /* (no non-scaling strokes here: a segment is stretched to its step's height, and a hair that is
+     painted by its dash must be measured in the same space it is drawn in) */
+  .cane path, .knot path, .fan path, .tuft path { stroke: var(--ink); }
+  /* the body of a segment is a pale wash between two dark edges; next year's shoot paler still */
+  .cane .wash { opacity: 0.55; }
+  .cane .wash path { stroke: var(--wash); }
+  .cane .shoot { opacity: 0.5; }
+  .cane .shoot path { stroke: var(--wash); }
+  .knot { position: absolute; inset-block-start: -6px; inset-inline: 0; inline-size: 100%; block-size: 12px; overflow: visible; }
+  /* the twig leaves the joint at the foot of this box (118 of its 130 units down) */
+  .fan { --fan: clamp(7.5rem, 11vw, 10.5rem); position: absolute; inset-block-start: calc(var(--fan) * -0.694); inset-inline-start: 66%; inline-size: var(--fan); max-inline-size: none; block-size: auto; overflow: visible; pointer-events: none; }
+  /* drawn reaching toward the end of the line; mirrored where the step is written toward its start */
+  .step--near .fan { inset-inline-start: auto; inset-inline-end: 66%; scale: -1 1; }
+  [dir='rtl'] .step--far .fan { scale: -1 1; }
+  [dir='rtl'] .step--near .fan { scale: 1 1; }
+  .tuft { position: absolute; inset-block-end: -30px; inset-inline-start: 50%; inline-size: 220px; max-inline-size: none; block-size: 70px; margin-inline-start: -110px; overflow: visible; pointer-events: none; }
+  .step:last-child { min-block-size: 9rem; }
+
+  /* painted as its step arrives: each hair is drawn along its length */
+  :global(.js) .step__cane path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  :global(.js) .step__cane:global(.is-in) path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.55, 0.05, 0.25, 1);
+    transition-delay: calc(var(--d) * 0.9s);
+  }
+  @media (prefers-reduced-motion: reduce) { :global(.js) .step__cane path { stroke-dashoffset: 0; } }
+  :global(.motion-off) .step__cane path { stroke-dashoffset: 0; transition: none; }
+
+  /* ---- the date, written large across the stalk ---- */
+  .step__mark {
+    font-size: var(--step-3);
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.05;
+    color: var(--rust);
+    opacity: 0.9;
+  }
+  :lang(ar) .step__mark { font-style: normal; line-height: 1.5; }
+  .step--next .step__mark { color: var(--muted); }
+
+  /* ---- the step ---- */
+  .step__group { margin-block-end: 0.9rem; }
+  .step__when { display: none; } /* the large date says it; shown where there is no room for that */
+  .step__org { font-family: var(--font-display); font-size: var(--step-3); font-weight: 600; line-height: 1; }
+  .step__role { color: var(--ink-2); margin-block-start: 0.45rem; font-weight: 500; }
+  .step__place { margin-block-start: 0.3rem; }
+  .step__body { display: grid; gap: 0.7rem; margin-block-start: 0.9rem; color: var(--ink-2); }
+  .step--next .step__body { font-family: var(--font-display); font-style: italic; font-size: var(--step-1); line-height: 1.4; color: var(--ink); }
+  :lang(ar) .step--next .step__body { font-style: normal; line-height: 1.8; }
+  .step__tags { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.4rem; margin-block-start: 0.9rem; justify-content: flex-end; }
+  .step--far .step__tags { justify-content: flex-start; }
+  .step__tags :global(.entry__link) { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
+  .step__cert {
+    margin-block-start: 1.1rem;
     padding: 0.35rem;
     border-radius: 4px;
     background: #fff;
@@ -120,11 +198,21 @@ const groups = [
     transform: rotate(-1.2deg);
     transition: transform 0.5s var(--ease-out);
   }
-  .entry__cert:hover, .entry__cert:focus-visible { transform: rotate(0) translateY(-4px); }
-  .entry__cert img { inline-size: clamp(180px, 22vw, 260px); block-size: auto; }
-  .entry__cert img[height='490'] { inline-size: clamp(120px, 11vw, 160px); } /* a portrait-format attestation */
-  @media (max-width: 960px) {
-    .path__group { grid-template-columns: 1fr; }
-    .entry { grid-template-columns: 1fr; }
+  .step--far .step__cert { transform: rotate(1.1deg); }
+  .step__cert:hover, .step__cert:focus-visible { transform: rotate(0) translateY(-4px); }
+  .step__cert img { inline-size: clamp(180px, 20vw, 250px); block-size: auto; }
+  .step__cert img[height='490'] { inline-size: clamp(120px, 10vw, 150px); } /* a portrait-format attestation */
+
+  /* ---- narrow screens: the stalk stands at the edge, every step beside it ---- */
+  @media (max-width: 860px) {
+    .stalk { --cane: 30px; }
+    .step, .step--far { grid-template-columns: var(--cane) minmax(0, 1fr); column-gap: 1.1rem; min-block-size: 9rem; }
+    .step__cane { grid-column: 1; }
+    .step__text, .step--far .step__text { grid-column: 2; text-align: start; justify-self: start; padding-block: 0.6rem 2.6rem; }
+    .step__mark, .step--far .step__mark { display: none; }
+    .step__when { display: block; margin-block-end: 0.5rem; color: var(--rust); }
+    .step__tags, .step--far .step__tags { justify-content: flex-start; }
+    .fan, .step--far .fan { display: none; } /* no room for leaves beside the words */
+    .tuft { inline-size: 150px; margin-inline-start: -75px; }
   }
 </style>

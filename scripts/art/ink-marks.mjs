@@ -82,11 +82,16 @@ write('roller', svg('0 0 100 24', paths(line(88, 12, { width: 7, bristles: 14, s
   write('sweep', svg('0 0 400 200', '<path d="M44 -6H300V206H44Z" fill="#000" stroke="none"/>' + hairs, { stretch: true, filter: fibre(0.011, 0.34, 7, 21) }));
 }
 
+// seal: the body of a carved name seal pressed on paper (the tools in Capabilities) — a block with
+// worn corners and an edge that did not take the ink evenly. (No chips inside it: at the size of a
+// word they read as stray full stops.)
+write('seal', svg('0 0 200 80', '<rect x="5" y="5" width="190" height="70" rx="7" fill="#000" stroke="none"/>', { stretch: true, filter: fibre(0.09, 0.11, 4.5, 31) }));
+
 // Bake every mark to a PNG alpha mask as well: an SVG with feTurbulence is re-rasterised by the
 // browser at every size it is used — measurable main-thread cost on pages with many marks.
 // CSS uses the PNGs; the SVGs stay as the editable source.
 import sharp from 'sharp';
-const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24], rod: [1200, 24], roller: [200, 48], sweep: [1600, 800] };
+const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24], rod: [1200, 24], roller: [200, 48], sweep: [1600, 800], seal: [400, 160] };
 // marks that are used upright are also baked turned a quarter clockwise (the stroke's start on top)
 const upright = { rod: ['rod', 1] };
 for (const [name, [w, h]] of Object.entries(bake)) {

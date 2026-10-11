@@ -67,6 +67,9 @@ void main(){
   vec2 d = vUv - uPoint; d.x *= uAspect;
   o = vec4(texture(uSrc, vUv).xyz + uValue * exp(-dot(d, d) / uRadius), 1.0);
 }`,
+  // ink in the shape of a picture the page sends (lettering): added wherever the picture is opaque
+  stamp: `uniform sampler2D uSrc; uniform sampler2D uStamp; uniform vec3 uValue;
+void main(){ o = vec4(texture(uSrc, vUv).xyz + uValue * texture(uStamp, vec2(vUv.x, 1.0 - vUv.y)).a, 1.0); }`,
   // ink on paper, for a layer that is multiplied onto the page: transparent where there is none
   show: `uniform sampler2D uDye; uniform vec2 uTexel;
 float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
@@ -92,6 +95,8 @@ export type InkEvent =
   | { move: { x: number; y: number; dx: number; dy: number; dt: number } }
   | { splash: { x: number; y: number } }
   | { stroke: { x0: number; y0: number; x1: number; y1: number; ms: number } }
+  // lettering, as a picture the size of the view: it turns to ink and lifts off the page
+  | { stamp: { picture: ImageBitmap; ink: number; lift: number; x0: number; y0: number; x1: number; y1: number } }
   | { scroll: number } // how far the page moved up, as a fraction of the view's height
   | { size: { w: number; h: number } }
   | { run: boolean };
@@ -288,6 +293,35 @@ export async function createInk(canvas: OffscreenCanvas, tick: Tick, cancel: (id
     }
   };
 
+  /** Lettering turns to ink where it stands, rises a little, and a few stray airs pull it into wisps. */
+  const stamp = (e: Extract<InkEvent, { stamp: unknown }>['stamp']) => {
+    const tex = gl.createTexture()!;
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, e.picture);
+    e.picture.close();
+    const { use, u } = programs.stamp;
+    for (const [field, value] of [[dye, [e.ink, 0, 0]], [velocity, [0, e.lift, 0]]] as [Pair, [number, number, number]][]) {
+      use();
+      gl.uniform1i(u.uSrc, bind(0, field.read));
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tex); gl.uniform1i(u.uStamp, 1);
+      gl.uniform3f(u.uValue, value[0], value[1], value[2]);
+      into(field.write);
+      field.swap();
+    }
+    gl.deleteTexture(tex);
+    const w = e.x1 - e.x0, h = e.y1 - e.y0;
+    // stray airs across the words pull the cloud apart into wisps
+    for (let i = 0; i < 16; i++) {
+      const a = Math.random() * Math.PI * 2, force = 45 + Math.random() * 70;
+      splat(velocity, e.x0 + Math.random() * w, e.y0 + Math.random() * h, [Math.cos(a) * force, Math.abs(Math.sin(a)) * force * 0.8, 0], 0.0011);
+    }
+  };
+
   let stroke: { x0: number; y0: number; x1: number; y1: number; ms: number; t0: number; at: number } | null = null;
   let last = 0;
   let touched = 0;
@@ -336,11 +370,12 @@ export async function createInk(canvas: OffscreenCanvas, tick: Tick, cancel: (id
     tell(e) {
       if ('size' in e) { allocate(e.size.w, e.size.h); stroke = null; return; }
       if ('run' in e) { allowed = e.run; if (!allowed) { running = false; cancel(raf); stroke = null; wipe(); } return; }
-      if (!allowed) return;
+      if (!allowed) { if ('stamp' in e) e.stamp.picture.close(); return; }
       if ('scroll' in e) { if (running) shift += e.scroll; return; }
       if ('move' in e) touch(e.move.x, e.move.y, e.move.dx, e.move.dy, e.move.dt);
       else if ('splash' in e) splash(e.splash.x, e.splash.y);
       else if ('stroke' in e) stroke = { ...e.stroke, t0: performance.now(), at: 0 };
+      else if ('stamp' in e) stamp(e.stamp);
       touched = performance.now();
       wake();
     },

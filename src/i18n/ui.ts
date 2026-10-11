@@ -84,6 +84,7 @@ export const ui = {
     education: { en: 'Education', fr: 'Formation', ar: 'التعليم' },
     competitions: { en: 'Competitions', fr: 'Compétitions', ar: 'المسابقات' },
     present: { en: 'present', fr: 'aujourd’hui', ar: 'الآن' },
+    next: { en: 'Next', fr: 'Ensuite', ar: 'بعد ذلك' },
   },
   credentials: {
     kicker: { en: 'Credentials', fr: 'Certifications', ar: 'الشهادات' },

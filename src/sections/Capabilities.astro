@@ -1,4 +1,9 @@
 ---
+// Capabilities as four hanging scrolls, side by side like paintings on a wall: each hangs from its
+// cord at its own height and a hair off true, unrolls when it arrives, and then the tools are
+// stamped onto it one by one — carved name seals in vermilion, each pressed at its own angle.
+// Under them, the languages they are written in, as a row of seals cut in outline.
+// (A seal's name is always read left to right, also on the Arabic page: "C#", not "#C".)
 import { path, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { capabilities, languagesSpoken } from '../content/capabilities';
@@ -6,26 +11,32 @@ import { projectBySlug } from '../content/projects';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
+// how each scroll hangs: a little off true, at its own height
+const hang = [{ tilt: -0.7, drop: 0.6 }, { tilt: 0.5, drop: 2.6 }, { tilt: -0.4, drop: 0 }, { tilt: 0.8, drop: 1.8 }];
+// a seal is never pressed quite straight
+const turn = (i: number, k: number) => (((i * 7 + k * 13) % 9) - 4) * 0.55;
 ---
 
-<section id="capabilities" class="section wrap" aria-labelledby="caps-title" data-tone="light" data-chapter-name={tr(ui.capabilities.kicker, lang)}>
-  <div class="scroll caps" data-unroll>
-    <header class="section-head">
-      <p class="kicker" data-reveal>{tr(ui.capabilities.kicker, lang)}</p>
-      <h2 id="caps-title" class="display" data-lines>{tr(ui.capabilities.title, lang)}</h2>
-    </header>
+<section id="capabilities" class="section wrap caps" aria-labelledby="caps-title" data-tone="light" data-chapter-name={tr(ui.capabilities.kicker, lang)}>
+  <header class="section-head caps__head">
+    <p class="kicker" data-reveal>{tr(ui.capabilities.kicker, lang)}</p>
+    <h2 id="caps-title" class="display" data-lines>{tr(ui.capabilities.title, lang)}</h2>
+  </header>
 
-    <ol class="caps__list">
-      {capabilities.map((c, i) => (
-        <li class="cap" data-reveal>
-          <span class="cap__n display">{String(i + 1).padStart(2, '0')}</span>
-          <div class="cap__head">
-            <h3 class="cap__name display">{tr(c.name, lang)}</h3>
-            <p class="cap__body">{tr(c.body, lang)}</p>
-          </div>
-          <div class="cap__tools">
-            <ul lang="en">{c.tools.map((t) => <li>{t}</li>)}</ul>
-            <p class="cap__proof label">
+  <ol class="wall">
+    {capabilities.map((c, i) => (
+      <li class="kake" style={`--tilt:${hang[i % 4].tilt}deg; --drop:${hang[i % 4].drop}rem; --i:${i}`} data-reveal-brush>
+        <svg class="kake__cord" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d="M3 33 L50 3 L97 33" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" /></svg>
+        <span class="kake__rod" aria-hidden="true"></span>
+        <div class="kake__sheet">
+          <div class="kake__paper">
+            <p class="kake__n display" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="kake__name display">{tr(c.name, lang)}</h3>
+            <p class="kake__body">{tr(c.body, lang)}</p>
+            <ul class="seals" lang="en">
+              {c.tools.map((t, k) => <li class="seal" dir="ltr" style={`--r:${turn(i, k)}deg; --k:${k}`}>{t}</li>)}
+            </ul>
+            <p class="kake__proof label">
               {tr(ui.capabilities.usedIn, lang)}{' '}
               {c.proof.map((slug, j) => {
                 const p = projectBySlug(slug)!;
@@ -33,22 +44,133 @@ const { lang } = Astro.props;
               })}
             </p>
           </div>
-        </li>
-      ))}
-    </ol>
-    <p class="caps__langs label" data-reveal lang="en">{languagesSpoken.join('  ·  ')}</p>
-  </div>
+          <span class="kake__rod kake__rod--foot" aria-hidden="true"></span>
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <ul class="tongues" lang="en" data-reveal>
+    {languagesSpoken.map((l, k) => <li class="seal seal--cut" dir="ltr" style={`--r:${turn(5, k) * 0.7}deg`}>{l}</li>)}
+  </ul>
 </section>
 
 <style>
-  .caps__list { border-block-start: 1px solid var(--line); }
-  .cap { display: grid; grid-template-columns: 3.5rem minmax(0, 5fr) minmax(0, 6fr); gap: var(--gutter); padding-block: 2rem; border-block-end: 1px solid var(--line); align-items: start; }
-  .cap__n { font-size: 2.2rem; line-height: 1; color: var(--seal); font-weight: 500; }
-  .cap__name { font-size: var(--step-3); font-weight: 600; }
-  .cap__body { color: var(--muted); margin-block-start: 0.5rem; max-inline-size: 26rem; }
-  .cap__tools ul { display: flex; flex-wrap: wrap; gap: 0.35rem 1.2rem; font-size: var(--step-1); font-weight: 500; }
-  .cap__proof { margin-block-start: 1rem; }
-  .cap__proof a { color: var(--rust); font-weight: 600; }
-  .caps__langs { margin-block-start: 1.8rem; white-space: pre-wrap; }
-  @media (max-width: 900px) { .cap { grid-template-columns: 1fr; gap: 0.8rem; } }
+  .caps__head h2 { font-size: var(--step-4); max-inline-size: 20ch; }
+  .caps__head { position: relative; }
+  .caps__head::before {
+    /* a soft wash of paper so the heading never fights the painting */
+    content: '';
+    position: absolute;
+    inset: -20% -10% -30% -12%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgb(246 241 229 / 0.94), rgb(246 241 229 / 0));
+    pointer-events: none;
+  }
+
+  /* ---- the wall ---- */
+  .wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1rem, 2.2vw, 2.4rem); align-items: start; margin-block-start: 3.2rem; padding-inline: 0.6rem; }
+  .kake {
+    position: relative;
+    margin-block-start: var(--drop);
+    rotate: var(--tilt);
+    transform-origin: 50% -2.2rem; /* it turns about the nail it hangs from */
+    transition: rotate 1.6s var(--ease-out);
+  }
+  /* a hand passing by sets it swinging the other way, gently */
+  .kake:hover { rotate: calc(var(--tilt) * -0.7); }
+  .kake__cord { display: block; inline-size: 62%; block-size: 2.2rem; margin-inline: auto; color: var(--wash-deep); overflow: visible; }
+  .kake__rod {
+    position: relative;
+    z-index: 1;
+    display: block;
+    block-size: 0.72rem;
+    margin-inline: -0.55rem;
+    background: var(--ink);
+    -webkit-mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+    mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+  }
+  .kake__sheet { position: relative; margin-block-start: -0.3rem; padding-block-end: 0.5rem; }
+  .kake__paper {
+    position: relative;
+    padding: 1.7rem 1.25rem 2rem;
+    background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f9f4e6 9%, #f7f1e3 91%, #e9dfc7);
+    box-shadow: 0 26px 46px -28px rgb(40 36 30 / 0.6), 0 2px 6px -3px rgb(40 36 30 / 0.25);
+  }
+  .kake__paper::before {
+    /* the mounting: a hairline of saffron silk just inside each long edge */
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline: 4px;
+    border-inline: 1px solid transparent;
+    border-image: linear-gradient(180deg, var(--saffron), var(--amber) 60%, var(--rust)) 1;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .kake__rod--foot { position: absolute; inset-inline: 0; inset-block-end: 0; margin-inline: -0.7rem; block-size: 0.8rem; }
+
+  .kake__n { font-size: 2.4rem; font-style: italic; font-weight: 500; line-height: 0.9; color: var(--seal); }
+  .kake__name { margin-block-start: 0.7rem; font-size: var(--step-2); font-weight: 600; line-height: 1.08; }
+  :lang(ar) .kake__name { line-height: 1.5; }
+  .kake__body { margin-block-start: 0.6rem; color: var(--ink-2); font-size: var(--step--1); line-height: 1.55; }
+  .kake__proof { margin-block-start: 1.3rem; line-height: 1.7; }
+  .kake__proof a { color: var(--rust); font-weight: 600; }
+
+  /* ---- seals ---- */
+  .seals { display: flex; flex-wrap: wrap; gap: 0.5rem 0.4rem; margin-block-start: 1.3rem; }
+  .seal {
+    position: relative;
+    isolation: isolate;
+    padding: 0.52em 0.74em 0.44em;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    line-height: 1.12;
+    color: #fdf6e7;
+    rotate: var(--r, 0deg);
+  }
+  .seal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--seal);
+    -webkit-mask: url('/ink/seal.png') center / 100% 100% no-repeat;
+    mask: url('/ink/seal.png') center / 100% 100% no-repeat;
+  }
+  /* cut in outline: the letters and the frame take the ink, the ground stays paper */
+  .seal--cut { color: var(--seal); font-size: 0.8rem; padding: 0.5em 0.8em 0.42em; }
+  .seal--cut::before { background: none; -webkit-mask: none; mask: none; border: 1.6px solid var(--seal); border-radius: 3px 4px 3px 5px; opacity: 0.85; }
+  .tongues { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem 0.75rem; margin-block-start: 3rem; }
+
+  /* ---- arriving: the scroll unrolls, then the seals are pressed on, one after another ---- */
+  @property --roll { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
+  :global(.js) .kake { --roll: 100%; }
+  :global(.js) .kake:global(.is-in) { --roll: 0%; transition: --roll 1.15s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--i) * 150ms), rotate 1.6s var(--ease-out); }
+  .kake__paper { clip-path: inset(0 0 var(--roll) 0); }
+  .kake__rod--foot { inset-block-end: var(--roll); }
+  :global(.js) .kake .seal { opacity: 0; scale: 1.55; }
+  :global(.js) .kake:global(.is-in) .seal {
+    opacity: 1;
+    scale: 1;
+    transition: opacity 0.1s linear, scale 0.3s cubic-bezier(0.2, 1.5, 0.4, 1);
+    transition-delay: calc(0.95s + var(--i) * 150ms + var(--k) * 80ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .kake { --roll: 0%; }
+    :global(.js) .kake .seal { opacity: 1; scale: 1; }
+  }
+  :global(.motion-off) .kake { --roll: 0%; transition: none; }
+  :global(.motion-off) .kake .seal { opacity: 1; scale: 1; transition: none; }
+
+  @media (max-width: 1100px) {
+    .wall { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2.6rem; }
+  }
+  @media (max-width: 620px) {
+    .wall { grid-template-columns: 1fr; padding-inline: 0.4rem; }
+    .kake { margin-block-start: 0; rotate: calc(var(--tilt) * 0.5); }
+    .kake:hover { rotate: calc(var(--tilt) * 0.5); }
+    .kake__cord { inline-size: 44%; }
+  }
 </style>
