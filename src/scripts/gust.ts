@@ -134,8 +134,12 @@ export function initGust({ trigger, dialog, canvas, onOpened, onClosing }: Optio
       for (const n of ['uRes', 'uTime', 'uCenter', 'uR0', 'uFar', 'uOpen', 'uPhase', 'uFade', 'uK']) u[n] = gl.getUniformLocation(prog, n);
       return true;
     })());
-  trigger.addEventListener('pointerenter', prepare, { once: true });
-  trigger.addEventListener('focus', prepare, { once: true });
+  // …but never inside the event itself: creating the WebGL context takes ~150 ms of main thread,
+  // which held back the gate's own hover. It now waits for an idle moment just after.
+  const idle: (f: () => void) => void = (window as any).requestIdleCallback ?? ((f) => setTimeout(f, 120));
+  const soon = () => idle(() => { prepare(); });
+  trigger.addEventListener('pointerenter', soon, { once: true });
+  trigger.addEventListener('focus', soon, { once: true });
 
   // geometry: the gate's centre and radius, in canvas pixels (GL: y up)
   const measure = () => {
