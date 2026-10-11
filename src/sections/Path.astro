@@ -1,7 +1,7 @@
 ---
 // The path, as a road: one pale-gold stroke of a loaded brush winding down a night-dark hanging
 // scroll (lib/road.ts) — a hair in the far distance at the top, where the way leads next, and
-// broad at the foot, where it began. The road makes a bend for every step, and the step is written
+// broad at the foot, where the brush runs dry. The road makes a bend for every step, and the step is written
 // in the hollow of its bend, facing a landmark that stands outside it: a pavilion, karst rocks, a
 // pine, each on its own rise of ground that runs into the road's edge (scripts/art/road-marks.mjs).
 // A walker and two riders are on the road. The steps keep their three groups (work, competitions,
@@ -13,7 +13,7 @@ import { ui } from '../i18n/ui';
 import { experience, education, competitions, type Entry } from '../content/path';
 import { competitionCertificate, internshipCertificate } from '../content/credentials';
 import { profile } from '../content/profile';
-import { road } from '../lib/road';
+import { road, swing, slope } from '../lib/road';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
@@ -47,6 +47,35 @@ const bends = road(steps.length);
 const landmarks: [string, number][] = [['peaks', 9], ['pavilion', 14], ['pine', 15], ['rocks', 18], ['pine', 18], ['pavilion', 20], ['rocks', 22]];
 // who is on the road: which bend, how far down it, how wide beside the road's own width
 const folk = [{ bend: 4, t: 0.9, who: 'riders', span: 1.5 }, { bend: 5, t: 0.36, who: 'walker', span: 0.44 }];
+
+// ---- the road is painted as the page is scrolled (wide screens; the rules are in the stylesheet below)
+// The brush's tip keeps to one level of the screen, so the stroke has to be drawn out faster where
+// the road runs across the page than where it runs down it (`slope`: how many times faster, where
+// it crosses the middle — measured in the road's own box, as the hairs' lengths are).
+const STEPS = 8;
+const drawn = [0];
+for (let k = 1; k <= STEPS; k++) {
+  let sum = 0;
+  for (let q = 0; q < 40; q++) sum += Math.hypot(1, slope * Math.cos((Math.PI * (k - 1 + (q + 0.5) / 40)) / STEPS));
+  drawn.push(drawn[k - 1] + sum / 40 / STEPS);
+}
+// a hair is one dash, 3 long, on a line never longer than 2.3: offset by 3 it is all still to paint
+const paint = (name: string, end: number) =>
+  `@keyframes ${name}{${drawn.map((d, k) => `${((k / STEPS) * 100).toFixed(1)}%{stroke-dashoffset:calc(${(3 - (k === STEPS ? end : d / drawn[STEPS] - 0.04)).toFixed(4)} - var(--lead))}`).join('')}}`;
+// the brush itself: from the middle out to a bend and back is a sine — eased out, then in
+const half = steps.length * 2;
+const brushX = Array.from({ length: half + 1 }, (_, k) =>
+  `${((k / half) * 100).toFixed(3)}%{transform:translateX(${k % 2 ? (bends[(k - 1) / 2].side * swing).toFixed(1) : 0}%);animation-timing-function:${k % 2 ? 'cubic-bezier(0.12,0,0.39,0)' : 'cubic-bezier(0.61,1,0.88,1)'}}`).join('');
+// it leans the way the road is going (LEAN: the same slope as it is on the screen, at the
+// proportions the chapter usually has), and bears down harder (comes closer) as the road widens
+const LEAN = 1.75;
+const turns = steps.length * 8;
+const brushLean = Array.from({ length: turns + 1 }, (_, k) => {
+  const bend = Math.min(steps.length - 1, Math.floor(k / 8));
+  const lean = (-bends[bend].side * Math.atan(LEAN * Math.cos(Math.PI * (k / 8 - bend))) * 180) / Math.PI;
+  return `${((k / turns) * 100).toFixed(3)}%{rotate:${lean.toFixed(1)}deg;scale:${(0.5 + 0.7 * (k / turns)).toFixed(3)}}`;
+}).join('');
+const paintCss = `${paint('road-paint', 1.08)}${paint('road-paint-out', 2.4)}@keyframes road-brush-x{${brushX}}@keyframes road-brush-lean{${brushLean}}`;
 ---
 
 <section id="path" class="section wrap" aria-labelledby="path-title" data-tone="light" data-chapter-name={tr(ui.nav.path, lang)}>
@@ -59,59 +88,85 @@ const folk = [{ bend: 4, t: 0.9, who: 'riders', span: 1.5 }, { bend: 5, t: 0.36,
           <h2 id="path-title" class="sr-only">{tr(ui.path.kicker, lang)}</h2>
         </header>
 
-        <ol class="road">
-          {steps.map((s, i) => {
-            const b = bends[i];
-            const [mark, size] = landmarks[i % landmarks.length];
-            const apex = b.at(0.5);
-            // the landmark stands outside the bend, and the rise of ground under it runs into the
-            // road's edge (the far peaks stand off on their own)
-            const markX = apex.x + b.side * (b.width(0.5) / 2 + size / 2 + (s.next ? 2.5 : -2.2));
-            const here = folk.filter((p) => p.bend === i);
-            return (
-              <li class:list={['bend', b.side < 0 ? 'bend--out' : 'bend--back', s.next && 'bend--next']}>
-                <div class="bend__road" aria-hidden="true" data-reveal-brush>
-                  {(['wide', 'narrow'] as const).map((kind) => (
-                    <svg class:list={['lane', `lane--${kind}`]} viewBox={kind === 'wide' ? '0 0 1000 300' : '0 0 64 300'} preserveAspectRatio="none">
+        <div class="way">
+          <ol class="road">
+            {steps.map((s, i) => {
+              const b = bends[i];
+              const [mark, size] = landmarks[i % landmarks.length];
+              const apex = b.at(0.5);
+              // the landmark stands outside the bend, and the rise of ground under it runs into the
+              // road's edge (the far peaks stand off on their own)
+              const markX = apex.x + b.side * (b.width(0.5) / 2 + size / 2 + (s.next ? 2.5 : -2.2));
+              const here = folk.filter((p) => p.bend === i);
+              return (
+                <li class:list={['bend', b.side < 0 ? 'bend--out' : 'bend--back', s.next && 'bend--next']}>
+                  <div class="bend__road" aria-hidden="true" data-reveal-brush>
+                    <svg class="lane lane--wide" viewBox="0 0 1000 300" preserveAspectRatio="none">
                       {/* the far end is not travelled yet: it comes out of the dark */}
-                      {s.next && <linearGradient id={`road-far-${kind}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d7a1" stop-opacity="0.12" /><stop offset="1" stop-color="#f0d7a1" /></linearGradient>}
-                      <path class="lane__ink" d={b[kind].body} style={s.next ? `fill:url(#road-far-${kind})` : undefined} />
-                      {b[kind].tail.map((d) => <path class="lane__ink" d={d} />)}
-                      {b[kind].dry.map((d) => <path class="lane__dry" d={d} />)}
+                      {s.next && <linearGradient id="road-far-wide" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="300"><stop offset="0" stop-color="#37312a" /><stop offset="1" stop-color="#f0d7a1" /></linearGradient>}
+                      {/* the bend's finished shape: what it is at rest, and what trims the hairs while it is painted */}
+                      <clipPath id={`road-shape-${i}`}><path d={b.wide.body} />{b.wide.tail.map((d) => <path d={d} />)}</clipPath>
+                      <g class="lane__whole" style={s.next ? 'fill:url(#road-far-wide)' : undefined}>
+                        <path d={b.wide.body} />
+                        {b.wide.tail.map((d) => <path d={d} />)}
+                      </g>
+                      <g class:list={['lane__hairs', i === steps.length - 1 && 'lane__hairs--out']} stroke-width={b.strands.thick} clip-path={`url(#road-shape-${i})`} style={s.next ? 'stroke:url(#road-far-wide)' : undefined}>
+                        {b.strands.hairs.map((h) => <path d={h.d} pathLength={h.length.toFixed(4)} style={`--lead:${h.lead}`} />)}
+                      </g>
+                      {b.wide.dry.map((d) => <path class="lane__dry" d={d} />)}
                     </svg>
-                  ))}
-                  <span class:list={['mark', `mark--${mark}`]} style={`--x:${markX.toFixed(1)}%; --w:${size}%`}></span>
-                  {here.map((p) => {
-                    const at = b.at(p.t);
-                    // they travel up the road, toward what comes next
-                    const faces = p.t < 0.5 ? -b.side : b.side;
-                    return <span class:list={['folk', `folk--${p.who}`, faces < 0 && 'folk--turned']} style={`--x:${at.x.toFixed(1)}%; --y:${at.y.toFixed(1)}%; --w:${(b.width(p.t) * p.span).toFixed(2)}%`}></span>;
-                  })}
-                </div>
-
-                <div class="bend__text" data-reveal>
-                  {s.group && <p class="bend__group kicker">{tr(s.group, lang)}</p>}
-                  <p class="bend__when display">{s.next ? s.mark : <time>{s.mark}</time>}</p>
-                  {s.org && <h3 class="bend__org">{s.org}</h3>}
-                  {s.role && <p class="bend__role">{s.role}</p>}
-                  {s.place && <p class="bend__place label">{s.place}</p>}
-                  {s.body.length > 0 && <div class="bend__body">{s.body.map((p) => <p>{p}</p>)}</div>}
-                  {(s.tags || s.link) && (
-                    <p class="bend__tags">
-                      {s.tags?.map((t) => <span class="pill">{t}</span>)}
-                      {s.link && <a class="link-u entry__link" href={s.link.href} target="_blank" rel="noopener">{s.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
-                    </p>
-                  )}
-                  {s.cert && (
-                    <button class="bend__cert" type="button" data-lightbox data-group={s.cert.group} data-src={s.cert.src} data-title={s.cert.title} data-meta={s.cert.meta} aria-label={`${tr(ui.credentials.view, lang)}: ${s.cert.title}`}>
-                      <img src={s.cert.thumb} width={s.cert.w} height={s.cert.h} alt="" loading="lazy" decoding="async" />
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+                    <svg class="lane lane--narrow" viewBox="0 0 64 300" preserveAspectRatio="none">
+                      {s.next && <linearGradient id="road-far-narrow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#37312a" /><stop offset="1" stop-color="#f0d7a1" /></linearGradient>}
+                      <path class="lane__ink" d={b.narrow.body} style={s.next ? 'fill:url(#road-far-narrow)' : undefined} />
+                      {b.narrow.tail.map((d) => <path class="lane__ink" d={d} />)}
+                    </svg>
+                    <span class:list={['mark', `mark--${mark}`]} style={`--x:${markX.toFixed(1)}%; --w:${size}%`}></span>
+                    {here.map((p) => {
+                      const at = b.at(p.t);
+                      // they travel up the road, toward what comes next
+                      const faces = p.t < 0.5 ? -b.side : b.side;
+                      return <span class:list={['folk', `folk--${p.who}`, faces < 0 && 'folk--turned']} style={`--x:${at.x.toFixed(1)}%; --y:${at.y.toFixed(1)}%; --w:${(b.width(p.t) * p.span).toFixed(2)}%`}></span>;
+                    })}
+                  </div>
+  
+                  <div class="bend__text" data-reveal>
+                    {s.group && <p class="bend__group kicker">{tr(s.group, lang)}</p>}
+                    <p class="bend__when display">{s.next ? s.mark : <time>{s.mark}</time>}</p>
+                    {s.org && <h3 class="bend__org">{s.org}</h3>}
+                    {s.role && <p class="bend__role">{s.role}</p>}
+                    {s.place && <p class="bend__place label">{s.place}</p>}
+                    {s.body.length > 0 && <div class="bend__body">{s.body.map((p) => <p>{p}</p>)}</div>}
+                    {(s.tags || s.link) && (
+                      <p class="bend__tags">
+                        {s.tags?.map((t) => <span class="pill">{t}</span>)}
+                        {s.link && <a class="link-u entry__link" href={s.link.href} target="_blank" rel="noopener">{s.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
+                      </p>
+                    )}
+                    {s.cert && (
+                      <button class="bend__cert" type="button" data-lightbox data-group={s.cert.group} data-src={s.cert.src} data-title={s.cert.title} data-meta={s.cert.meta} aria-label={`${tr(ui.credentials.view, lang)}: ${s.cert.title}`}>
+                        <img src={s.cert.thumb} width={s.cert.w} height={s.cert.h} alt="" loading="lazy" decoding="async" />
+                      </button>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+          <div class="painter" aria-hidden="true">
+            <div class="painter__x">
+              <svg class="painter__tool" viewBox="0 0 64 300">
+                <linearGradient id="road-brush-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d7a1" /><stop offset="0.42" stop-color="#8d7440" /><stop offset="1" stop-color="#211c14" /></linearGradient>
+                <path d="M32 0C22 22 13 44 15 72H49C51 44 42 22 32 0Z" fill="url(#road-brush-hair)" />
+                <path d="M32 6C29 28 25 48 24 70M32 6C35 28 39 48 40 70M32 4V70" fill="none" stroke="#14110c" stroke-opacity="0.45" stroke-width="1.2" />
+                <path d="M13 70H51V86H13Z" fill="#b08a3c" stroke="#2a1f10" stroke-width="2" />
+                <path d="M19 86H45L42 292Q32 300 22 292Z" fill="#d2b47a" stroke="#2a1f10" stroke-width="2" stroke-linejoin="round" />
+                <path d="M20 140H44M21 198H43M22 252H42" fill="none" stroke="#2a1f10" stroke-opacity="0.7" stroke-width="2" />
+                <path d="M26 92V286" fill="none" stroke="#fff6d8" stroke-opacity="0.45" stroke-width="3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <style is:inline set:html={paintCss}></style>
       </div>
     </div>
     <div class="night__foot" aria-hidden="true"><span class="night__rod night__rod--foot"></span></div>
@@ -168,6 +223,13 @@ const folk = [{ bend: 4, t: 0.9, who: 'riders', span: 1.5 }, { bend: 5, t: 0.36,
   .night__rod--foot { inset-block-start: auto; inset-block-end: -0.55rem; block-size: 1.1rem; inset-inline: -0.9rem; }
 
   /* ---- the road ---- */
+  .way { position: relative; }
+  /* the brush that paints it (only where the road is painted as you scroll, below): a sheet as large
+     as the road whose foot is at the brush's tip, a slide for the tip to run sideways on, the brush */
+  .painter { position: absolute; inset: 0; z-index: 2; pointer-events: none; display: none; }
+  :global([dir='rtl']) .painter { scale: -1 1; }
+  .painter__x { position: absolute; inset-inline: 0; inset-block-end: 0; block-size: 0; }
+  .painter__tool { position: absolute; left: 50%; top: -2px; inline-size: 3.4rem; block-size: auto; max-inline-size: none; translate: -50% 0; transform-origin: 50% 0; overflow: visible; }
   /* every bend is as tall as the tallest step: stretched alike, the pieces of the road run into
      one another without a kink, and the bends keep one rhythm */
   .road { position: relative; display: grid; grid-auto-rows: 1fr; margin-block-start: 1rem; }
@@ -177,6 +239,11 @@ const folk = [{ bend: 4, t: 0.9, who: 'riders', span: 1.5 }, { bend: 5, t: 0.36,
   .lane { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: 100%; block-size: calc(100% + 1px); max-inline-size: none; overflow: visible; }
   .lane--narrow { display: none; }
   .lane__ink { fill: var(--gold); }
+  /* the wide road at rest: its one finished shape; and again as a few broad hairs (lib/road.ts)
+     for painting it, each hair a dash far longer than its line (so it is whole) */
+  .lane__whole { fill: var(--gold); }
+  .lane__hairs { display: none; fill: none; stroke: var(--gold); stroke-linecap: round; stroke-linejoin: round; }
+  .lane__hairs path { stroke-dasharray: 3; --lead: 0; }
   /* where the brush ran dry the silk shows through between its hairs */
   .lane__dry { fill: none; stroke: #15130f; stroke-opacity: 0.8; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
   /* in Arabic the road is the mirror of itself, as the page is */
@@ -269,14 +336,41 @@ const folk = [{ bend: 4, t: 0.9, who: 'riders', span: 1.5 }, { bend: 5, t: 0.36,
       :global(html.js) .night__foot { animation: night-window linear both; }
       :global(html.js) .night__sheet { pointer-events: auto; animation: night-silk linear both; }
       :global(html.js) .night .night__window, :global(html.js) .night .night__foot, :global(html.js) .night .night__sheet { animation-timeline: --night; animation-range: cover 12vh cover calc(100% - 88vh); }
-      /* the roller uncovers the road; it need not paint itself as well */
+      /* the roller uncovers the silk; a little above it a brush paints the road onto it, as far as
+         the page has been scrolled. Its tip keeps to one level of the screen (62 % down).
+         The brush is moved by transform (the compositor). The hairs are drawn out by
+         stroke-dashoffset, which is painted on the main thread — so only the one bend the brush
+         is in is ever animated (the script below says which: the bends above it are their
+         finished shape, those below are bare). */
       :global(html.js) .night .bend__road .lane { clip-path: none; transition: none; }
+      :global(html.js:not(.motion-off)) .night .bend { view-timeline: --bend block; view-timeline-inset: 0px; }
+      :global(html.js:not(.motion-off)) .night .bend:global(.is-bare) .lane--wide { visibility: hidden; }
+      /* (every bend keeps a layer of its own, so that taking up the brush or setting it down in a
+         bend makes and unmakes nothing: only that bend is drawn again) */
+      :global(html.js:not(.motion-off)) .night .lane--wide { will-change: transform; }
+      :global(html.js:not(.motion-off)) .night .bend:global(.is-painting) .lane__whole { display: none; }
+      :global(html.js:not(.motion-off)) .night .bend:global(.is-painting) .lane__hairs { display: inline; }
+      :global(html.js:not(.motion-off)) .night .bend:global(.is-painting) .lane__hairs path { animation: road-paint linear both; }
+      :global(html.js:not(.motion-off)) .night .bend:global(.is-painting) .lane__hairs--out path { animation-name: road-paint-out; }
+      :global(html.js:not(.motion-off)) .night .road .bend:global(.is-painting) .lane__hairs path { animation-timeline: --bend; animation-range: cover 38vh cover calc(100% - 62vh); }
+      :global(html.js:not(.motion-off)) .night .way { view-timeline: --way block; view-timeline-inset: 0px; }
+      :global(html.js:not(.motion-off)) .night .painter { display: block; animation: road-brush-y linear both; }
+      :global(html.js:not(.motion-off)) .night .painter__x { animation: road-brush-x linear both; }
+      :global(html.js:not(.motion-off)) .night .painter__tool { animation: road-brush-lean linear both; }
+      :global(html.js:not(.motion-off)) .night .way :is(.painter, .painter__x, .painter__tool) { animation-timeline: --way; animation-range: cover 38vh cover calc(100% - 62vh); }
+      /* what stands by the road, and who is on it, appear as the brush comes level with them */
+      :global(html.js:not(.motion-off)) .night .bend:global(.is-bare) :is(.mark, .folk) { opacity: 0; }
+      :global(html.js:not(.motion-off)) .night .bend:global(.is-painting) :is(.mark, .folk) { animation: road-arrive linear both; }
+      :global(html.js:not(.motion-off)) .night .road .bend:global(.is-painting) :is(.mark, .folk) { animation-timeline: view(); animation-range: cover 34vh cover 46vh; }
       /* what the keyboard reaches must come out from under the roller */
       :global(html.js) .night :is(a, button) { scroll-margin-block-end: 18vh; }
     }
   }
   :global(html.motion-off) .night :is(.night__window, .night__foot, .night__sheet) { animation: none; }
   :global(html.motion-off) .night .night__window { overflow: visible; }
+  @keyframes road-arrive { from { opacity: 0; } }
+  /* (lifted off the silk at the end of the stroke) */
+  @keyframes road-brush-y { from { transform: translateY(-100%); } 97% { opacity: 1; } to { transform: none; opacity: 0; } }
 
   /* ---- narrow screens: the road keeps to the margin, every step beside it, as tall as its own text ---- */
   @media (max-width: 999px) {
@@ -289,3 +383,28 @@ const folk = [{ bend: 4, t: 0.9, who: 'riders', span: 1.5 }, { bend: 5, t: 0.36,
     .bend--out .bend__text, .bend--back .bend__text { grid-column: 2; justify-self: start; padding-inline: 0.9rem 0; padding-block: 0.9rem 2.4rem; max-inline-size: none; }
   }
 </style>
+
+<script>
+  // Which bend is the brush in? Its tip is 62 % down the screen: the bend that level falls in is
+  // being painted, the bends below it are still bare silk, those above are done. Worked out from
+  // where the road is (never from what was seen on the way: the page can be thrown from one end to
+  // the other in a single step), once a frame, and only while the road is near the screen.
+  const road = document.querySelector<HTMLElement>('.road');
+  if (road && 'IntersectionObserver' in window && CSS.supports('animation-timeline: view()')) {
+    const bends = [...road.querySelectorAll('.bend')];
+    let queued = 0;
+    const place = () => {
+      queued = 0;
+      const box = road.getBoundingClientRect();
+      const at = Math.floor(((innerHeight * 0.62 - box.top) / box.height) * bends.length);
+      bends.forEach((b, i) => { b.classList.toggle('is-painting', i === at); b.classList.toggle('is-bare', i > at); });
+    };
+    const soon = () => { queued ||= requestAnimationFrame(place); };
+    new IntersectionObserver(([e]) => {
+      place();
+      if (e.isIntersecting) addEventListener('scroll', soon, { passive: true });
+      else removeEventListener('scroll', soon);
+    }, { rootMargin: '100% 0px' }).observe(road);
+    addEventListener('resize', soon);
+  }
+</script>

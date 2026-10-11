@@ -75,15 +75,64 @@ function piece(s: Shape, index: number, count: number, side: number): Piece {
   return { body, tail, dry };
 }
 
+/** One hair of the brush: the line it draws, how long that line is against the bend's own length
+    (it starts a little before the bend and, on the last one, runs on past the end), and how far
+    ahead of the others its tip travels. */
+export type Hair = { d: string; length: number; lead: number };
+
+/** The same stroke as a few broad hairs of the brush that made it, side by side — so that it can
+    be painted: each hair is drawn out along its length as the page is scrolled, a little ahead of
+    or behind its neighbours, and the leading edge of the stroke is the ragged edge of a brush.
+    Together they cover the shape of `piece()` and more; the page trims them to that shape, so a
+    bend looks the same painted hair by hair as drawn in one. Few hairs, few points: every one is
+    drawn again on each frame of the painting. */
+function strands(s: Shape, index: number, count: number, side: number): { hairs: Hair[]; thick: number } {
+  const N = 14;
+  const n = 7;
+  const last = index === count - 1;
+  const cuts = Array.from({ length: N + 1 }, (_, k) => slice(s, index, count, side, k / N));
+  const thick = (2 * Math.max(cuts[0].w, cuts[N].w) * 1.9) / n; // they overlap by half or more
+  const r = seeded(11 + index * 7);
+  const heading = (c: (typeof cuts)[number]) => { const len = Math.hypot(c.dx, BOX); return [c.dx / len, BOX / len]; };
+  const [sx, sy] = heading(cuts[0]);
+  const [ex, ey] = heading(cuts[N]);
+  const before = 34; // enough to fill the corners where the bend begins
+  const beyond = last ? cuts[N].w * 7.2 : 0; // on the last bend, as far as its longest hair runs out
+  const hairs: Hair[] = [];
+  for (let j = 0; j < n; j++) {
+    const lane = -1 + (2 * j) / (n - 1);
+    const pts = cuts.map((c) => [c.x + lane * Math.max(0, 1 - (0.7 * thick) / 2 / c.w) * c.reach, c.y]);
+    let along = 0;
+    for (let k = 1; k < pts.length; k++) along += Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]);
+    pts.unshift([pts[0][0] - sx * before, pts[0][1] - sy * before]);
+    if (last) pts.push([pts[pts.length - 1][0] + ex * beyond, pts[pts.length - 1][1] + ey * beyond]);
+    hairs.push({
+      d: 'M' + pts.map(([x, y]) => `${f(x)} ${f(y)}`).join('L'),
+      length: (along + before + beyond) / along,
+      // (the stretch before the bend counts as already painted; a hair's round end reaches half
+      // its thickness further than its line does)
+      lead: Math.round((before / along + r() * 0.03 - thick / 2 / along) * 1000) / 1000,
+    });
+  }
+  return { hairs, thick: Math.round(thick * 100) / 100 };
+}
+
 export type Bend = {
   side: -1 | 1;
   wide: Piece;
   narrow: Piece;
+  /** The wide stroke again, hair by hair, for painting it. */
+  strands: { hairs: Hair[]; thick: number };
   /** Where the middle of the road is, `t` of the way down this bend: percentages of the bend's box. */
   at(t: number): { x: number; y: number };
   /** The road's whole width at that point, as a percentage of the box's width. */
   width(t: number): number;
 };
+
+/** How far the road swings to either side of the middle, as a percentage of its box's width. */
+export const swing = WIDE.swing / 10;
+/** How many times faster the road runs sideways than down where it crosses the middle, in its own box. */
+export const slope = (Math.PI * WIDE.swing) / BOX;
 
 export function road(count: number): Bend[] {
   return Array.from({ length: count }, (_, i) => {
@@ -92,6 +141,7 @@ export function road(count: number): Bend[] {
       side,
       wide: piece(WIDE, i, count, side),
       narrow: piece(NARROW, i, count, side),
+      strands: strands(WIDE, i, count, side),
       at: (t: number) => ({ x: (WIDE.mid + side * WIDE.swing * Math.sin(Math.PI * t)) / 10, y: t * 100 }),
       width: (t: number) => (half(WIDE, (i + t) / count) * 2) / 10,
     };
