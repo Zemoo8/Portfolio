@@ -2,7 +2,18 @@
 
 Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro preview`; Chromium via Playwright 1.61 (headless; GPU via ANGLE/D3D11 for WebGL); Lighthouse 12 (mobile, simulated throttling).
 
-## Round 6 — 2026-10-11: Path as a road on an unrolling scroll, Capabilities as hanging scrolls (latest)
+## Round 7 — 2026-10-11: a folding screen, a handscroll, a night at the road's end (latest)
+
+Three more chapters laid out again, for Ahmed to choose from. (A fourth experiment — the road painted by a brush as the page scrolls — was built, measured and withdrawn at his word; it is in the branch's history.)
+
+| Area | Result |
+|---|---|
+| Behaviour | Handscroll: opens fully, the first certificate rests clear of the roller (134 px against 93), arrows / filters / drag / lightbox work, the rollers follow the reading (`--roll`). Folding screen: leaves lean ±4.4° alternately and the writing on them measures 0.00° off level; repository links and "All repositories" take clicks. Contact: address, CV and links take clicks; the longest line of words ends 160 px short of the picture |
+| Layout | No sideways scrolling in any of the three at 390, 1024 and 1536 wide, English and Arabic (the screen and the night scene are mirrored with the page) |
+| Scrolling, returning visitor | Late frames (> 20 ms) at a reading pace: Credentials 11 of 77, More 5 of 67, Contact 4 of 152 — all while the handscroll is drawn open or the screen unfolds; none of those over 34 ms in Credentials or More. Path 0 of 300. Whole page 4.3 % over 20 ms, 0.5 % over 34 ms |
+| Regression checks | type check 0 errors · axe 0 violations on 7 pages · keyboard 21 / 21 · films 14 / 14 · scroll-calm 5 / 5 · no console errors |
+
+## Round 6 — 2026-10-11: Path as a road on an unrolling scroll, Capabilities as hanging scrolls
 
 Same laptop and Chrome. New tool: `scripts/qa/smooth.mjs` scrolls a page by the wheel at a reading pace and a hurried one and times every frame, per chapter; with `PROFILE=<dir>` it keeps the browser profile, so a second run is a returning visitor (graphics shaders already compiled).
 

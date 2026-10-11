@@ -134,6 +134,7 @@ npm run og                             # social cards + intro posters
 npm run art                            # repaint the landscape (seeded, deterministic)
 node scripts/art/ink-marks.mjs         # brush marks for buttons / links / arrows, the page-change sweep, the paper grain and the name seal (public/ink)
 node scripts/art/road-marks.mjs        # the Path chapter's pavilion, rocks, pine and travellers (public/art/road-*.png)
+node scripts/art/screen.mjs            # the pine on gold leaf painted across the folding screen (public/art/screen.webp)
 node scripts/art/favicon.mjs           # brushed-ensō favicons
 node scripts/media/encode-films.mjs    # every showcase film as H.264 MP4 (+ 960 px orbit cut, phone version, posters)
 node scripts/media/encode-films.mjs --phone   # only the 960 px phone versions, from the finished films
