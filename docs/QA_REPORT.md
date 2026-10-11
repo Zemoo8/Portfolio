@@ -2,21 +2,7 @@
 
 Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro preview`; Chromium via Playwright 1.61 (headless; GPU via ANGLE/D3D11 for WebGL); Lighthouse 12 (mobile, simulated throttling).
 
-## Round 7 — 2026-10-11: the road is painted by a brush as the page is scrolled (latest)
-
-Ahmed's idea. Same laptop; it was busy with other work during the round (30–50 % CPU), so every figure is a back-to-back comparison on a second pass in a fresh browser.
-
-| Area | Result |
-|---|---|
-| First version | 11–30 hairs per bend, all 96 animated at once by scroll timelines, round caps, 28 points each: 3–7 % of frames late along the road, against 0 % with the road as plain shapes |
-| As shipped | Seven hairs of 14 points per bend, trimmed to the bend's outline by a `clipPath`; only the bend under the brush is animated, the others are one filled shape each. Late frames along the whole road (~255 frames): 0–5 with the painting, 3–6 with the same hairs standing still — the painting itself is not measurable; what is left falls where the brush passes from one bend to the next |
-| Same shape painted or not | A bend changes from hairs to its finished shape when the brush leaves it: the two renderings differ in 890 of 3.3 million pixels (edge antialiasing), so nothing moves |
-| The paint follows the brush | Lowest painted point against the brush's level at 16 scroll positions: within 27 px at 1536 and 1920 wide. The pace is taken from the road's own geometry (`slope` in `lib/road.ts`), not from the screen's |
-| Thrown about | States are worked out from where the road is, once a frame: after a jump to the end of the page, back into the middle of the road, to the top, and by the #path link, the bends above the brush are painted and those below bare. (A first version listened for bends crossing the brush's level and left every bend it had skipped unpainted.) |
-| Elsewhere | Arabic: brush and road mirrored together. Phones: no brush, the road keeps to the margin as before. Animations off / reduced motion: the road is simply there. The brush element is `.painter`: `.brush` is the stroke component's own class and its global rules would have applied |
-| Regression checks | type check 0 errors · axe 0 violations · keyboard 21 / 21 · films 14 / 14 · scroll-calm 5 / 5 · no console errors |
-
-## Round 6 — 2026-10-11: Path as a road on an unrolling scroll, Capabilities as hanging scrolls
+## Round 6 — 2026-10-11: Path as a road on an unrolling scroll, Capabilities as hanging scrolls (latest)
 
 Same laptop and Chrome. New tool: `scripts/qa/smooth.mjs` scrolls a page by the wheel at a reading pace and a hurried one and times every frame, per chapter; with `PROFILE=<dir>` it keeps the browser profile, so a second run is a returning visitor (graphics shaders already compiled).
 
