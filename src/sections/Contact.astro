@@ -4,6 +4,8 @@
 // walker of the Path chapter on it (the same gold and ink, the same pieces: scripts/art/
 // road-marks.mjs). The words stand beside the picture: the invitation, the address, the links.
 // The moon climbs a little as the chapter comes up the screen (tied to scroll position; transform).
+// And the finale: sky lanterns are lit at the pavilion and climb past the moon, a whole flight of
+// them once the night fills the screen (scripts/lanterns.ts).
 import Brush from '../components/Brush.astro';
 import { asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
@@ -32,6 +34,8 @@ const cv = exists('cv/ahmed-baghouli-cv.pdf') ? 'cv/ahmed-baghouli-cv.pdf' : nul
       <span class="dusk__riders"></span>
       <span class="dusk__walker"></span>
     </div>
+    <canvas class="dusk__sky" data-lanterns aria-hidden="true" hidden></canvas>
+    <span class="dusk__end" data-lanterns-end aria-hidden="true"></span>
 
     <div class="dusk__words">
       <p class="kicker" data-reveal>{tr(ui.contact.kicker, lang)}</p>
@@ -59,6 +63,7 @@ const cv = exists('cv/ahmed-baghouli-cv.pdf') ? 'cv/ahmed-baghouli-cv.pdf' : nul
         <li><a class="btn" href={profile.links.github} target="_blank" rel="noopener me">GitHub <span class="arrow" aria-hidden="true">↗</span></a></li>
       </ul>
       <p class="sr-only" aria-live="polite" data-copy-status></p>
+      <p class="dusk__hint label">{tr(ui.contact.lantern, lang)}</p>
     </div>
   </div>
 </section>
@@ -134,6 +139,15 @@ const cv = exists('cv/ahmed-baghouli-cv.pdf') ? 'cv/ahmed-baghouli-cv.pdf' : nul
   .dusk__riders { inset-inline-start: 12%; inset-block-end: 5%; inline-size: 30%; aspect-ratio: 340 / 190; background-image: url('/art/road-riders.png') !important; }
   .dusk__walker { inset-inline-start: 50%; inset-block-end: 19%; inline-size: 6.4%; aspect-ratio: 120 / 200; background-image: url('/art/road-walker.png') !important; }
 
+  /* the lanterns: a canvas over the whole picture, under the words; a mark near its foot tells the
+     page the night now fills the screen (the flight goes up then); a line says the night can be
+     touched (only once lit) */
+  .dusk__sky { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; pointer-events: none; }
+  .dusk__end { position: absolute; inset-block-start: 56%; inset-inline-start: 0; inline-size: 1px; block-size: 1px; }
+  .dusk__hint { display: none; margin-block-start: 0.4rem; color: var(--muted); }
+  .dusk:global(.has-lanterns) .dusk__hint { display: block; }
+  :global(html.motion-off) .dusk .dusk__hint { display: none; }
+
   /* the moon climbs as the chapter comes up the screen */
   @keyframes moon-rise { from { transform: translateY(34%); } to { transform: none; } }
   @supports (animation-timeline: view()) {
@@ -150,6 +164,17 @@ const cv = exists('cv/ahmed-baghouli-cv.pdf') ? 'cv/ahmed-baghouli-cv.pdf' : nul
 </style>
 
 <script>
+  // the lanterns are fetched only when the night is about to come on to the screen
+  const night = document.querySelector<HTMLElement>('.dusk');
+  if (night && 'IntersectionObserver' in window) {
+    const near = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      near.disconnect();
+      import('../scripts/lanterns').then((m) => m.initLanterns(night));
+    }, { rootMargin: '120% 0px' });
+    near.observe(night);
+  }
+
   document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) =>
     b.addEventListener('click', async () => {
       const label = b.querySelector<HTMLElement>('[data-copy-label]')!;

@@ -116,6 +116,7 @@ export const ui = {
     email: { en: 'Email', fr: 'E-mail', ar: 'البريد' },
     copy: { en: 'Copy', fr: 'Copier', ar: 'نسخ' },
     copied: { en: 'Copied', fr: 'Copié', ar: 'تم النسخ' },
+    lantern: { en: 'Click or tap the night to let a lantern go', fr: 'Cliquez ou touchez la nuit pour lâcher une lanterne', ar: 'انقر أو المس الليل لتُطلق فانوسًا' },
     cv: { en: 'CV', fr: 'CV', ar: 'السيرة الذاتية' },
     // the CV exists in English only: say so before the download
     cvNote: { en: 'PDF', fr: 'PDF, en anglais', ar: 'PDF، بالإنجليزية' },
