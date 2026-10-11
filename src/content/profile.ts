@@ -44,7 +44,7 @@ export const profile = {
   languages: [
     { name: { en: 'Arabic', fr: 'Arabe', ar: 'العربية' }, level: { en: 'Native', fr: 'Langue maternelle', ar: 'اللغة الأم' } },
     { name: { en: 'English', fr: 'Anglais', ar: 'الإنجليزية' }, level: { en: 'Cambridge B2 First · 176', fr: 'Cambridge B2 First · 176', ar: 'كامبريدج B2 First · 176' } },
-    { name: { en: 'French', fr: 'Français', ar: 'الفرنسية' }, level: { en: 'B1 · language of instruction', fr: 'B1 · langue d’enseignement', ar: 'B1 · لغة التدريس' } },
+    { name: { en: 'French', fr: 'Français', ar: 'الفرنسية' }, level: { en: 'TCF B2 · 408 · language of instruction', fr: 'TCF B2 · 408 · langue d’enseignement', ar: 'TCF B2 · 408 · لغة التدريس' } },
   ] as { name: L; level: L }[],
 
   interests: [

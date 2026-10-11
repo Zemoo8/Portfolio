@@ -87,7 +87,9 @@ const now: L = {
   .about__facts { display: grid; margin-block-start: 2.6rem; border-block-start: 1px solid var(--line); }
   .about__facts > div { display: grid; grid-template-columns: 10rem 1fr; gap: 1.5rem; padding-block: 1rem; border-block-end: 1px solid var(--line); }
   .about__langs { display: grid; gap: 0.3rem; }
-  .about__langs li { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .about__langs li { display: flex; justify-content: space-between; gap: 0 1rem; flex-wrap: wrap; }
+  /* a level too long for its line drops below the language, still against the far edge */
+  .about__langs .label { margin-inline-start: auto; text-align: end; }
   @media (max-width: 960px) {
     .about { grid-template-columns: 1fr; }
     .about__portrait { max-inline-size: 24rem; inline-size: 100%; margin-inline: auto; }
