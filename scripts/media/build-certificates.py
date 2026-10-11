@@ -33,6 +33,7 @@ PUBLISH = {
     'datacamp-github-concepts': None,
     'cambridge-statement-upload': None,  # the version Ahmed uploaded (photo blurred)
     'b2-diplome': None,
+    'tcf-b2': None,  # photo of the provisional results sheet; candidate code and date of birth blurred before export
     'diplome-chess': None,
     'aspire-leaders': None,
     'soliya-dialogue-facilitation': None,

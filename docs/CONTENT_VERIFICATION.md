@@ -14,7 +14,7 @@ Statuses: **VERIFIED BY PRIMARY SOURCE** (code, official document) · **VERIFIED
 | Location: Tunis/Tunisia | LinkedIn (Tunis) | CV (Ariana), GitHub (Tunisia) | VERIFIED — shown as "Tunisia"/"Tunis" |
 | Email ahmedbaghoulii@gmail.com | CV | GitHub profile README | VERIFIED (already public) |
 | Phone number | CV | — | **OMIT** (private; not needed) — also removed from the downloadable CV |
-| French: TCF B2, score 408 (Oct 2026); language of instruction | CV (`CV_Baghouli_Ahmed.pdf`) | Ahmed, 2026-10-11 ("yes i got a b2 tcf its new") | SINGLE SOURCE — replaces the earlier "B1"; no certificate file seen yet |
+| French: TCF B2, score 408 (session of 8 Oct 2026); language of instruction | TCF provisional results sheet (`TCF.pdf`: global 408 / B2; oral 392 B1, structures 389 B1, written 435 B2) | CV (`CV_Baghouli_Ahmed.pdf`) | VERIFIED BY PRIMARY SOURCE — replaces the earlier "B1". Shown among the credentials as a *provisional* results sheet (the sheet itself says only the final attestation is authoritative); candidate code and date of birth blurred |
 | Downloadable CV (`/cv/ahmed-baghouli-cv.pdf`, English) | Ahmed's own `CV_Baghouli_Ahmed.pdf` | — | Published 2026-10-11 at Ahmed's request, without the phone number (`scripts/media/build-cv.py`); otherwise his document, unedited. It states things the site leaves out or words differently — "Jun 2027 (expected)", freelance start "Jun 2026", grades and rankings, chess ~1600. The older `CV - English.pdf` was online for about fifteen minutes the same day and removed: wrong CV |
 | GitHub / LinkedIn URLs | CV | browser | VERIFIED |
 | Seeking a Master's in AI (NLP + CV), then doctoral research | CV | — | SINGLE SOURCE |
@@ -76,7 +76,7 @@ Statuses: **VERIFIED BY PRIMARY SOURCE** (code, official document) · **VERIFIED
 | Caffeine, Bubbleberry, Brew Bliss, aieyes-backend descriptions | each repo's own GitHub description + language stats | VERIFIED |
 | Université Sesame website replica "without AI" (CV) | CV | **OMIT** (no repo or asset found) |
 
-## Credentials (18) — primary sources
+## Credentials (20) — primary sources
 
 Ahmed supplied the certificate documents themselves (PDFs + two images) during the redesign. **The certificate is now the primary source** for title, issuer and date; LinkedIn and the CV are secondary. Every credential on the site is shown with its real document.
 

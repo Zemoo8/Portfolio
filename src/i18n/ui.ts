@@ -87,7 +87,7 @@ export const ui = {
   },
   credentials: {
     kicker: { en: 'Credentials', fr: 'Certifications', ar: 'الشهادات' },
-    title: { en: 'Nineteen credentials, earned one at a time.', fr: 'Dix-neuf certifications, obtenues une à une.', ar: 'تسع عشرة شهادة، نلتُها واحدة تلو الأخرى.' },
+    title: { en: 'Twenty credentials, earned one at a time.', fr: 'Vingt certifications, obtenues une à une.', ar: 'عشرون شهادة، نلتُها واحدة تلو الأخرى.' },
     verify: { en: 'Verify', fr: 'Vérifier', ar: 'تحقّق' },
     issued: { en: 'Issued', fr: 'Délivrée', ar: 'صدرت' },
     all: { en: 'All', fr: 'Toutes', ar: 'الكل' },

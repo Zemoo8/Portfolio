@@ -56,6 +56,14 @@ export const credentialGroups: CredentialGroup[] = [
         highlight: a('Listening 190 — the top of the scale for this exam', 'Compréhension orale 190 — le maximum de l’échelle pour cet examen', 'الاستماع 190 — أعلى درجة في سلّم هذا الامتحان'),
       },
       {
+        title: 'TCF — Level B2, 408',
+        issuer: 'CIEP · Institut français de Tunisie',
+        date: '2026-10', // session of 8 October 2026
+        image: 'tcf-b2',
+        // the document is the provisional results sheet: said so, until the final attestation replaces it
+        highlight: a('Provisional results sheet — reading comprehension 435', 'Fiche de résultats provisoires — compréhension écrite 435', 'كشف نتائج مؤقت — فهم المكتوب 435'),
+      },
+      {
         title: 'Silver Diploma — Roi d’argent',
         issuer: 'Fédération Française des Échecs',
         image: 'diplome-chess',
