@@ -299,7 +299,9 @@ const cards = projects.map((p) => {
 <script>
   import { initOrbit } from '../scripts/orbit';
   import { mountVortex } from '../scripts/vortex';
-  // Nothing heavy runs until the storm chapter approaches the viewport.
+  import { settled } from '../scripts/settled';
+  // Nothing heavy runs until the storm chapter approaches the viewport — and the smoke waits
+  // until the page has arrived (a brush sweep in progress has the graphics process to itself).
   const section = document.querySelector<HTMLElement>('[data-storm]');
   if (section) {
     const io = new IntersectionObserver(([e]) => {
@@ -310,7 +312,7 @@ const cards = projects.map((p) => {
       const canvas = section.querySelector<HTMLCanvasElement>('[data-vortex]');
       if (canvas && !matchMedia('(max-width: 760px), (pointer: coarse)').matches) {
         const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 60));
-        idle(() => mountVortex(canvas, section.querySelector<HTMLElement>('.orbit__core')).catch(() => { /* no WebGL: the CSS ink gradient remains */ }));
+        settled.then(() => idle(() => mountVortex(canvas, section.querySelector<HTMLElement>('.orbit__core')).catch(() => { /* no WebGL: the CSS ink gradient remains */ })));
       }
     }, { rootMargin: '0px 0px 150px 0px' });
     io.observe(section);

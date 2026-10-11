@@ -29,7 +29,7 @@ const cv = exists('cv/ahmed-baghouli-cv.pdf') ? 'cv/ahmed-baghouli-cv.pdf' : nul
     <ul class="contact__links" data-reveal>
       {cv && (
         <li>
-          <a class="btn" href={asset(cv)} download="Ahmed-Baghouli-CV.pdf" type="application/pdf" hreflang="en">
+          <a class="btn" href={asset(cv)} download="Ahmed-Baghouli-CV.pdf" type="application/pdf" hreflang="en" data-astro-prefetch="false">
             {tr(ui.contact.cv, lang)} <span class="contact__cv-note">{tr(ui.contact.cvNote, lang)}</span> <span aria-hidden="true">↓</span>
           </a>
         </li>

@@ -40,6 +40,7 @@ const phone = (n: string) => ({ n, src: asset(`art/build-${n}-1000.webp`) });
   // Stages that are not yet painted at the top of the page load once the page itself has loaded,
   // so they never compete with the first view.
   // Only the stages this screen shows are loaded (a phone's merged stages, or the wide screen's six).
+  import { settled } from '../scripts/settled';
   const paint = () =>
     document.querySelectorAll<HTMLImageElement>('.world img[data-src]').forEach((i) => {
       if (getComputedStyle(i).display === 'none') return;
@@ -47,8 +48,10 @@ const phone = (n: string) => ({ n, src: asset(`art/build-${n}-1000.webp`) });
       i.src = i.dataset.src!;
       i.removeAttribute('data-src');
     });
+  // …nor, on a page change, with the brush that is sweeping the old page away (settled.ts).
   const idle = (window as any).requestIdleCallback ?? ((f: () => void) => setTimeout(f, 200));
-  if (document.readyState === 'complete') idle(paint); else addEventListener('load', () => idle(paint), { once: true });
+  const later = () => settled.then(() => idle(paint));
+  if (document.readyState === 'complete') later(); else addEventListener('load', later, { once: true });
   matchMedia('(max-width: 760px)').addEventListener('change', () => idle(paint));
 </script>
 

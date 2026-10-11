@@ -64,8 +64,9 @@
   --dur-2: 420ms;
   --dur-3: 900ms;
 
-  /* paper grain (static) */
-  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .22 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  /* paper grain: a baked, seamless tile (scripts/art/ink-marks.mjs). Not an SVG noise filter —
+     compiling its shader froze the first render of every page for a quarter of a second */
+  --paper-grain: url('/ink/grain.png');
 }
 
 :root:lang(ar) {
@@ -499,20 +500,40 @@ main #about, main #path, main #more { scroll-margin-block-start: calc(-1.5rem - 
   .js :lang(ar) [data-lines] { opacity: 1; filter: none; transform: none; }
 }
 
-/* Native cross-document transitions where supported */
+/* Native cross-document transitions where supported.
+   A page is changed by one stroke of a loaded brush: it sweeps across the screen, the old page is
+   under the ink for an instant, and when the stroke has passed the new page is there. Only
+   `transform` and `opacity` move, so the compositor runs all of it — it stays fluid while the new
+   page is still starting up (a mask that grew, as before, was repainted on the main thread and
+   stuttered exactly then). The stroke is an empty, fixed element (Base.astro) given a name; its
+   group is painted through the sweep mark (public/ink/sweep.png, scripts/art/ink-marks.mjs). */
 @view-transition { navigation: auto; }
-/* the next page is painted in: a brush swash grows from the centre until it covers the view */
-::view-transition-old(root) { animation: 700ms var(--ease-in-out) both vt-settle; }
-::view-transition-new(root) {
-  animation: 900ms cubic-bezier(0.7, 0, 0.2, 1) both vt-ink;
-  -webkit-mask: url('/ink/swash.png') 50% 50% / 400% 420% no-repeat;
-  mask: url('/ink/swash.png') 50% 50% / 400% 420% no-repeat;
+.vt-ink { position: fixed; inset: 0; z-index: -2; pointer-events: none; contain: strict; view-transition-name: ink; }
+::view-transition-old(root), ::view-transition-new(root) { mix-blend-mode: normal; }
+/* the pages swap while the body of the stroke covers the whole screen */
+::view-transition-old(root) { animation: 950ms linear both vt-leave; }
+::view-transition-new(root) { animation: 950ms linear both vt-arrive; }
+@keyframes vt-leave { 0%, 52.5% { opacity: 1; } 52.6%, 100% { opacity: 0; } }
+@keyframes vt-arrive { 0%, 52.5% { opacity: 0; } 52.6%, 100% { opacity: 1; } }
+::view-transition-old(ink), ::view-transition-new(ink) { display: none; }
+::view-transition-group(ink) {
+  inset: -15vh auto auto 0;
+  inline-size: 300vw;
+  block-size: 130vh;
+  background: var(--ink);
+  -webkit-mask: url('/ink/sweep.png') center / 100% 100% no-repeat;
+  mask: url('/ink/sweep.png') center / 100% 100% no-repeat;
+  transform-origin: 50% 50%;
+  animation: 950ms cubic-bezier(0.65, 0, 0.35, 1) both vt-sweep;
 }
-@keyframes vt-ink {
-  from { -webkit-mask-size: 6% 7%; mask-size: 6% 7%; }
-  to { -webkit-mask-size: 400% 420%; mask-size: 400% 420%; }
-}
-@keyframes vt-settle { to { opacity: 0.6; transform: scale(0.985); } }
+/* from wholly off one side to wholly off the other; in Arabic the brush is mirrored and travels
+   right to left (the same keyframes, read through the flip: the box runs from 100vw…400vw to −300vw…0) */
+@keyframes vt-sweep { from { transform: translateX(-300vw); } to { transform: translateX(100vw); } }
+:root[dir='rtl']::view-transition-group(ink) { scale: -1 1; animation-name: vt-sweep-rtl; }
+@keyframes vt-sweep-rtl { from { transform: translateX(-100vw); } to { transform: translateX(300vw); } }
+/* motion switched off: the page simply changes */
+:root.motion-off::view-transition-group(*), :root.motion-off::view-transition-old(*), :root.motion-off::view-transition-new(*) { animation: none; }
+:root.motion-off::view-transition-group(ink), :root.motion-off::view-transition-old(root) { display: none; }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
 
 /* ==========================================================================

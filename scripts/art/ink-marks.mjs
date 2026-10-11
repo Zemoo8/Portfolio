@@ -58,11 +58,35 @@ write('rod', svg('0 0 1200 16', paths(line(1188, 8, { width: 3.4, bristles: 10, 
 
 write('roller', svg('0 0 100 24', paths(line(88, 12, { width: 7, bristles: 14, seed: 17, dryness: 0.4, bow: 0.8, rise: -1 }), 6, 0), { stretch: true, filter: fibre(0.05, 0.5, 2.2, 13) }));
 
+// sweep: the stroke that changes the page (global.css → view transitions) — a brush wider than
+// the screen. Its body is solid from top to bottom (both lie beyond the screen), so only its two
+// ends are ever seen: the loaded start that trails, and the long dry tail that leads the way.
+{
+  const rand = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  const lanes = 58;
+  let hairs = '';
+  for (let k = 0; k < lanes; k++) {
+    const lane = ((k + 0.5) / lanes) * 2 - 1; // −1 (top) … 1 (bottom)
+    const y = f(((k + 0.5) * 200) / lanes + (rand(k + 600) - 0.5) * 2.2);
+    // the tip of a brush: the hairs in the middle reach furthest, the outer ones give out sooner
+    const reach = 0.22 + 0.78 * Math.pow(Math.abs(lane), 1.7);
+    const to = f(394 - 92 * reach * (0.55 + rand(k + 100) * 0.75));
+    const from = f(8 + 30 * Math.pow(Math.abs(lane), 2) + rand(k) * 14);
+    const width = f((200 / lanes) * (0.85 + rand(k + 700) * 1.5)); // hairs clump: no two alike
+    // a hair is never quite straight: it sags or lifts a little on its way
+    const bend = f((rand(k + 800) - 0.5) * 5);
+    hairs += `<path d="M${from} ${y}Q${f((from + to) / 2)} ${f(y + bend)} ${to} ${f(y + bend * 0.4)}" stroke-width="${width}" stroke-opacity="${f(0.7 + rand(k + 200) * 0.3)}"/>`;
+    // a few hairs skip, then touch the paper again further on
+    if (rand(k + 300) > 0.6) hairs += `<path d="M${f(to + 4 + rand(k + 400) * 8)} ${f(y + bend * 0.4)}h${f(3 + rand(k + 500) * 11)}" stroke-width="${f(width * 0.6)}" stroke-opacity="0.45"/>`;
+  }
+  write('sweep', svg('0 0 400 200', '<path d="M44 -6H300V206H44Z" fill="#000" stroke="none"/>' + hairs, { stretch: true, filter: fibre(0.011, 0.34, 7, 21) }));
+}
+
 // Bake every mark to a PNG alpha mask as well: an SVG with feTurbulence is re-rasterised by the
 // browser at every size it is used — measurable main-thread cost on pages with many marks.
 // CSS uses the PNGs; the SVGs stay as the editable source.
 import sharp from 'sharp';
-const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24], rod: [1200, 24], roller: [200, 48] };
+const bake = { swash: [800, 160], under: [600, 28], ring: [200, 200], arrow: [240, 80], cross: [80, 80], dash: [88, 24], rod: [1200, 24], roller: [200, 48], sweep: [1600, 800] };
 // marks that are used upright are also baked turned a quarter clockwise (the stroke's start on top)
 const upright = { rod: ['rod', 1] };
 for (const [name, [w, h]] of Object.entries(bake)) {
@@ -78,3 +102,16 @@ for (const [name, [w, h]] of Object.entries(bake)) {
   }
 }
 console.log('baked PNG masks');
+
+// grain: the tooth of the paper (--paper-grain in global.css), a 220 px tile of fine noise that
+// repeats without a seam. It used to be an inline SVG feTurbulence: on a first visit the graphics
+// driver compiled a noise shader for it — about a quarter of a second during which nothing on the
+// page could move. One warm grey, its transparency taken from the noise (1–8 %).
+{
+  const noise = `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="p"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0"/></filter><rect width="100%" height="100%" filter="url(#p)"/></svg>`;
+  const { data, info } = await sharp(Buffer.from(noise), { density: 72 }).resize(220, 220).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  // the filter worked in linear light: its (.35 .3 .22) reaches the screen as this sRGB colour
+  for (let i = 0; i < data.length; i += 4) { data[i] = 160; data[i + 1] = 149; data[i + 2] = 129; }
+  await sharp(data, { raw: info }).png({ compressionLevel: 9, palette: true, colours: 32, dither: 0 }).toFile(path.join(OUT, 'grain.png'));
+  console.log('grain.png'.padEnd(12), `${(fs.statSync(path.join(OUT, 'grain.png')).size / 1024).toFixed(1)} KB`);
+}

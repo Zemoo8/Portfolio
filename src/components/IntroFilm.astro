@@ -30,11 +30,11 @@ const gateLabel = hasFilm ? `${tr(ui.intro.play, lang)} — ${tr(ui.intro.label,
       <p class="gate__hint" aria-hidden="true">
         <span class="gate__hint-text">{tr(ui.intro.hint, lang)} <em>· {tr(ui.intro.length, lang)}</em></span>
         <svg class="gate__hint-arrow" viewBox="0 0 120 96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <filter id="gate-hint-ink" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.06 0.3" numOctaves="2" seed="4" /><feDisplacementMap in="SourceGraphic" scale="2.2" xChannelSelector="R" yChannelSelector="G" /></filter>
-          <g filter="url(#gate-hint-ink)">
-            <path class="gate__hint-stroke" d="M10 10 C 44 8, 86 20, 98 70" stroke-width="3.2" pathLength="1" />
-            <path class="gate__hint-head" d="M84 60 L 99 76 L 108 55" stroke-width="3" pathLength="1" />
-          </g>
+          {/* drawn by hand in its geometry — an uneven curve and a dry hair beside it — rather than
+              roughened by an SVG noise filter, whose shader stalled the hero's first paint */}
+          <path class="gate__hint-stroke" d="M10 10.6 C 24 8.2, 40 9.4, 54 13.2 S 82 27, 90.4 44.6 S 97.4 61, 98 70" stroke-width="3.2" pathLength="1" />
+          <path class="gate__hint-stroke" d="M24 12.4 C 47 11.2, 80 24.5, 94.6 60" stroke-width="1" stroke-opacity="0.42" pathLength="1" />
+          <path class="gate__hint-head" d="M84 60.4 L 98.9 76 L 107.7 55.3" stroke-width="3" pathLength="1" />
         </svg>
       </p>
     )}

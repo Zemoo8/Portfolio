@@ -129,9 +129,20 @@ const person = {
         if (localStorage.getItem('motion') === 'off') document.documentElement.classList.add('motion-off');
       } catch (e) {}
       if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('reduced');
+      // when has this page arrived? (scripts/settled.ts) — at once, or when the brush has passed
+      window.__settled = new Promise(function (done) {
+        if (!('onpagereveal' in window)) return done();
+        addEventListener('pagereveal', function (e) {
+          if (!e.viewTransition) return done();
+          window.__swept = true;
+          e.viewTransition.finished.then(done, done);
+        }, { once: true });
+        setTimeout(done, 4000); // a tab opened in the background never reveals: don't wait for it
+      });
     </script>
   </head>
   <body data-lang={lang}>
+    <div class="vt-ink" aria-hidden="true"></div>
     <EmblemSymbol />
     <Backdrop />
     <a class="skip-link" href="#main">{tr(ui.skip, lang)}</a>
@@ -144,7 +155,8 @@ const person = {
     <script>
       import { initMotion } from '../scripts/motion';
       import { initFilms } from '../scripts/films';
-      initFilms();
+      import { settled } from '../scripts/settled';
+      settled.then(() => initFilms());
       initMotion();
     </script>
   </body>

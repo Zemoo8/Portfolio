@@ -5,6 +5,7 @@
 // station index or the keyboard; "pause" stops the automatic turning only. The automatic turn
 // also waits while the pointer rests on the ring or focus is inside it.
 import { motionAllowed } from './scroll';
+import { settled } from './settled';
 
 type Film = { mp4: string };
 
@@ -122,7 +123,9 @@ export function initOrbit(root: HTMLElement) {
     cards.forEach((x, k) => x.toggleAttribute('data-active', k === i));
     showCaption(i);
     const film: Film | null = c.dataset.orbitFilm ? JSON.parse(c.dataset.orbitFilm) : null;
-    if (film && !reduced && motionAllowed() && !c.querySelector('video')) {
+    // (the first film waits until the page has arrived: see settled.ts)
+    if (film && !reduced && motionAllowed() && !c.querySelector('video')) settled.then(() => {
+      if (active !== i || c.querySelector('video')) return; // the ring has moved on meanwhile
       const v = document.createElement('video');
       Object.assign(v, { muted: true, loop: true, playsInline: true, autoplay: true, src: film.mp4 });
       v.setAttribute('aria-hidden', 'true');
@@ -130,7 +133,7 @@ export function initOrbit(root: HTMLElement) {
       v.addEventListener('error', () => v.remove(), { once: true }); // the still stays underneath
       c.querySelector('.orbit__media')!.append(v);
       v.play().catch(() => {});
-    }
+    });
     restUntil = performance.now() + DWELL;
   };
 

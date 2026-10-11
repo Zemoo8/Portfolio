@@ -8,7 +8,8 @@ export default defineConfig({
   site,
   trailingSlash: 'always',
   build: { format: 'directory', inlineStylesheets: 'always' },
-  prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
+  // every internal link is fetched while the pointer rests on it, so the next page is already here
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   devToolbar: { enabled: false },
   vite: { build: { assetsInlineLimit: 2048 } },
 });

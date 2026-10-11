@@ -7,6 +7,7 @@
 //                         scroll-driven — see global.css)
 // Scrolling itself is the browser's own: no smooth-scroll hijacking, no inertia.
 import { initScroll } from './scroll';
+import { swept } from './settled';
 
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -73,7 +74,13 @@ export function initMotion() {
   initMotionSwitch();
 
   document.fonts.ready.then(() =>
-    requestAnimationFrame(() => document.querySelectorAll('[data-onload]').forEach((el) => el.classList.add('is-in'))),
+    requestAnimationFrame(() => {
+      const rise = () => document.querySelectorAll('[data-onload]').forEach((el) => el.classList.add('is-in'));
+      // arriving under the brush, the page is uncovered a little after half-way through the sweep:
+      // the title rises as the ink leaves it, not unseen beneath it
+      if (swept()) setTimeout(rise, 430);
+      else rise();
+    }),
   );
 
   // Latin headings rise line by line; Arabic headings fade in whole (no re-measuring of
