@@ -124,7 +124,7 @@ The credential gallery shows the **real documents**. Data: `src/content/credenti
 
 `src/content/profile.ts`: name, role, email, links, statement, about paragraphs, languages, interests. The phone number from the CV is intentionally **not** published.
 
-**CV download.** The Contact section links `public/cv/ahmed-baghouli-cv.pdf` when that file exists (delete it and rebuild to remove the link). It is a copy of `../CV - English.pdf` made by `npm run media:cv` (`scripts/media/build-cv.py`): the phone line is deleted from the page content, everything else is the original, and the script refuses to write a file in which a phone number can still be read. After editing the CV, run it again, look at the PDF, and redeploy. The file is served with `X-Robots-Tag: noindex` (`vercel.json`), so it is offered to visitors but kept out of search results.
+**CV download.** No CV is published at the moment. The Contact section links `public/cv/ahmed-baghouli-cv.pdf` when that file exists (delete it and rebuild to remove the link). `npm run media:cv` (`scripts/media/build-cv.py`) makes that file from a CV PDF: the phone line is deleted from the page content, everything else is the original, and the script refuses to write a file in which a phone number can still be read. Its default source, `../CV - English.pdf`, is **not** the CV to publish — point `SRC` at the right file first, then look at the result before deploying. The file is served with `X-Robots-Tag: noindex` (`vercel.json`), so it is offered to visitors but kept out of search results.
 
 ## Regenerating everything
 

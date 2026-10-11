@@ -4,7 +4,7 @@ Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro prev
 
 ## Round 4 — 2026-10-11: search, loading, phone films, CV (latest)
 
-Nothing visual changed apart from the CV button in Contact. Checked on the live site (`www.ahmedbaghouli.world`) after deploying.
+Nothing visual changed. Checked on the live site (`www.ahmedbaghouli.world`) after deploying.
 
 | Area | Result |
 |---|---|
@@ -16,7 +16,7 @@ Nothing visual changed apart from the CV button in Contact. Checked on the live 
 | Accessibility (axe-core) | 0 violations on 7 pages; the moon-gate button's name now starts with its visible label ("Play — Intro film"), the one Lighthouse flag |
 | Keyboard · films · links | 21 / 21 · 14 / 14 play · 0 broken internal links |
 | Lighthouse | A11y 100 · BP 100 · SEO 100. Performance on `/en/` measured 58–81 before and 61–91 after over three alternating runs each — this machine's runs vary too much to claim a change; `/en/work/cheezy/` 93 → 96 |
-| CV | `public/cv/ahmed-baghouli-cv.pdf`: Ahmed's CV with the phone line deleted from the page content (checked: no phone number readable in the file; the six links still work) |
+| CV | Contact can offer a CV download when `public/cv/ahmed-baghouli-cv.pdf` exists. None is published: the copy put online in this round came from the wrong CV and was removed the same day (the URL answers 404) |
 
 ## Round 3 — films, calm scrolling, painted interface
 
