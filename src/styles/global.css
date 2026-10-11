@@ -500,6 +500,11 @@ main #about, main #path, main #more { scroll-margin-block-start: calc(-1.5rem - 
   .js :lang(ar) [data-lines] { opacity: 1; filter: none; transform: none; }
 }
 
+/* Living ink (scripts/ink.ts): the fluid is drawn on this canvas and multiplied onto the page, so
+   it darkens what lies beneath as ink does — above the content, under the navigation. Hidden
+   (no layer at all) whenever there is no ink on the paper. */
+.ink { position: fixed; inset: 0; z-index: 45; inline-size: 100%; block-size: 100%; pointer-events: none; mix-blend-mode: multiply; }
+
 /* Native cross-document transitions where supported.
    A page is changed by one stroke of a loaded brush: it sweeps across the screen, the old page is
    under the ink for an instant, and when the stroke has passed the new page is there. Only

@@ -152,12 +152,18 @@ const person = {
     </main>
     <Footer lang={lang} route={route} />
     <Lightbox lang={lang} />
+    <canvas class="ink" data-ink aria-hidden="true" hidden></canvas>
     <script>
       import { initMotion } from '../scripts/motion';
       import { initFilms } from '../scripts/films';
       import { settled } from '../scripts/settled';
       settled.then(() => initFilms());
       initMotion();
+      // living ink (scripts/ink.ts) is for a mouse or a pen: on a phone its code is never fetched
+      if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        const idle: (f: () => void) => void = (window as any).requestIdleCallback ?? ((f) => setTimeout(f, 300));
+        settled.then(() => idle(() => import('../scripts/ink').then((m) => m.initInk())));
+      }
     </script>
   </body>
 </html>
