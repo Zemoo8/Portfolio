@@ -1,10 +1,10 @@
 ---
 // "More on GitHub" as a folding screen: six leaves of gold leaf standing in a zigzag, an old pine
-// painted across all of them (scripts/art/screen.mjs), and — as on the screens that have poem
-// cards pasted to them — a paper card on every leaf: the first carries the title, each of the
-// others one repository. It arrives folded and opens out.
+// painted across all of them (scripts/art/screen.mjs), and on every leaf a cloud of brighter gold
+// with writing on it, in ink: the first carries the title, each of the others one repository.
+// It arrives folded and opens out.
 // Only `transform` moves. A leaf is sheared to stand in the zigzag (alternately, about the hinge
-// it shares with its neighbour) and its cards are sheared back, so the writing stays level.
+// it shares with its neighbour) and its writing is sheared back, so it stays level.
 // Six leaves in a row need room: a narrower page gets a pair of three-leaf screens (the second
 // with the picture reversed, as pairs of screens are painted), a phone a column of single leaves.
 import Shot from '../components/Shot.astro';
@@ -106,25 +106,36 @@ const leaf = (i: number) => `--i:${i}; --j:${i % 3}; --s6:${i % 2 ? -1 : 1}; --s
     transform: skewY(calc(var(--s) * var(--fold) * -1));
   }
 
-  /* ---- the cards pasted on it ---- */
+  /* ---- the writing on it: not paper pasted over the gold but a cloud of the same gold, a shade
+     brighter and soft at the edges, as the old screens float clouds of gold over their pictures —
+     the pine passes behind it. Ink on gold: every colour here is dark enough to read on it. ---- */
   .card {
-    padding: 1rem 0.95rem 1.05rem;
-    background: var(--paper-grain), linear-gradient(180deg, #faf5e8, #f1e9d5);
-    box-shadow: 0 10px 22px -12px rgb(40 28 6 / 0.7), 0 1px 2px rgb(40 28 6 / 0.3);
-    rotate: var(--r);
-    transition: translate 0.5s var(--ease-out), rotate 0.5s var(--ease-out);
+    --ink: #1b150c;
+    --ink-2: #2e281d;
+    --muted: #4a422c;
+    --rust: #6a2a0a;
+    padding: 1.1rem 1rem 1.15rem;
+    color: var(--ink);
+    background: linear-gradient(180deg, rgb(238 210 140 / 0.93), rgb(228 196 120 / 0.93));
+    -webkit-mask: linear-gradient(90deg, #0000, #000 0.8rem, #000 calc(100% - 0.8rem), #0000), linear-gradient(180deg, #0000, #000 0.8rem, #000 calc(100% - 0.8rem), #0000);
+    mask: linear-gradient(90deg, #0000, #000 0.8rem, #000 calc(100% - 0.8rem), #0000), linear-gradient(180deg, #0000, #000 0.8rem, #000 calc(100% - 0.8rem), #0000);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+    transition: translate 0.5s var(--ease-out);
   }
-  .leaf:hover .card, .leaf:focus-within .card { translate: 0 -4px; rotate: 0deg; }
-  .card--pic { padding: 0.3rem; rotate: calc(var(--r) * -1.6); align-self: center; inline-size: min(100%, 15rem); }
+  .leaf:hover .card, .leaf:focus-within .card { translate: 0 -4px; }
+  /* a picture of the work, in the screen's own frame: black lacquer and a line of brocade */
+  .card--pic { padding: 3px; align-self: center; inline-size: min(100%, 15rem); background: #17130e; box-shadow: 0 0 0 1.5px rgb(120 90 34 / 0.9), 0 12px 22px -12px rgb(40 28 6 / 0.8); -webkit-mask: none; mask: none; rotate: calc(var(--r) * -1.4); }
   .card--title { display: grid; gap: 0.7rem; padding-block: 1.3rem 1.4rem; }
+  .card--title :global(.kicker) { color: var(--rust); }
   .card--title h2 { font-size: var(--step-2); line-height: 1.08; }
   :lang(ar) .card--title h2 { line-height: 1.5; }
-  .card__all { justify-self: start; font-size: var(--step--1); font-weight: 600; color: var(--rust); }
-  .card__title { font-family: var(--font-display); font-size: 1.36rem; font-weight: 600; line-height: 1.08; overflow-wrap: anywhere; }
-  .card__body { margin-block-start: 0.5rem; font-size: 0.86rem; line-height: 1.5; color: var(--ink-2); }
+  .card__all { justify-self: start; font-size: var(--step--1); font-weight: 700; color: var(--rust); }
+  .card__title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; line-height: 1.08; overflow-wrap: anywhere; }
+  .card__body { margin-block-start: 0.5rem; font-size: 0.86rem; font-weight: 500; line-height: 1.5; color: var(--ink-2); }
   :lang(ar) .card__body { line-height: 1.8; }
-  .card__tech { margin-block-start: 0.6rem; line-height: 1.6; }
-  .card__links { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; margin-block-start: 0.6rem; font-size: var(--step--1); font-weight: 600; color: var(--rust); }
+  .card__tech { margin-block-start: 0.6rem; line-height: 1.6; color: var(--muted); }
+  .card__links { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; margin-block-start: 0.6rem; font-size: var(--step--1); font-weight: 700; color: var(--rust); }
 
   /* ---- … a pair of three-leaf screens where there is room … */
   @container (min-width: 700px) {
@@ -140,8 +151,8 @@ const leaf = (i: number) => `--i:${i}; --j:${i % 3}; --s6:${i % 2 ? -1 : 1}; --s
     .leaf { --s: var(--s6); }
     .leaf__paint, .leaf--second .leaf__paint { inline-size: 600%; inset-inline-start: calc(var(--i) * -100%); scale: none; }
     .leaf__face { min-block-size: 38rem; padding: 10.5rem 0.75rem 3rem; }
-    .card { padding-inline: 0.8rem; }
-    .card__title { font-size: 1.26rem; }
+    .card { padding-inline: 0.95rem; }
+    .card__title { font-size: 1.3rem; }
     .card__body { font-size: 0.83rem; }
   }
 
