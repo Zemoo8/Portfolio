@@ -13,7 +13,8 @@ Statuses: **VERIFIED BY PRIMARY SOURCE** (code, official document) · **VERIFIED
 | Role "Full-stack & AI developer" | LinkedIn headline | GitHub bio ("AI & ML enthusiast… full-stack") | VERIFIED |
 | Location: Tunis/Tunisia | LinkedIn (Tunis) | CV (Ariana), GitHub (Tunisia) | VERIFIED — shown as "Tunisia"/"Tunis" |
 | Email ahmedbaghoulii@gmail.com | CV | GitHub profile README | VERIFIED (already public) |
-| Phone number | CV | — | **OMIT** (private; not needed) |
+| Phone number | CV | — | **OMIT** (private; not needed) — also removed from the downloadable CV |
+| Downloadable CV (`/cv/ahmed-baghouli-cv.pdf`, English) | Ahmed's own `CV - English.pdf` | — | Published 2026-10-11 at Ahmed's request, without the phone line (`scripts/media/build-cv.py`). It is his document, unedited otherwise, so it states things the site leaves out or words differently: "expected June 2027" (LinkedIn: July 2029), freelance start "Jun 2026" (LinkedIn: Jul 2026), grades and rankings, chess ~1600 |
 | GitHub / LinkedIn URLs | CV | browser | VERIFIED |
 | Seeking a Master's in AI (NLP + CV), then doctoral research | CV | — | SINGLE SOURCE |
 | Chess since 2018; six years of Shotokan karate | CV | — | SINGLE SOURCE |

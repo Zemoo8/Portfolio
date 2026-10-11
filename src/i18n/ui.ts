@@ -115,6 +115,9 @@ export const ui = {
     email: { en: 'Email', fr: 'E-mail', ar: 'البريد' },
     copy: { en: 'Copy', fr: 'Copier', ar: 'نسخ' },
     copied: { en: 'Copied', fr: 'Copié', ar: 'تم النسخ' },
+    cv: { en: 'CV', fr: 'CV', ar: 'السيرة الذاتية' },
+    // the CV exists in English only: say so before the download
+    cvNote: { en: 'PDF', fr: 'PDF, en anglais', ar: 'PDF، بالإنجليزية' },
   },
   footer: {
     rights: { en: 'Designed and built by Ahmed Baghouli.', fr: 'Conçu et développé par Ahmed Baghouli.', ar: 'تصميم وتطوير أحمد بغولي.' },
