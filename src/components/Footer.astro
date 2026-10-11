@@ -30,16 +30,25 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
+  /* the page ends on the night it opened on: black silk, a hairline of gold, the name in gold */
   .foot {
+    --gold: #f0d7a1;
+    --ink: #f3eee2;
+    --ink-2: #d6d3c8;
+    --muted: #a5a399;
+    --line: rgb(240 215 161 / 0.2);
     margin-block-start: var(--section);
-    padding-block: 3rem 1.6rem;
-    background: var(--paper-grain), linear-gradient(180deg, rgb(245 239 225 / 0.6), var(--paper) 40%);
-    border-block-start: 1px solid var(--line);
+    padding-block: 3.2rem 1.7rem;
+    color: var(--ink);
+    background: linear-gradient(180deg, #1b1915, #121110 55%);
+    border-block-start: 1px solid rgb(240 215 161 / 0.35);
   }
+  .foot__sign em { color: var(--gold); }
+  .foot :global(.link-u):hover { color: var(--gold); }
   .foot__grid { display: grid; grid-template-columns: 1fr auto auto; gap: 2rem 4rem; align-items: start; }
   .foot__sign { font-size: var(--step-3); font-weight: 600; line-height: 1; }
   .foot__sign em { font-weight: 500; }
-  :lang(ar) .foot__sign em { font-style: normal; color: var(--ink-2); }
+  :lang(ar) .foot__sign em { font-style: normal; color: var(--gold); }
   .foot__links, .foot__langs { display: grid; gap: 0.45rem; font-size: var(--step--1); font-weight: 500; }
   .foot__langs a { color: var(--muted); }
   .foot__langs a[aria-current='true'] { color: var(--ink); font-weight: 700; }

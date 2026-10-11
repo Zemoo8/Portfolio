@@ -140,7 +140,7 @@ const cards = projects.map((p) => {
   /* ---- stage ---- */
   .orbit__stage {
     position: relative;
-    block-size: clamp(420px, 60vh, 680px);
+    block-size: clamp(480px, 74vh, 740px);
     perspective: 1800px;
     perspective-origin: 50% 30%;
     touch-action: pan-y;
@@ -163,7 +163,7 @@ const cards = projects.map((p) => {
   .orbit__core :global(.emblem) { inline-size: 100%; block-size: 100%; }
 
   .orbit__card {
-    --card-w: clamp(170px, 19vw, 320px);
+    --card-w: clamp(160px, 16.5vw, 280px);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -291,6 +291,19 @@ const cards = projects.map((p) => {
   .orbit__hint { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: #9a9588; }
   :lang(ar) .orbit__hint { font-style: normal; font-size: 0.9rem; }
 
+  /* ---- below the ring, on a wide screen: one column down the middle, in the order it is read —
+     what the card in front is, the way to the others, then all six by name ---- */
+  @media (min-width: 901px) {
+    .orbit__below { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 2.2rem; text-align: center; margin-block-start: clamp(1.6rem, 4vh, 3rem); }
+    .orbit__caption { display: grid; justify-items: center; gap: 0.7rem; }
+    .orbit__big { display: none; }
+    .orbit__meta { justify-content: center; }
+    .orbit__tagline { max-inline-size: 36rem; }
+    .orbit__controls { justify-items: center; gap: 1.3rem; inline-size: 100%; }
+    .orbit__index { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.2rem 1.5rem; min-inline-size: 0; padding-block: 0.9rem; border-block: 1px solid rgb(240 215 161 / 0.18); inline-size: min(100%, 76rem); }
+    .orbit__index button { inline-size: auto; gap: 0.5rem; }
+    .orbit__foot { justify-content: center; }
+  }
   @media (max-width: 900px) {
     .orbit__below { grid-template-columns: 1fr; }
     .orbit__controls { justify-items: start; }

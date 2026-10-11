@@ -16,7 +16,6 @@ const { lang } = Astro.props;
     <span class="hero__rod"></span>
     <span class="hero__land hero__land--peaks"></span>
     <span class="hero__land hero__land--rocks"></span>
-    <span class="hero__land hero__land--pine"></span>
     <span class="hero__rod hero__rod--foot"></span>
   </div>
   <div class="hero__text">
@@ -66,9 +65,9 @@ const { lang } = Astro.props;
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: center;
-    gap: calc(var(--gutter) * 1.5);
+    gap: calc(var(--gutter) * 2.2);
     min-block-size: 100svh;
-    padding-block: clamp(4.75rem, 9.5vh, 7.5rem) 4.6rem;
+    padding-block: clamp(5.5rem, 11vh, 8.5rem) 6.4rem;
     /* (--end: the room the page leaves at its far edge — on wide screens, for the chapter scroll
        that hangs there: see .wrap in global.css. The silk stops short of it, as every chapter does) */
     --end: var(--gutter);
@@ -104,17 +103,16 @@ const { lang } = Astro.props;
   .hero__rod--foot { inset-block-start: auto; inset-block-end: -0.55rem; block-size: 1.1rem; inset-inline: -0.9rem; }
   /* the far country, in the gold of the road (scripts/art/road-marks.mjs), faint along the foot */
   .hero__land { position: absolute; inset-block-end: 9px; background: center bottom / contain no-repeat; opacity: 0.2; }
-  .hero__land--peaks { inset-inline-start: 3%; inline-size: clamp(7rem, 13vw, 13rem); aspect-ratio: 400 / 424; background-image: url('/art/road-peaks.png'); }
-  .hero__land--rocks { inset-inline-end: 4%; inline-size: clamp(9rem, 17vw, 17rem); aspect-ratio: 400 / 424; background-image: url('/art/road-rocks.png'); }
-  .hero__land--pine { inset-inline-end: 21%; inline-size: clamp(5rem, 9vw, 9rem); aspect-ratio: 400 / 420; background-image: url('/art/road-pine.png'); }
-  .hero__text { position: relative; display: grid; gap: 1.4rem; justify-items: start; }
+  .hero__land--peaks { inset-inline-start: 46%; inline-size: clamp(6rem, 10vw, 10rem); aspect-ratio: 400 / 424; background-image: url('/art/road-peaks.png'); }
+  .hero__land--rocks { inset-inline-end: 3%; inline-size: clamp(5rem, 8vw, 8.5rem); aspect-ratio: 400 / 424; background-image: url('/art/road-rocks.png'); }
+  .hero__text { position: relative; display: grid; gap: 1.7rem; justify-items: start; }
   /* on the dark silk the buttons are strokes of gold, lettered in ink */
   .hero :global(.btn) { --btn-ink: var(--gold); color: #1a150d; }
   .hero :global(.btn:hover), .hero :global(.btn:focus-visible) { --btn-ink: #fff1cc; }
   .hero :global(.btn--ghost) { color: var(--ink); }
   .hero :global(.btn--ghost:hover), .hero :global(.btn--ghost:focus-visible) { color: var(--gold); }
   .hero__name {
-    font-size: clamp(4rem, min(1.4rem + 9.6vw, 1rem + 19.5vh), 12.5rem);
+    font-size: clamp(3.6rem, min(1.2rem + 7.4vw, 1rem + 15vh), 9.4rem);
     font-weight: 600;
     line-height: 0.86;
     letter-spacing: -0.03em;
@@ -126,7 +124,7 @@ const { lang } = Astro.props;
   .hero__last em { font-weight: 500; color: var(--gold); }
   :lang(ar) .hero__last em { color: var(--gold); font-weight: 500; }
   .hero :global(.hero__stroke) { inline-size: min(100%, 30rem); block-size: 22px; margin-block: -0.4rem 0.2rem; }
-  .hero__statement { font-size: var(--step-1); line-height: 1.55; max-inline-size: 34rem; color: var(--ink-2); }
+  .hero__statement { font-size: var(--step-1); line-height: 1.6; max-inline-size: 31rem; color: var(--ink-2); }
   :lang(ar) .hero__statement { line-height: 1.95; }
   .hero__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 1.2rem 2rem; margin-block-start: 0.6rem; }
   .hero__loc { margin-block-start: 0.2rem; }
@@ -151,7 +149,6 @@ const { lang } = Astro.props;
   }
   @media (max-width: 960px) {
     .hero { grid-template-columns: 1fr; padding-block: 6rem 4.4rem; min-block-size: auto; }
-    .hero__land--pine { display: none; }
     .hero__gate { order: 2; }
     .hero__last > span { padding-inline-start: 0.35em; }
     .hero__scroll { display: none; }

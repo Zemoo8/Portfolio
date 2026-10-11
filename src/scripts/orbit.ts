@@ -76,7 +76,10 @@ export function initOrbit(root: HTMLElement) {
     Rx = Math.min(w * (w < 700 ? 0.3 : 0.37), 620);
     while (Rx > 120 && reach(Rx, Rx * depth, half, persp) > free) Rx -= 6;
     Rz = Rx * depth;
-    Ry = Math.min(h * 0.22, 170);
+    // the ring is seen from well above: with six cards two always stand at the same distance to
+    // either side, one on the near half and one on the far — tilted this much, the far one clears
+    // the near one instead of hiding behind it
+    Ry = Math.min(h * 0.3, 230);
     // The card in front sits low enough that the whole emblem shows above it: its top edge, seen
     // through the perspective (origin 30 % down the stage), lands just under the emblem.
     const core = root.querySelector<HTMLElement>('.orbit__core');
