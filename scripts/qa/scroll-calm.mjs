@@ -16,7 +16,8 @@ const results = [];
 const check = (name, ok, info = '') => results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? '  — ' + info : ''}`);
 
 check('no scroll-speed wind canvas', !(await p.$('[data-wind]')));
-const tl = await p.evaluate(() => [...document.querySelectorAll('.build')].map((el) => el.getAnimations()[0]?.timeline?.constructor?.name ?? 'none'));
+// (only the stages this screen shows: a wide screen leaves the phone's two merged stages out)
+const tl = await p.evaluate(() => [...document.querySelectorAll('.build')].filter((el) => getComputedStyle(el).display !== 'none').map((el) => el.getAnimations()[0]?.timeline?.constructor?.name ?? 'none'));
 check('the painting builds on a ScrollTimeline', tl.length > 0 && tl.every((t) => t === 'ScrollTimeline'), tl.join(','));
 
 // 1) native wheel

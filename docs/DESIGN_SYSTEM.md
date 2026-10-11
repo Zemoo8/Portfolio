@@ -6,7 +6,7 @@
 
 | Token | Value | Use |
 |---|---|---|
-| `--paper` / `--paper-2` / `--paper-3` | `#f5efe1` / `#ede5d2` / `#e2d8c1` | page ground, parchment panels, mats (always with `--paper-grain`) |
+| `--paper` / `--paper-2` / `--paper-3` | `#f5efe1` / `#ede5d2` / `#e2d8c1` | page ground, parchment panels, mats (always with `--paper-grain`, a baked 220 px tile — never an SVG noise filter at runtime: its shader froze a first visit for a quarter of a second) |
 | `--ink` / `--ink-2` | `#1f1d1a` / `#45413a` | headings, body copy |
 | `--muted` | `#66615a` | labels and meta (≥ 4.5 : 1 on paper) |
 | `--mist` · `--ash` · `--wash` · `--wash-deep` | `#ebe6da` · `#b8b3a7` · `#6e6a62` · `#3a3732` | the ink-wash greys of the painting; decorative only |
@@ -78,13 +78,13 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 | Wind | open sky | ambient and time-based: three soft mist wisps cross the sky at a constant pace (95–150 s), mist banks breathe sideways — the same whether or not you scroll |
 | Orbit | projects | a rhythm, not a drift: one project rests in front for 6.5 s, then the ring glides (1.5 s, ease-in-out) to the next — the card in front, its film and the caption always agree. Drag settles on the nearest project in one motion; arrows / stations / keys glide there; the automatic turn waits while the pointer rests on the ring or focus is inside, and on pause. The ring and the smoke vortex both centre exactly on the emblem; the front of the ring falls a little lower, so the card in front sits just under the emblem and the whole emblem shows; on wide screens the ring is sized to stay clear of the chapter scroll (the certificate rail likewise stops short of it and fades out); the vortex turns at one constant pace (30 fps) and ignores the pointer |
 | The gust | moon gate → intro film | WebGL smoke vortex with an alpha edge torn by fbm noise into spiral streaks and bright wind lines at its front; its reach eases from the gate's rim to past the screen corners (1.35 s), then it settles to the storm's calm 30 fps behind the screen; reversed on close (0.8 s). Reduced motion / motion off / no WebGL: the stage fades in on ink |
-| Page change | cross-document | the next page is painted in: a brush swash grows from the centre until it covers the view (View Transitions + mask) |
+| Page change | cross-document | one stroke of a loaded brush sweeps across the screen (right to left in Arabic); the pages swap while the body of the stroke covers the view, and the title rises as the ink leaves it. View Transitions, `transform` and `opacity` only, so the compositor runs it while the new page is still starting up (`public/ink/sweep.png`); films, the smoke shader and the later stages of the painting wait until it has passed (`scripts/settled.ts`). Internal links are fetched on hover, so the stroke starts at once |
 
 **Scrolling is the browser's own** (no smooth-scroll library, no inertia). Nothing responds to scroll *speed*; everything that follows the scroll is a function of scroll *position*, run by the compositor, so the same place on the page always looks the same.
 
 **Reduced motion** (OS setting) **or the motion switch** (footer and index, persisted): everything is shown immediately, no parallax/wind/drift/auto-rotation, the vortex renders a single still frame, films don't autoplay.
 
-**Performance rules:** no per-frame scroll JavaScript (scroll-driven CSS; timelines kept out of the `animation` shorthand so minifiers can't fold them into a form browsers reject); the orbit skips style writes while paused; the vortex compiles its shader asynchronously (`KHR_parallel_shader_compile`), renders at ~0.5× resolution, and only runs while visible; ink marks are baked PNG masks; the painting ships 1000 w/2000 w variants; above-the-fold content never waits for JavaScript.
+**Performance rules:** no per-frame scroll JavaScript (scroll-driven CSS; timelines kept out of the `animation` shorthand so minifiers can't fold them into a form browsers reject); the orbit skips style writes while paused; the vortex runs in a worker on a canvas handed over to it (`vortex.worker.ts`; creating a WebGL context held the page's thread for 40–170 ms), compiles its shader asynchronously (`KHR_parallel_shader_compile`), renders at ~0.5× resolution, and only runs while visible; ink marks are baked PNG masks; the painting ships 1000 w/2000 w variants; above-the-fold content never waits for JavaScript.
 
 ## Media treatment
 

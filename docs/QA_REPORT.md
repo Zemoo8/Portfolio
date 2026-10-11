@@ -2,7 +2,20 @@
 
 Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro preview`; Chromium via Playwright 1.61 (headless; GPU via ANGLE/D3D11 for WebGL); Lighthouse 12 (mobile, simulated throttling).
 
-## Round 4 — 2026-10-11: search, loading, phone films, CV (latest)
+## Round 5 — 2026-10-11: smoother page changes, no first-visit freeze (latest)
+
+Measured in Chrome on the owner's laptop (Ryzen 7 7730U, integrated Radeon, 1920×1200 at 125 %), tracing the frames that reached the screen.
+
+| Area | Result |
+|---|---|
+| Scrolling | Already ~60 fps on this machine before the round (59.6 fps, one frame over 33 ms in 468); left native, as designed |
+| Moon gate hover | The gate's `pointerenter` created a WebGL context on the spot: 172 ms with the page frozen, measured in the owner's own Chrome. It now waits for an idle moment after the event |
+| Page change | New transition (a brush sweep, compositor-only). Longest stretch without a new frame, warm browser profile, new vs. previous build: into a case study 25 ms vs 71 ms · between case studies 47–50 ms vs 68–106 ms · back to the home page 85–106 ms vs 118–219 ms. With prefetch-on-hover the next page's HTML is already there (15 ms) |
+| First visit (cold graphics cache) | The paper grain and the gate's arrow used SVG `feTurbulence`; the driver compiled a noise shader for them while the page stood still. Landing on the home page: 590–640 ms → 350–370 ms without a frame. Grain baked to `public/ink/grain.png` (mean colour and noise of a panel unchanged: 242.2/236.4/221.8 vs 242.2/236.4/221.7), arrow drawn in its geometry |
+| Smoke vortex | Runs in a worker where `transferControlToOffscreen` exists (main-thread fallback kept); same picture, same 30 fps |
+| Regression checks | type check 0 errors · axe 0 violations on 7 pages · keyboard 21 / 21 · films 14 / 14 · scroll-calm 5 / 5 (its layer check now ignores the phone-only stages a wide screen never shows — it had been failing since those were added) |
+
+## Round 4 — 2026-10-11: search, loading, phone films, CV
 
 Nothing visual changed. Checked on the live site (`www.ahmedbaghouli.world`) after deploying.
 
