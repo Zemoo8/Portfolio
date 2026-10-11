@@ -8,6 +8,7 @@ import { locales, path, tr, type Locale } from '../../../i18n/config';
 import { ui } from '../../../i18n/ui';
 import { projects, type Project } from '../../../content/projects';
 import { profile } from '../../../content/profile';
+import { ids } from '../../../lib/seo';
 
 export const getStaticPaths = () =>
   locales.flatMap((lang) => projects.map((project) => ({ params: { lang, slug: project.slug }, props: { project } })));
@@ -25,16 +26,29 @@ const credit = tr(p.film?.credit ?? ui.work.film, lang);
 const label = `${p.title} — ${credit}`;
 const recLabel = `${p.title} — ${tr(ui.work.film, lang)}`; // phone films are always screen recordings
 const ogImage = exists(`og/${p.slug}-${lang}.jpg`) ? `og/${p.slug}-${lang}.jpg` : undefined;
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'CreativeWork',
-  name: p.title,
-  description: tr(p.tagline, lang),
-  inLanguage: lang,
-  dateCreated: p.year.replace(/\D.*$/, ''),
-  author: { '@type': 'Person', name: profile.name.en, url: new URL(path('en'), Astro.site).href },
-  keywords: p.stack.join(', '),
-};
+const url = new URL(path(lang, `work/${p.slug}`), Astro.site).href;
+const id = ids(Astro.site!);
+const jsonLd = [
+  {
+    '@type': 'CreativeWork',
+    '@id': `${url}#work`,
+    url,
+    name: p.title,
+    description: tr(p.tagline, lang),
+    inLanguage: lang,
+    dateCreated: p.year.replace(/\D.*$/, ''),
+    author: { '@id': id.person },
+    isPartOf: { '@id': id.website },
+    keywords: p.stack.join(', '),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: tr(profile.name, lang), item: new URL(path(lang), Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: p.title, item: url },
+    ],
+  },
+];
 ---
 
 <Base lang={lang} title={`${p.title} — ${tr(profile.name, lang)}`} description={tr(p.tagline, lang)} route={`work/${p.slug}`} ogImage={ogImage} jsonLd={jsonLd}>

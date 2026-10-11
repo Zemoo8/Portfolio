@@ -2,8 +2,7 @@
 import '@fontsource/cormorant-garamond/latin-500.css';
 import '@fontsource/cormorant-garamond/latin-500-italic.css';
 import '@fontsource/cormorant-garamond/latin-600.css';
-import '@fontsource/cormorant-garamond/latin-ext-500.css';
-import '@fontsource/cormorant-garamond/latin-ext-600.css';
+import '../styles/fonts.css';
 import '@fontsource-variable/figtree';
 import '@fontsource/noto-naskh-arabic/arabic-500.css';
 import '@fontsource/noto-naskh-arabic/arabic-600.css';
@@ -16,9 +15,16 @@ import Footer from '../components/Footer.astro';
 import Backdrop from '../components/Backdrop.astro';
 import Lightbox from '../components/Lightbox.astro';
 import EmblemSymbol from '../components/EmblemSymbol.astro';
+// the faces the first screen is set in: asked for with the HTML, not after the first layout
+import displayFace from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-600-normal.woff2?url';
+import italicFace from '@fontsource/cormorant-garamond/files/cormorant-garamond-latin-500-italic.woff2?url';
+import textFace from '@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url';
+import arabicDisplayFace from '@fontsource/noto-naskh-arabic/files/noto-naskh-arabic-arabic-600-normal.woff2?url';
+import arabicTextFace from '@fontsource/ibm-plex-sans-arabic/files/ibm-plex-sans-arabic-arabic-400-normal.woff2?url';
 import { locales, localeMeta, path, asset, tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { profile } from '../content/profile';
+import { ids } from '../lib/seo';
 
 interface Props {
   lang: Locale;
@@ -27,17 +33,33 @@ interface Props {
   /** path below the locale root, e.g. 'work/cheezy' */
   route?: string;
   ogImage?: string;
-  jsonLd?: Record<string, unknown>;
+  /** this page's own nodes, added to the site-wide graph (the site and the person) */
+  jsonLd?: Record<string, unknown>[];
+  /** pages that are not content (404): kept out of search, with no canonical of their own */
+  noindex?: boolean;
 }
 
-const { lang, title, description, route = '', ogImage = `og/default-${lang}.jpg`, jsonLd } = Astro.props;
+const { lang, title, description, route = '', ogImage = `og/default-${lang}.jpg`, jsonLd = [], noindex = false } = Astro.props;
 const dir = localeMeta[lang].dir;
 const site = Astro.site!;
 const canonical = new URL(path(lang, route), site).href;
 const og = new URL(asset(ogImage), site).href;
+const preloads = lang === 'ar' ? [arabicDisplayFace, arabicTextFace] : [displayFace, italicFace, textFace];
+// Vercel Web Analytics (cookieless, same origin). The script only exists on Vercel deployments.
+const analytics = import.meta.env.PROD && !!process.env.VERCEL;
+const id = ids(site);
+const website = {
+  '@type': 'WebSite',
+  '@id': id.website,
+  url: new URL('/', site).href,
+  name: profile.name.en,
+  alternateName: profile.name.ar,
+  inLanguage: [...locales],
+  publisher: { '@id': id.person },
+};
 const person = {
-  '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': id.person,
   name: profile.name.en,
   alternateName: profile.name.ar,
   jobTitle: profile.role.en,
@@ -59,12 +81,17 @@ const person = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content={profile.name.en} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
     <meta name="theme-color" content="#f5efe1" />
     <meta name="color-scheme" content="light" />
-    <link rel="canonical" href={canonical} />
-    {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(l, route), site).href} />)}
-    <link rel="alternate" hreflang="x-default" href={new URL(path('en', route), site).href} />
+    {preloads.map((href) => <link rel="preload" as="font" type="font/woff2" href={href} crossorigin />)}
+    {!noindex && (
+      <Fragment>
+        <link rel="canonical" href={canonical} />
+        {locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(path(l, route), site).href} />)}
+        <link rel="alternate" hreflang="x-default" href={new URL(path('en', route), site).href} />
+      </Fragment>
+    )}
 
     <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
     <link rel="icon" href={asset('favicon-32.png')} sizes="32x32" type="image/png" />
@@ -87,7 +114,13 @@ const person = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={og} />
 
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd ?? person)} />
+    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@graph': [website, person, ...jsonLd] })} />
+    {analytics && (
+      <Fragment>
+        <script is:inline>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+        <script is:inline defer src="/_vercel/insights/script.js"></script>
+      </Fragment>
+    )}
 
     <script is:inline>
       document.documentElement.classList.replace('no-js', 'js');

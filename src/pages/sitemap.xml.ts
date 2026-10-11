@@ -12,6 +12,7 @@ export const GET: APIRoute = ({ site }) => {
         (l) => `  <url>
     <loc>${url(l, r)}</loc>
 ${locales.map((a) => `    <xhtml:link rel="alternate" hreflang="${a}" href="${url(a, r)}"/>`).join('\n')}
+    <xhtml:link rel="alternate" hreflang="x-default" href="${url('en', r)}"/>
   </url>`,
       ),
     )

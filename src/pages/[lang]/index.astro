@@ -8,15 +8,20 @@ import Credentials from '../../sections/Credentials.astro';
 import Capabilities from '../../sections/Capabilities.astro';
 import MoreWork from '../../sections/MoreWork.astro';
 import Contact from '../../sections/Contact.astro';
-import { locales, tr, type Locale } from '../../i18n/config';
+import { locales, path, tr, type Locale } from '../../i18n/config';
 import { profile } from '../../content/profile';
+import { ids } from '../../lib/seo';
 
 export const getStaticPaths = () => locales.map((lang) => ({ params: { lang } }));
 const lang = Astro.params.lang as Locale;
 const title = `${tr(profile.name, lang)} — ${tr(profile.role, lang)}`;
+const url = new URL(path(lang), Astro.site).href;
+const id = ids(Astro.site!);
+// the home page is the profile of one person
+const jsonLd = [{ '@type': 'ProfilePage', '@id': `${url}#profile`, url, name: title, inLanguage: lang, isPartOf: { '@id': id.website }, mainEntity: { '@id': id.person } }];
 ---
 
-<Base lang={lang} title={title} description={tr(profile.statement, lang)}>
+<Base lang={lang} title={title} description={tr(profile.statement, lang)} jsonLd={jsonLd}>
   <Hero lang={lang} />
   <Work lang={lang} />
   <About lang={lang} />
