@@ -14,7 +14,7 @@ Statuses: **VERIFIED BY PRIMARY SOURCE** (code, official document) · **VERIFIED
 | Location: Tunis/Tunisia | LinkedIn (Tunis) | CV (Ariana), GitHub (Tunisia) | VERIFIED — shown as "Tunisia"/"Tunis" |
 | Email ahmedbaghoulii@gmail.com | CV | GitHub profile README | VERIFIED (already public) |
 | Phone number | CV | — | **OMIT** (private; not needed) — also removed from the downloadable CV |
-| Downloadable CV | — | — | **NOT PUBLISHED.** A phone-free copy of `CV - English.pdf` was online for about fifteen minutes on 2026-10-11 and removed at Ahmed's request: that file is the wrong CV. Publish one only from a file he names (`scripts/media/build-cv.py`) |
+| Downloadable CV (`/cv/ahmed-baghouli-cv.pdf`, English) | Ahmed's own `CV_Baghouli_Ahmed.pdf` | — | Published 2026-10-11 at Ahmed's request, without the phone number (`scripts/media/build-cv.py`); otherwise his document, unedited. It states things the site leaves out or words differently — "Jun 2027 (expected)", freelance start "Jun 2026", grades and rankings, chess ~1600, French "TCF B2, 408" (the site says B1). The older `CV - English.pdf` was online for about fifteen minutes the same day and removed: wrong CV |
 | GitHub / LinkedIn URLs | CV | browser | VERIFIED |
 | Seeking a Master's in AI (NLP + CV), then doctoral research | CV | — | SINGLE SOURCE |
 | Chess since 2018; six years of Shotokan karate | CV | — | SINGLE SOURCE |
