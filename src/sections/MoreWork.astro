@@ -1,4 +1,12 @@
 ---
+// "More on GitHub" as a folding screen: six leaves of gold leaf standing in a zigzag, an old pine
+// painted across all of them (scripts/art/screen.mjs), and — as on the screens that have poem
+// cards pasted to them — a paper card on every leaf: the first carries the title, each of the
+// others one repository. It arrives folded and opens out.
+// Only `transform` moves. A leaf is sheared to stand in the zigzag (alternately, about the hinge
+// it shares with its neighbour) and its cards are sheared back, so the writing stays level.
+// Six leaves in a row need room: a narrower page gets a pair of three-leaf screens (the second
+// with the picture reversed, as pairs of screens are painted), a phone a column of single leaves.
 import Shot from '../components/Shot.astro';
 import { tr, type Locale } from '../i18n/config';
 import { ui } from '../i18n/ui';
@@ -7,28 +15,37 @@ import { profile } from '../content/profile';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
+// where a leaf stands (--i of six, --j of three) and which way it leans in a row of six or of three
+const leaf = (i: number) => `--i:${i}; --j:${i % 3}; --s6:${i % 2 ? -1 : 1}; --s3:${(i % 3) % 2 ? -1 : 1}; --r:${[-0.7, 0.5, -0.4, 0.8, -0.5, 0.6][i]}deg`;
 ---
 
-<section id="more" class="section wrap" aria-labelledby="more-title" data-tone="light" data-chapter-name="GitHub">
-  <div class="scroll more" data-unroll>
-    <header class="section-head more__head">
-      <p class="kicker" data-reveal>{tr(ui.more.kicker, lang)}</p>
-      <h2 id="more-title" class="display" data-lines>{tr(ui.more.title, lang)}</h2>
-      <a class="btn btn--ghost" href={profile.links.github} target="_blank" rel="noopener me" data-reveal>{tr(ui.more.all, lang)} <span class="arrow" aria-hidden="true">↗</span></a>
+<section id="more" class="section wrap more" aria-labelledby="more-title" data-tone="light" data-chapter-name="GitHub">
+  <div class="byobu" data-reveal-brush>
+    <header class="leaf" style={leaf(0)}>
+      <div class="leaf__paint" aria-hidden="true"></div>
+      <div class="leaf__face">
+        <div class="card card--title">
+          <p class="kicker">{tr(ui.more.kicker, lang)}</p>
+          <h2 id="more-title" class="display">{tr(ui.more.title, lang)}</h2>
+          <a class="link-u card__all" href={profile.links.github} target="_blank" rel="noopener me">{tr(ui.more.all, lang)} <span class="arrow" aria-hidden="true">↗</span></a>
+        </div>
+      </div>
     </header>
-
-    <ul class="more__list">
-      {moreWork.map((w, i) => (
-        <li class="item" data-reveal style={`--i:${i}`}>
-          <div class="item__thumb">{w.image ? <Shot src={w.image} alt="" sizes="16rem" ratio="16 / 10" /> : <div class="item__blank" aria-hidden="true"><span lang="en">{w.tech[0]}</span></div>}</div>
-          <div class="item__main">
-            <h3 class="item__title" lang="en">{w.title}</h3>
-            <p class="item__body">{tr(w.body, lang)}</p>
-            <p class="item__tech label" lang="en">{w.tech.join(' · ')}</p>
-          </div>
-          <div class="item__links">
-            {w.live && <a class="link-u" href={w.live} target="_blank" rel="noopener">{tr(ui.work.live, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
-            {w.repo && <a class="link-u" href={w.repo} target="_blank" rel="noopener">{tr(ui.work.source, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
+    <ul class="leaves">
+      {moreWork.map((w, k) => (
+        <li class:list={['leaf', k + 1 > 2 && 'leaf--second']} style={leaf(k + 1)}>
+          <div class="leaf__paint" aria-hidden="true"></div>
+          <div class="leaf__face">
+            {w.image && <div class="card card--pic"><Shot src={w.image} alt="" sizes="16rem" ratio="16 / 10" /></div>}
+            <div class="card">
+              <h3 class="card__title" lang="en">{w.title}</h3>
+              <p class="card__body">{tr(w.body, lang)}</p>
+              <p class="card__tech label" lang="en">{w.tech.join(' · ')}</p>
+              <p class="card__links">
+                {w.live && <a class="link-u" href={w.live} target="_blank" rel="noopener">{tr(ui.work.live, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
+                {w.repo && <a class="link-u" href={w.repo} target="_blank" rel="noopener">{tr(ui.work.source, lang)} <span class="arrow" aria-hidden="true">↗</span></a>}
+              </p>
+            </div>
           </div>
         </li>
       ))}
@@ -37,21 +54,108 @@ const { lang } = Astro.props;
 </section>
 
 <style>
-  .more__head { max-inline-size: none; grid-template-columns: 1fr auto; align-items: end; }
-  .more__head .kicker { grid-column: 1 / -1; }
-  .more__head h2 { font-size: var(--step-4); }
-  .more__list { border-block-start: 1px solid var(--line); }
-  .item { display: grid; grid-template-columns: 11rem minmax(0, 1fr) auto; gap: var(--gutter); align-items: start; padding-block: 1.5rem; border-block-end: 1px solid var(--line); }
-  .item__thumb :global(.media) { box-shadow: 0 12px 26px -16px rgb(40 36 30 / 0.5); }
-  .item__blank { aspect-ratio: 16 / 10; display: grid; place-items: center; border-radius: var(--radius); background: var(--paper-2); box-shadow: 0 0 0 1px var(--line) inset; font-size: 0.8rem; color: var(--muted); }
-  .item__title { font-family: var(--font-display); font-size: var(--step-2); font-weight: 600; line-height: 1.1; }
-  .item__body { color: var(--ink-2); margin-block-start: 0.4rem; max-inline-size: 44rem; }
-  .item__tech { margin-block-start: 0.6rem; }
-  .item__links { display: grid; gap: 0.4rem; justify-items: end; white-space: nowrap; font-weight: 600; color: var(--rust); font-size: var(--step--1); }
-  @media (max-width: 800px) {
-    .more__head { grid-template-columns: 1fr; }
-    .item { grid-template-columns: 1fr; }
-    .item__thumb { max-inline-size: 16rem; }
-    .item__links { justify-items: start; grid-auto-flow: column; justify-content: start; gap: 1.4rem; }
+  .more { container-type: inline-size; padding-block-end: 2rem; }
+  /* ---- the screen: a column of leaves on a phone … */
+  .byobu { --fold: 0deg; --s: 0; position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.9rem 0; }
+  .byobu::after {
+    /* its shadow on the floor */
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset-inline: 2%;
+    inset-block-start: calc(100% - 0.4rem);
+    block-size: 2.4rem;
+    background: radial-gradient(50% 100% at 50% 0%, rgb(40 32 18 / 0.36), rgb(40 32 18 / 0));
   }
+  .leaves { display: contents; }
+  .leaf {
+    position: relative;
+    overflow: clip;
+    transform: skewY(calc(var(--s) * var(--fold)));
+    transform-origin: calc(50% - var(--s) * 50%) 50%;
+  }
+  .leaf__paint {
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    inset-inline-start: calc(var(--j) * -100%);
+    inline-size: 300%;
+    background: #d8b25e url('/art/screen.webp') center / cover;
+  }
+  .leaf:nth-child(even) .leaf__paint, .leaf--second .leaf__paint { scale: -1 1; }
+  .leaf::after {
+    /* the light falls from one side: a leaf that turns away from it is darker. And its frame:
+       black lacquer, then a line of brocade (drawn here, over the painting) */
+    content: '';
+    position: absolute;
+    inset: 0;
+    scale: var(--s) 1;
+    background: linear-gradient(90deg, rgb(255 246 214 / 0.16), rgb(52 34 6 / 0.36));
+    box-shadow: inset 0 0 0 3px #17130e, inset 0 0 0 5px rgb(120 90 34 / 0.9);
+    pointer-events: none;
+  }
+  .leaf__face {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.8rem;
+    min-block-size: 21rem;
+    padding: 7rem 0.9rem 1.5rem;
+    transform: skewY(calc(var(--s) * var(--fold) * -1));
+  }
+
+  /* ---- the cards pasted on it ---- */
+  .card {
+    padding: 1rem 0.95rem 1.05rem;
+    background: var(--paper-grain), linear-gradient(180deg, #faf5e8, #f1e9d5);
+    box-shadow: 0 10px 22px -12px rgb(40 28 6 / 0.7), 0 1px 2px rgb(40 28 6 / 0.3);
+    rotate: var(--r);
+    transition: translate 0.5s var(--ease-out), rotate 0.5s var(--ease-out);
+  }
+  .leaf:hover .card, .leaf:focus-within .card { translate: 0 -4px; rotate: 0deg; }
+  .card--pic { padding: 0.3rem; rotate: calc(var(--r) * -1.6); align-self: center; inline-size: min(100%, 15rem); }
+  .card--title { display: grid; gap: 0.7rem; padding-block: 1.3rem 1.4rem; }
+  .card--title h2 { font-size: var(--step-2); line-height: 1.08; }
+  :lang(ar) .card--title h2 { line-height: 1.5; }
+  .card__all { justify-self: start; font-size: var(--step--1); font-weight: 600; color: var(--rust); }
+  .card__title { font-family: var(--font-display); font-size: 1.36rem; font-weight: 600; line-height: 1.08; overflow-wrap: anywhere; }
+  .card__body { margin-block-start: 0.5rem; font-size: 0.86rem; line-height: 1.5; color: var(--ink-2); }
+  :lang(ar) .card__body { line-height: 1.8; }
+  .card__tech { margin-block-start: 0.6rem; line-height: 1.6; }
+  .card__links { display: flex; flex-wrap: wrap; gap: 0.2rem 1rem; margin-block-start: 0.6rem; font-size: var(--step--1); font-weight: 600; color: var(--rust); }
+
+  /* ---- … a pair of three-leaf screens where there is room … */
+  @container (min-width: 700px) {
+    .byobu { --fold: 3.2deg; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3.4rem 0; }
+    .leaf { --s: var(--s3); }
+    .leaf:nth-child(even) .leaf__paint { scale: none; }
+    .leaf--second .leaf__paint { scale: -1 1; }
+    .leaf__face { min-block-size: 31rem; padding: 9.5rem 0.9rem 2.6rem; }
+  }
+  /* ---- … and all six in a row on a wide page ---- */
+  @container (min-width: 1240px) {
+    .byobu { --fold: 4.4deg; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .leaf { --s: var(--s6); }
+    .leaf__paint, .leaf--second .leaf__paint { inline-size: 600%; inset-inline-start: calc(var(--i) * -100%); scale: none; }
+    .leaf__face { min-block-size: 38rem; padding: 10.5rem 0.75rem 3rem; }
+    .card { padding-inline: 0.8rem; }
+    .card__title { font-size: 1.26rem; }
+    .card__body { font-size: 0.83rem; }
+  }
+
+  /* ---- arriving: the screen stands folded, and opens ---- */
+  .byobu { transform-origin: 0 50%; }
+  :global([dir='rtl']) .byobu { transform-origin: 100% 50%; }
+  :global(.js) .byobu:not(:global(.is-in)) { transform: scaleX(0.2); opacity: 0; }
+  :global(.js) .byobu:not(:global(.is-in)) .leaf { transform: skewY(calc(var(--s) * 15deg)); }
+  :global(.js) .byobu:global(.is-in) { transition: transform 1.3s cubic-bezier(0.65, 0, 0.2, 1), opacity 0.4s linear; }
+  :global(.js) .byobu:global(.is-in) .leaf { transition: transform 1.3s cubic-bezier(0.65, 0, 0.2, 1); }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .byobu:not(:global(.is-in)) { transform: none; opacity: 1; }
+    :global(.js) .byobu:not(:global(.is-in)) .leaf { transform: skewY(calc(var(--s) * var(--fold))); }
+  }
+  :global(.motion-off) .byobu.byobu { transform: none; opacity: 1; transition: none; }
+  :global(.motion-off) .byobu .leaf.leaf { transform: skewY(calc(var(--s) * var(--fold))); transition: none; }
 </style>
