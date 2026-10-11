@@ -132,12 +132,14 @@ The credential gallery shows the **real documents**. Data: `src/content/credenti
 npm run build && npm run preview       # keep running in another terminal
 npm run og                             # social cards + intro posters
 npm run art                            # repaint the landscape (seeded, deterministic)
-node scripts/art/ink-marks.mjs         # brush marks for buttons / links / arrows, the page-change sweep and the paper grain (public/ink)
+node scripts/art/ink-marks.mjs         # brush marks for buttons / links / arrows, the page-change sweep, the paper grain and the name seal (public/ink)
+node scripts/art/road-marks.mjs        # the Path chapter's pavilion, rocks, pine and travellers (public/art/road-*.png)
 node scripts/art/favicon.mjs           # brushed-ensō favicons
 node scripts/media/encode-films.mjs    # every showcase film as H.264 MP4 (+ 960 px orbit cut, phone version, posters)
 node scripts/media/encode-films.mjs --phone   # only the 960 px phone versions, from the finished films
 node scripts/qa/films.mjs              # every film must actually play in Chrome
 node scripts/qa/scroll-calm.mjs        # scrolling stays native and position-driven
+node scripts/qa/smooth.mjs /en/        # frame times while scrolling, per chapter (PROFILE=<dir> twice: first visit, then returning)
 npm run media:certs                    # certificate WebPs from assets-source/certificates
 npm run media:cv                       # the public CV (no phone number) from ../CV - English.pdf
 npm run qa:a11y && npm run qa:keys && npm run qa:links

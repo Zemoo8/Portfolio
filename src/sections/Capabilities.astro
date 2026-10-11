@@ -29,22 +29,24 @@ const turn = (i: number, k: number) => (((i * 7 + k * 13) % 9) - 4) * 0.55;
         <svg class="kake__cord" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true"><path d="M3 33 L50 3 L97 33" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" /></svg>
         <span class="kake__rod" aria-hidden="true"></span>
         <div class="kake__sheet">
-          <div class="kake__paper">
-            <p class="kake__n display" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
-            <h3 class="kake__name display">{tr(c.name, lang)}</h3>
-            <p class="kake__body">{tr(c.body, lang)}</p>
-            <ul class="seals" lang="en">
-              {c.tools.map((t, k) => <li class="seal" dir="ltr" style={`--r:${turn(i, k)}deg; --k:${k}`}>{t}</li>)}
-            </ul>
-            <p class="kake__proof label">
-              {tr(ui.capabilities.usedIn, lang)}{' '}
-              {c.proof.map((slug, j) => {
-                const p = projectBySlug(slug)!;
-                return <>{j > 0 && ' · '}<a class="link-u" href={path(lang, `work/${slug}`)}>{p.title}</a></>;
-              })}
-            </p>
+          <div class="kake__window">
+            <div class="kake__paper">
+              <p class="kake__n display" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
+              <h3 class="kake__name display">{tr(c.name, lang)}</h3>
+              <p class="kake__body">{tr(c.body, lang)}</p>
+              <ul class="seals" lang="en">
+                {c.tools.map((t, k) => <li class="seal" dir="ltr" style={`--r:${turn(i, k)}deg; --k:${k}`}>{t}</li>)}
+              </ul>
+              <p class="kake__proof label">
+                {tr(ui.capabilities.usedIn, lang)}{' '}
+                {c.proof.map((slug, j) => {
+                  const p = projectBySlug(slug)!;
+                  return <>{j > 0 && ' · '}<a class="link-u" href={path(lang, `work/${slug}`)}>{p.title}</a></>;
+                })}
+              </p>
+            </div>
           </div>
-          <span class="kake__rod kake__rod--foot" aria-hidden="true"></span>
+          <div class="kake__foot" aria-hidden="true"><span class="kake__rod kake__rod--foot"></span></div>
         </div>
       </li>
     ))}
@@ -62,7 +64,9 @@ const turn = (i: number, k: number) => (((i * 7 + k * 13) % 9) - 4) * 0.55;
     /* a soft wash of paper so the heading never fights the painting */
     content: '';
     position: absolute;
-    inset: -20% -10% -30% -12%;
+    /* (it may spill past the start of the line but not past its end: that would make the page scroll sideways) */
+    inset-block: -20% -30%;
+    inset-inline: -12% 0;
     z-index: -1;
     background: radial-gradient(closest-side, rgb(246 241 229 / 0.94), rgb(246 241 229 / 0));
     pointer-events: none;
@@ -95,8 +99,16 @@ const turn = (i: number, k: number) => (((i * 7 + k * 13) % 9) - 4) * 0.55;
     position: relative;
     padding: 1.7rem 1.25rem 2rem;
     background: var(--paper-grain), linear-gradient(90deg, #ece3cd, #f9f4e6 9%, #f7f1e3 91%, #e9dfc7);
+  }
+  .kake__sheet::before {
+    /* the paper's shadow on the wall (its own layer: the paper is seen through a window while it unrolls) */
+    content: '';
+    position: absolute;
+    inset: 0 0 0.5rem;
     box-shadow: 0 26px 46px -28px rgb(40 36 30 / 0.6), 0 2px 6px -3px rgb(40 36 30 / 0.25);
   }
+  .kake__window { position: relative; }
+  .kake__foot { position: absolute; inset: 0 0 0.5rem; pointer-events: none; }
   .kake__paper::before {
     /* the mounting: a hairline of saffron silk just inside each long edge */
     content: '';
@@ -108,7 +120,7 @@ const turn = (i: number, k: number) => (((i * 7 + k * 13) % 9) - 4) * 0.55;
     opacity: 0.4;
     pointer-events: none;
   }
-  .kake__rod--foot { position: absolute; inset-inline: 0; inset-block-end: 0; margin-inline: -0.7rem; block-size: 0.8rem; }
+  .kake__rod--foot { position: absolute; inset-inline: 0; inset-block-end: -0.5rem; margin-inline: -0.7rem; block-size: 0.8rem; }
 
   .kake__n { font-size: 2.4rem; font-style: italic; font-weight: 500; line-height: 0.9; color: var(--seal); }
   .kake__name { margin-block-start: 0.7rem; font-size: var(--step-2); font-weight: 600; line-height: 1.08; }
@@ -144,12 +156,17 @@ const turn = (i: number, k: number) => (((i * 7 + k * 13) % 9) - 4) * 0.55;
   .seal--cut::before { background: none; -webkit-mask: none; mask: none; border: 1.6px solid var(--seal); border-radius: 3px 4px 3px 5px; opacity: 0.85; }
   .tongues { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem 0.75rem; margin-block-start: 3rem; }
 
-  /* ---- arriving: the scroll unrolls, then the seals are pressed on, one after another ---- */
-  @property --roll { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
-  :global(.js) .kake { --roll: 100%; }
-  :global(.js) .kake:global(.is-in) { --roll: 0%; transition: --roll 1.15s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--i) * 150ms), rotate 1.6s var(--ease-out); }
-  .kake__paper { clip-path: inset(0 0 var(--roll) 0); }
-  .kake__rod--foot { inset-block-end: var(--roll); }
+  /* ---- arriving: the scroll unrolls, then the seals are pressed on, one after another.
+     Only `transform` moves (the compositor runs it): a window slides down over the paper while
+     the paper slides up inside it by as much, so the paper stays where it hangs and is seen only
+     through the window; the lower roller rides on the window's edge. ---- */
+  :global(.js) .kake .kake__window { overflow: clip; pointer-events: none; }
+  :global(.js) .kake .kake__paper { pointer-events: auto; }
+  :global(.js) .kake :is(.kake__window, .kake__foot) { transform: translateY(-100%); }
+  :global(.js) .kake .kake__paper { transform: translateY(100%); }
+  :global(.js) .kake .kake__sheet::before { opacity: 0; }
+  :global(.js) .kake:global(.is-in) :is(.kake__window, .kake__foot, .kake__paper) { transform: none; transition: transform 1.15s cubic-bezier(0.7, 0, 0.2, 1) calc(var(--i) * 150ms); }
+  :global(.js) .kake:global(.is-in) .kake__sheet::before { opacity: 1; transition: opacity 0.7s var(--ease-out) calc(1s + var(--i) * 150ms); }
   :global(.js) .kake .seal { opacity: 0; scale: 1.55; }
   :global(.js) .kake:global(.is-in) .seal {
     opacity: 1;
@@ -158,10 +175,12 @@ const turn = (i: number, k: number) => (((i * 7 + k * 13) % 9) - 4) * 0.55;
     transition-delay: calc(0.95s + var(--i) * 150ms + var(--k) * 80ms);
   }
   @media (prefers-reduced-motion: reduce) {
-    :global(.js) .kake { --roll: 0%; }
+    :global(.js) .kake :is(.kake__window, .kake__foot, .kake__paper) { transform: none; }
+    :global(.js) .kake .kake__sheet::before { opacity: 1; }
     :global(.js) .kake .seal { opacity: 1; scale: 1; }
   }
-  :global(.motion-off) .kake { --roll: 0%; transition: none; }
+  :global(.motion-off) .kake :is(.kake__window, .kake__foot, .kake__paper) { transform: none; transition: none; }
+  :global(.motion-off) .kake .kake__sheet::before { opacity: 1; transition: none; }
   :global(.motion-off) .kake .seal { opacity: 1; scale: 1; transition: none; }
 
   @media (max-width: 1100px) {

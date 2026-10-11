@@ -2,7 +2,22 @@
 
 Environment: Windows 11, Node 24, Astro 7.3.5 static build served by `astro preview`; Chromium via Playwright 1.61 (headless; GPU via ANGLE/D3D11 for WebGL); Lighthouse 12 (mobile, simulated throttling).
 
-## Round 5 — 2026-10-11: smoother page changes, no first-visit freeze (latest)
+## Round 6 — 2026-10-11: Path as a road on an unrolling scroll, Capabilities as hanging scrolls (latest)
+
+Same laptop and Chrome. New tool: `scripts/qa/smooth.mjs` scrolls a page by the wheel at a reading pace and a hurried one and times every frame, per chapter; with `PROFILE=<dir>` it keeps the browser profile, so a second run is a returning visitor (graphics shaders already compiled).
+
+| Area | Result |
+|---|---|
+| Unrolling, first version | Cut the silk off with `clip-path` driven by a scroll timeline: repainted on the main thread on every frame. Path: 21 of 243 frames late at a reading pace, 27 of 116 hurried. The four hanging scrolls (a registered custom property driving `clip-path`): 35 of 58 late |
+| Unrolling, as shipped | `transform` only — a window slides down while the sheet slides up inside it by as much; the compositor runs it. Path: 0–6 late of 260–300 at a reading pace over nine runs, 0–2 of ~130 hurried (one run had a single 203 ms stall in Path; the two runs after it had no late frame there). Capabilities: 0–4 of ~80. The roller holds its line on the screen (727 px of 826 at three scroll positions) |
+| Whole home page, late frames (> 20 ms) | Returning visitor: live site 0.7 %, this build 0.6–3.9 % over four runs (the spread is in the hero, Work and About, which this round did not touch; the machine was in use). First visit: live 3.0 %, this build 3.1–6.8 % |
+| What a first visit pays for | Traced: every stall of 50–110 ms on a first visit is the GPU process compiling a shader for a kind of paint it meets for the first time (`RasterDecoder…Flush` with ANGLE compile tasks). Switching off masks, blend modes, filters, shadows, films, the backdrop or the canvases one at a time did not move them; a second pass over the page in the same browser has none (no slice over 31 ms in a warm trace of the whole page) |
+| View timeline | `view-timeline-inset` defaults to the page's `scroll-padding` (1.5rem here): the roller crept 24 px down the screen over the chapter until the inset was set to 0 |
+| Behaviour under the roller | The rolled-up window lies over the chapters above: it lets clicks through (`pointer-events: none`, the sheet takes them back). Keyboard: all focusable elements in the chapter come out from under the roller when focused (`scroll-margin`). Certificate lightbox opens from the road. Animations off / reduced motion: the scroll is simply open |
+| Layout | No sideways scrolling and no text touching the road at 11 widths (360–1920) × 3 languages. Found on the way: the Capabilities heading's paper wash spilled 46 px past the line's end at 900 px and made the page scroll sideways — now it may only spill past the start. Arabic: the road is mirrored with the page (a scoped `[dir='rtl']` rule never matched; it needed `:global`) |
+| Regression checks | type check 0 errors · axe 0 violations on 7 pages · keyboard 21 / 21 · films 14 / 14 · scroll-calm 5 / 5 · no console errors |
+
+## Round 5 — 2026-10-11: smoother page changes, no first-visit freeze
 
 Measured in Chrome on the owner's laptop (Ryzen 7 7730U, integrated Radeon, 1920×1200 at 125 %), tracing the frames that reached the screen.
 

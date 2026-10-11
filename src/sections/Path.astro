@@ -1,16 +1,19 @@
 ---
-// The path, painted as one stalk of ink bamboo (lib/bamboo.ts). Bamboo grows a joint at a time, so
-// each step of the way hangs from a joint: the newest growth at the top — a pale shoot for what
-// comes next — down to the root where it began. The steps keep their three groups (work,
-// competitions, studies), each newest first; they alternate from side to side, and across the
-// stalk from each one its date is written large. Every segment is painted as its step arrives.
+// The path, as a road: one pale-gold stroke of a loaded brush winding down a night-dark hanging
+// scroll (lib/road.ts) — a hair in the far distance at the top, where the way leads next, and
+// broad at the foot, where it began. The road makes a bend for every step, and the step is written
+// in the hollow of its bend, facing a landmark that stands outside it: a pavilion, karst rocks, a
+// pine, each on its own rise of ground that runs into the road's edge (scripts/art/road-marks.mjs).
+// A walker and two riders are on the road. The steps keep their three groups (work, competitions,
+// studies), newest first.
+// On a wide screen the scroll unrolls as you read: its lower roller keeps its place near the foot
+// of the screen and the silk comes out from under it.
 import { formatMonth, tr, asset, type Locale, type L } from '../i18n/config';
 import { ui } from '../i18n/ui';
 import { experience, education, competitions, type Entry } from '../content/path';
 import { competitionCertificate, internshipCertificate } from '../content/credentials';
 import { profile } from '../content/profile';
-import { cane, joint, leaves, shoot, grass } from '../lib/bamboo';
-import type { Bristle } from '../lib/brush';
+import { road } from '../lib/road';
 
 interface Props { lang: Locale }
 const { lang } = Astro.props;
@@ -30,7 +33,7 @@ const fromEntry = (e: Entry, group?: L): Step => ({
   cert: e.org === 'Sotetel' ? cert(internshipCertificate.image, tr(internshipCertificate.title, lang), tr(internshipCertificate.meta, lang), 'internship', 334, 490) : undefined,
 });
 const steps: Step[] = [
-  // what comes next, in Ahmed's own words (About): the shoot the stalk has not grown yet
+  // where the road leads, in Ahmed's own words (About): the far end, still only a hair of ink
   { next: true, mark: tr(ui.path.next, lang), org: '', body: [tr(profile.about[2], lang)] },
   ...experience.map((e, i) => fromEntry(e, i === 0 ? ui.path.experience : undefined)),
   ...competitions.map((c, i): Step => ({
@@ -39,180 +42,250 @@ const steps: Step[] = [
   })),
   ...education.map((e, i) => fromEntry(e, i === 0 ? ui.path.education : undefined)),
 ];
-const late = (bs: Bristle[], by: number) => bs.map((b) => ({ ...b, delay: b.delay + by }));
+const bends = road(steps.length);
+// what stands outside each bend, and how large (a share of the scroll's width): small far off
+const landmarks: [string, number][] = [['peaks', 9], ['pavilion', 14], ['pine', 15], ['rocks', 18], ['pine', 18], ['pavilion', 20], ['rocks', 22]];
+// who is on the road: which bend, how far down it, how wide beside the road's own width
+const folk = [{ bend: 4, t: 0.9, who: 'riders', span: 1.5 }, { bend: 5, t: 0.36, who: 'walker', span: 0.44 }];
 ---
 
 <section id="path" class="section wrap" aria-labelledby="path-title" data-tone="light" data-chapter-name={tr(ui.nav.path, lang)}>
-  <div class="scroll path" data-unroll>
-    <header class="section-head">
-      <p class="kicker" data-reveal>{tr(ui.path.kicker, lang)}</p>
-      <h2 id="path-title" class="sr-only">{tr(ui.path.kicker, lang)}</h2>
-    </header>
+  <div class="night">
+    <span class="night__rod" aria-hidden="true"></span>
+    <div class="night__window">
+      <div class="night__sheet">
+        <header class="section-head">
+          <p class="kicker" data-reveal>{tr(ui.path.kicker, lang)}</p>
+          <h2 id="path-title" class="sr-only">{tr(ui.path.kicker, lang)}</h2>
+        </header>
 
-    <ol class="stalk">
-      {steps.map((s, i) => {
-        const c = cane(31 + i * 7);
-        const hair = (b: Bristle) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay}`} />;
-        // leaves grow up from the joint on the side this step is written on — into the empty paper
-        // under the date of the step above; not every joint has them
-        const leafy = !s.next && i % 3 !== 0;
-        const fan = leafy ? leaves(5 + i * 3, 3 + (i % 3)) : null;
-        return (
-          <li class:list={['step', i % 2 ? 'step--far' : 'step--near', s.next && 'step--next']}>
-            <div class="step__cane" aria-hidden="true" data-reveal-brush>
-              <svg class="cane" viewBox="0 0 44 200" preserveAspectRatio="none">
-                <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  {s.next
-                    ? <g class="shoot">{shoot(77).map(hair)}</g>
-                    : <Fragment><g class="wash">{c.wash.map(hair)}</g><g class="edge">{late(c.edges, 0.15).map(hair)}</g></Fragment>}
-                </g>
-              </svg>
-              {!s.next && (
-                <svg class="knot" viewBox="0 0 44 12">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    {joint(60 + i).map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay}`} />)}
-                  </g>
-                </svg>
-              )}
-              {fan && (
-                <svg class="fan" viewBox="0 0 170 130">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    {fan.twig.map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay * 0.4 + 0.5}`} />)}
-                    {fan.fan.flatMap((lf, k) => lf.map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${b.delay * 0.3 + 0.75 + k * 0.16}`} />))}
-                  </g>
-                </svg>
-              )}
-              {i === steps.length - 1 && (
-                <svg class="tuft" viewBox="0 0 220 70">
-                  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    {grass(140).flatMap((blade, k) => blade.map((b) => <path d={b.d} pathLength="1" stroke-width={b.w} stroke-opacity={b.o} style={`--d:${0.9 + k * 0.07}`} />))}
-                  </g>
-                </svg>
-              )}
-            </div>
+        <ol class="road">
+          {steps.map((s, i) => {
+            const b = bends[i];
+            const [mark, size] = landmarks[i % landmarks.length];
+            const apex = b.at(0.5);
+            // the landmark stands outside the bend, and the rise of ground under it runs into the
+            // road's edge (the far peaks stand off on their own)
+            const markX = apex.x + b.side * (b.width(0.5) / 2 + size / 2 + (s.next ? 2.5 : -2.2));
+            const here = folk.filter((p) => p.bend === i);
+            return (
+              <li class:list={['bend', b.side < 0 ? 'bend--out' : 'bend--back', s.next && 'bend--next']}>
+                <div class="bend__road" aria-hidden="true" data-reveal-brush>
+                  {(['wide', 'narrow'] as const).map((kind) => (
+                    <svg class:list={['lane', `lane--${kind}`]} viewBox={kind === 'wide' ? '0 0 1000 300' : '0 0 64 300'} preserveAspectRatio="none">
+                      {/* the far end is not travelled yet: it comes out of the dark */}
+                      {s.next && <linearGradient id={`road-far-${kind}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d7a1" stop-opacity="0.12" /><stop offset="1" stop-color="#f0d7a1" /></linearGradient>}
+                      <path class="lane__ink" d={b[kind].body} style={s.next ? `fill:url(#road-far-${kind})` : undefined} />
+                      {b[kind].tail.map((d) => <path class="lane__ink" d={d} />)}
+                      {b[kind].dry.map((d) => <path class="lane__dry" d={d} />)}
+                    </svg>
+                  ))}
+                  <span class:list={['mark', `mark--${mark}`]} style={`--x:${markX.toFixed(1)}%; --w:${size}%`}></span>
+                  {here.map((p) => {
+                    const at = b.at(p.t);
+                    // they travel up the road, toward what comes next
+                    const faces = p.t < 0.5 ? -b.side : b.side;
+                    return <span class:list={['folk', `folk--${p.who}`, faces < 0 && 'folk--turned']} style={`--x:${at.x.toFixed(1)}%; --y:${at.y.toFixed(1)}%; --w:${(b.width(p.t) * p.span).toFixed(2)}%`}></span>;
+                  })}
+                </div>
 
-            <p class="step__mark display" aria-hidden="true" data-reveal>{s.mark}</p>
-
-            <div class="step__text" data-reveal>
-              {s.group && <p class="step__group kicker">{tr(s.group, lang)}</p>}
-              <p class="step__when label">{s.next ? s.mark : <time>{s.mark}</time>}</p>
-              {s.org && <h3 class="step__org">{s.org}</h3>}
-              {s.role && <p class="step__role">{s.role}</p>}
-              {s.place && <p class="step__place label">{s.place}</p>}
-              {s.body.length > 0 && <div class="step__body">{s.body.map((b) => <p>{b}</p>)}</div>}
-              {(s.tags || s.link) && (
-                <p class="step__tags">
-                  {s.tags?.map((t) => <span class="pill">{t}</span>)}
-                  {s.link && <a class="link-u entry__link" href={s.link.href} target="_blank" rel="noopener">{s.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
-                </p>
-              )}
-              {s.cert && (
-                <button class="step__cert" type="button" data-lightbox data-group={s.cert.group} data-src={s.cert.src} data-title={s.cert.title} data-meta={s.cert.meta} aria-label={`${tr(ui.credentials.view, lang)}: ${s.cert.title}`}>
-                  <img src={s.cert.thumb} width={s.cert.w} height={s.cert.h} alt="" loading="lazy" decoding="async" />
-                </button>
-              )}
-            </div>
-          </li>
-        );
-      })}
-    </ol>
+                <div class="bend__text" data-reveal>
+                  {s.group && <p class="bend__group kicker">{tr(s.group, lang)}</p>}
+                  <p class="bend__when display">{s.next ? s.mark : <time>{s.mark}</time>}</p>
+                  {s.org && <h3 class="bend__org">{s.org}</h3>}
+                  {s.role && <p class="bend__role">{s.role}</p>}
+                  {s.place && <p class="bend__place label">{s.place}</p>}
+                  {s.body.length > 0 && <div class="bend__body">{s.body.map((p) => <p>{p}</p>)}</div>}
+                  {(s.tags || s.link) && (
+                    <p class="bend__tags">
+                      {s.tags?.map((t) => <span class="pill">{t}</span>)}
+                      {s.link && <a class="link-u entry__link" href={s.link.href} target="_blank" rel="noopener">{s.link.text} <span class="arrow" aria-hidden="true">↗</span></a>}
+                    </p>
+                  )}
+                  {s.cert && (
+                    <button class="bend__cert" type="button" data-lightbox data-group={s.cert.group} data-src={s.cert.src} data-title={s.cert.title} data-meta={s.cert.meta} aria-label={`${tr(ui.credentials.view, lang)}: ${s.cert.title}`}>
+                      <img src={s.cert.thumb} width={s.cert.w} height={s.cert.h} alt="" loading="lazy" decoding="async" />
+                    </button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    </div>
+    <div class="night__foot" aria-hidden="true"><span class="night__rod night__rod--foot"></span></div>
   </div>
 </section>
 
 <style>
-  /* three columns: a step, the stalk, and across the stalk the step's date written large */
-  .stalk { --cane: 44px; margin-block-start: 1.5rem; }
-  .step {
+  /* ---- the night scroll: ink-dark silk between two rollers, with its own palette for all on it */
+  .night {
+    --gold: #f0d7a1;
+    --ink: #f3eee2;
+    --ink-2: #d6d3c8;
+    --muted: #a5a399;
+    --rust: var(--gold);
+    --line: rgb(240 215 161 / 0.2);
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) var(--cane) minmax(0, 1fr);
-    column-gap: clamp(1.5rem, 4vw, 4rem);
-    min-block-size: 13rem;
+    color: var(--ink);
   }
-  .step__cane { grid-column: 2; grid-row: 1; position: relative; }
-  .step__text { grid-row: 1; grid-column: 1; padding-block: 1.1rem 3.4rem; text-align: end; justify-self: end; max-inline-size: 34rem; }
-  .step__mark { grid-row: 1; grid-column: 3; padding-block-start: 0.5rem; align-self: start; }
-  .step--far .step__text { grid-column: 3; text-align: start; justify-self: start; }
-  .step--far .step__mark { grid-column: 1; text-align: end; }
-
-  /* ---- the stalk ---- */
-  .cane { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; overflow: visible; }
-  /* (no non-scaling strokes here: a segment is stretched to its step's height, and a hair that is
-     painted by its dash must be measured in the same space it is drawn in) */
-  .cane path, .knot path, .fan path, .tuft path { stroke: var(--ink); }
-  /* the body of a segment is a pale wash between two dark edges; next year's shoot paler still */
-  .cane .wash { opacity: 0.55; }
-  .cane .wash path { stroke: var(--wash); }
-  .cane .shoot { opacity: 0.5; }
-  .cane .shoot path { stroke: var(--wash); }
-  .knot { position: absolute; inset-block-start: -6px; inset-inline: 0; inline-size: 100%; block-size: 12px; overflow: visible; }
-  /* the twig leaves the joint at the foot of this box (118 of its 130 units down) */
-  .fan { --fan: clamp(7.5rem, 11vw, 10.5rem); position: absolute; inset-block-start: calc(var(--fan) * -0.694); inset-inline-start: 66%; inline-size: var(--fan); max-inline-size: none; block-size: auto; overflow: visible; pointer-events: none; }
-  /* drawn reaching toward the end of the line; mirrored where the step is written toward its start */
-  .step--near .fan { inset-inline-start: auto; inset-inline-end: 66%; scale: -1 1; }
-  [dir='rtl'] .step--far .fan { scale: -1 1; }
-  [dir='rtl'] .step--near .fan { scale: 1 1; }
-  .tuft { position: absolute; inset-block-end: -30px; inset-inline-start: 50%; inline-size: 220px; max-inline-size: none; block-size: 70px; margin-inline-start: -110px; overflow: visible; pointer-events: none; }
-  .step:last-child { min-block-size: 9rem; }
-
-  /* painted as its step arrives: each hair is drawn along its length */
-  :global(.js) .step__cane path { stroke-dasharray: 1; stroke-dashoffset: 1; }
-  :global(.js) .step__cane:global(.is-in) path {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1.2s cubic-bezier(0.55, 0.05, 0.25, 1);
-    transition-delay: calc(var(--d) * 0.9s);
+  .night__sheet {
+    position: relative;
+    padding: clamp(2.4rem, 1rem + 4vw, 5rem) clamp(1.25rem, 0.5rem + 4vw, 5rem) clamp(3.4rem, 1rem + 11vw, 13rem);
+    background: radial-gradient(130% 70% at 50% 0%, #1e1c18, #121110 62%);
+    box-shadow: inset 0 0 0 1px rgb(240 215 161 / 0.12);
   }
-  @media (prefers-reduced-motion: reduce) { :global(.js) .step__cane path { stroke-dashoffset: 0; } }
-  :global(.motion-off) .step__cane path { stroke-dashoffset: 0; transition: none; }
-
-  /* ---- the date, written large across the stalk ---- */
-  .step__mark {
-    font-size: var(--step-3);
-    font-style: italic;
-    font-weight: 500;
-    line-height: 1.05;
-    color: var(--rust);
-    opacity: 0.9;
+  .night__sheet::before {
+    /* the mounting: a hairline of gold silk just inside each long edge */
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline: 7px;
+    border-inline: 1px solid rgb(240 215 161 / 0.2);
+    pointer-events: none;
   }
-  :lang(ar) .step__mark { font-style: normal; line-height: 1.5; }
-  .step--next .step__mark { color: var(--muted); }
+  .night__rod {
+    position: absolute;
+    z-index: 2;
+    inset-inline: -0.7rem;
+    inset-block-start: -0.5rem;
+    block-size: 1rem;
+    background: #24211c;
+    -webkit-mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+    mask: url('/ink/roller.png') center / 100% 100% no-repeat;
+  }
+  .night__foot { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+  .night__foot::after {
+    /* the roller's shadow on the wall */
+    content: '';
+    position: absolute;
+    inset-inline: 1%;
+    inset-block-start: calc(100% + 0.35rem);
+    block-size: 1.6rem;
+    background: radial-gradient(50% 100% at 50% 0%, rgb(30 26 20 / 0.34), rgb(30 26 20 / 0));
+  }
+  .night__rod--foot { inset-block-start: auto; inset-block-end: -0.55rem; block-size: 1.1rem; inset-inline: -0.9rem; }
 
-  /* ---- the step ---- */
-  .step__group { margin-block-end: 0.9rem; }
-  .step__when { display: none; } /* the large date says it; shown where there is no room for that */
-  .step__org { font-family: var(--font-display); font-size: var(--step-3); font-weight: 600; line-height: 1; }
-  .step__role { color: var(--ink-2); margin-block-start: 0.45rem; font-weight: 500; }
-  .step__place { margin-block-start: 0.3rem; }
-  .step__body { display: grid; gap: 0.7rem; margin-block-start: 0.9rem; color: var(--ink-2); }
-  .step--next .step__body { font-family: var(--font-display); font-style: italic; font-size: var(--step-1); line-height: 1.4; color: var(--ink); }
-  :lang(ar) .step--next .step__body { font-style: normal; line-height: 1.8; }
-  .step__tags { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.4rem; margin-block-start: 0.9rem; justify-content: flex-end; }
-  .step--far .step__tags { justify-content: flex-start; }
-  .step__tags :global(.entry__link) { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
-  .step__cert {
+  /* ---- the road ---- */
+  /* every bend is as tall as the tallest step: stretched alike, the pieces of the road run into
+     one another without a kink, and the bends keep one rhythm */
+  .road { position: relative; display: grid; grid-auto-rows: 1fr; margin-block-start: 1rem; }
+  .bend { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; min-block-size: clamp(19rem, 29vw, 25rem); }
+  .bend__road { position: absolute; inset: 0; pointer-events: none; }
+  /* (a pixel over: the pieces of the road must meet without a seam) */
+  .lane { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: 100%; block-size: calc(100% + 1px); max-inline-size: none; overflow: visible; }
+  .lane--narrow { display: none; }
+  .lane__ink { fill: var(--gold); }
+  /* where the brush ran dry the silk shows through between its hairs */
+  .lane__dry { fill: none; stroke: #15130f; stroke-opacity: 0.8; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+  /* in Arabic the road is the mirror of itself, as the page is */
+  :global([dir='rtl']) .bend__road { scale: -1 1; }
+
+  /* where the scroll does not unroll, each bend is painted from its far end as it arrives */
+  :global(.js) .bend__road .lane { clip-path: inset(0 -40% 100% -40%); }
+  :global(.js) .bend__road:global(.is-in) .lane { clip-path: inset(0 -40% -60% -40%); transition: clip-path 1.2s cubic-bezier(0.55, 0.05, 0.25, 1); }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .bend__road .lane { clip-path: none; }
+  }
+  :global(.motion-off) .bend__road .lane { clip-path: none; transition: none; }
+
+  /* ---- what stands by the road, cut in gold (placed from the left: the road's box is what is
+     mirrored in Arabic, and these with it) ---- */
+  .mark {
+    position: absolute;
+    left: var(--x);
+    inset-block-start: 62%;
+    inline-size: var(--w);
+    translate: -50% -100%;
+    background: center bottom / contain no-repeat;
+  }
+  .mark--pavilion { background-image: url('/art/road-pavilion.png'); aspect-ratio: 400 / 372; }
+  .mark--rocks { background-image: url('/art/road-rocks.png'); aspect-ratio: 400 / 424; }
+  .mark--peaks { background-image: url('/art/road-peaks.png'); aspect-ratio: 400 / 424; opacity: 0.42; }
+  .mark--pine { background-image: url('/art/road-pine.png'); aspect-ratio: 400 / 420; }
+  /* ---- and who is on it, in ink against the pale road ---- */
+  .folk {
+    position: absolute;
+    left: var(--x);
+    inset-block-start: var(--y);
+    inline-size: var(--w);
+    translate: -50% -64%;
+    background: center / contain no-repeat;
+  }
+  .folk--walker { background-image: url('/art/road-walker.png'); aspect-ratio: 120 / 200; }
+  .folk--riders { background-image: url('/art/road-riders.png'); aspect-ratio: 340 / 190; }
+  .folk--turned { scale: -1 1; }
+
+  /* ---- a step, written in the hollow of its bend ---- */
+  .bend__text { position: relative; z-index: 1; padding-block: 2.6rem; max-inline-size: 34rem; }
+  .bend--out .bend__text { grid-column: 2; justify-self: start; padding-inline-start: 18%; }
+  .bend--back .bend__text { grid-column: 1; justify-self: end; padding-inline-end: 18%; }
+  .bend__group { margin-block-end: 0.8rem; }
+  .bend__when { font-size: var(--step-2); font-style: italic; font-weight: 500; line-height: 1.1; color: var(--gold); }
+  :lang(ar) .bend__when { font-style: normal; line-height: 1.5; }
+  .bend--next .bend__when { color: var(--muted); }
+  .bend__org { margin-block-start: 0.35rem; font-family: var(--font-display); font-size: var(--step-3); font-weight: 600; line-height: 1; }
+  .bend__role { color: var(--ink-2); margin-block-start: 0.5rem; font-weight: 500; }
+  .bend__place { margin-block-start: 0.3rem; }
+  .bend__body { display: grid; gap: 0.6rem; margin-block-start: 0.8rem; color: var(--ink-2); font-size: 0.95rem; line-height: 1.55; }
+  .bend--next .bend__body { font-family: var(--font-display); font-style: italic; font-size: var(--step-1); line-height: 1.4; color: var(--ink); }
+  :lang(ar) .bend--next .bend__body { font-style: normal; line-height: 1.8; }
+  .bend__tags { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1.4rem; margin-block-start: 0.9rem; }
+  .bend__tags :global(.entry__link) { font-size: 0.86rem; font-weight: 600; color: var(--ink); }
+  .bend__cert {
     margin-block-start: 1.1rem;
     padding: 0.35rem;
     border-radius: 4px;
     background: #fff;
-    box-shadow: 0 14px 30px -18px rgb(40 36 30 / 0.55), 0 0 0 1px var(--line);
+    box-shadow: 0 16px 34px -18px rgb(0 0 0 / 0.8);
     transform: rotate(-1.2deg);
     transition: transform 0.5s var(--ease-out);
   }
-  .step--far .step__cert { transform: rotate(1.1deg); }
-  .step__cert:hover, .step__cert:focus-visible { transform: rotate(0) translateY(-4px); }
-  .step__cert img { inline-size: clamp(180px, 20vw, 250px); block-size: auto; }
-  .step__cert img[height='490'] { inline-size: clamp(120px, 10vw, 150px); } /* a portrait-format attestation */
+  .bend--back .bend__cert { transform: rotate(1.1deg); }
+  .bend__cert:hover, .bend__cert:focus-visible { transform: rotate(0) translateY(-4px); }
+  .bend__cert img { inline-size: clamp(140px, 12vw, 176px); block-size: auto; }
+  .bend__cert img[height='490'] { inline-size: clamp(78px, 6.4vw, 94px); } /* a portrait-format attestation */
 
-  /* ---- narrow screens: the stalk stands at the edge, every step beside it ---- */
-  @media (max-width: 860px) {
-    .stalk { --cane: 30px; }
-    .step, .step--far { grid-template-columns: var(--cane) minmax(0, 1fr); column-gap: 1.1rem; min-block-size: 9rem; }
-    .step__cane { grid-column: 1; }
-    .step__text, .step--far .step__text { grid-column: 2; text-align: start; justify-self: start; padding-block: 0.6rem 2.6rem; }
-    .step__mark, .step--far .step__mark { display: none; }
-    .step__when { display: block; margin-block-end: 0.5rem; color: var(--rust); }
-    .step__tags, .step--far .step__tags { justify-content: flex-start; }
-    .fan, .step--far .fan { display: none; } /* no room for leaves beside the words */
-    .tuft { inline-size: 150px; margin-inline-start: -75px; }
+  /* ---- the scroll unrolls as you read. The lower roller keeps its place, a little above the foot
+     of the screen, and the silk comes out from under it: tied to where the page is, never to how
+     fast it moves.
+     Only `transform` moves, so the compositor does all of it and it keeps step with the page even
+     when the main thread is busy: a window slides down over the silk while the silk slides up
+     inside it by as much — the silk stays where it is on the page and is seen only through the
+     window — and the roller rides on the window's lower edge. (Cutting the silk off with clip-path
+     would be repainted on every frame.) The window lets clicks through: while rolled up it lies
+     over the chapters above.
+     Wide screens only, as every unrolling panel is (global.css); the timeline stays in its own
+     rule (minifiers fold it into the shorthand). ---- */
+  @keyframes night-window { from { transform: translateY(-100%); } to { transform: none; } }
+  @keyframes night-silk { from { transform: translateY(100%); } to { transform: none; } }
+  @supports (animation-timeline: view()) {
+    @media (min-width: 1000px) and (prefers-reduced-motion: no-preference) {
+      /* (measured against the whole screen: by default a view timeline leaves out the page's scroll-padding,
+         and the roller would creep down by that much) */
+      :global(html.js) .night { view-timeline: --night block; view-timeline-inset: 0px; }
+      :global(html.js) .night__window { overflow: clip; pointer-events: none; animation: night-window linear both; }
+      :global(html.js) .night__foot { animation: night-window linear both; }
+      :global(html.js) .night__sheet { pointer-events: auto; animation: night-silk linear both; }
+      :global(html.js) .night .night__window, :global(html.js) .night .night__foot, :global(html.js) .night .night__sheet { animation-timeline: --night; animation-range: cover 12vh cover calc(100% - 88vh); }
+      /* the roller uncovers the road; it need not paint itself as well */
+      :global(html.js) .night .bend__road .lane { clip-path: none; transition: none; }
+      /* what the keyboard reaches must come out from under the roller */
+      :global(html.js) .night :is(a, button) { scroll-margin-block-end: 18vh; }
+    }
+  }
+  :global(html.motion-off) .night :is(.night__window, .night__foot, .night__sheet) { animation: none; }
+  :global(html.motion-off) .night .night__window { overflow: visible; }
+
+  /* ---- narrow screens: the road keeps to the margin, every step beside it, as tall as its own text ---- */
+  @media (max-width: 999px) {
+    .road { grid-auto-rows: auto; }
+    .bend__body { font-size: inherit; line-height: inherit; }
+    .bend { grid-template-columns: 64px minmax(0, 1fr); min-block-size: 0; }
+    .bend__road { inset-inline-end: auto; inline-size: 64px; }
+    .lane--wide, .mark, .folk { display: none; }
+    .lane--narrow { display: block; }
+    .bend--out .bend__text, .bend--back .bend__text { grid-column: 2; justify-self: start; padding-inline: 0.9rem 0; padding-block: 0.9rem 2.4rem; max-inline-size: none; }
   }
 </style>
