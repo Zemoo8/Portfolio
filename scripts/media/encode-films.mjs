@@ -4,9 +4,12 @@
 // in Chrome after the first frame, and a failure at that point never falls back to MP4.
 //
 //   node scripts/media/encode-films.mjs [key ...]      (no keys = all)
+//   node scripts/media/encode-films.mjs --phone [key ...]   only (re)make the phone versions
 //
 // Outputs per key:  public/media/projects/<key>.mp4
 //                   public/media/projects/<key>-card.mp4   (960 px, for the orbit; desktop films only)
+//                   public/media/projects/<key>-phone.mp4  (960 px, the whole film, served to phones;
+//                                                           wide films only — made from the finished film)
 //                   <key>-poster.webp + -poster-sm.webp    (only when `poster` is given)
 //                   src/data/film-dimensions.json          ({ key: [w, h, seconds] })
 // Sources are only read. Our own earlier encodes are first copied to
@@ -74,12 +77,24 @@ const encode = (src, out, width, crf, pillar, start, end) => {
 
 const dimsFile = path.join(ROOT, 'src/data/film-dimensions.json');
 const dims = fs.existsSync(dimsFile) ? JSON.parse(fs.readFileSync(dimsFile, 'utf8')) : {};
-const only = process.argv.slice(2);
+const PHONE = 960; // a phone never shows a wide film larger than this
+const args = process.argv.slice(2);
+const phoneOnly = args.includes('--phone');
+const only = args.filter((a) => !a.startsWith('--'));
+const kbOf = (file) => (fs.statSync(file).size / 1024) | 0;
 fs.mkdirSync(MASTERS, { recursive: true });
 
 for (const [key, f] of Object.entries(FILMS)) {
   if (only.length && !only.includes(key)) continue;
   const out = path.join(PUB, `${key}.mp4`);
+  const phone = f.width > PHONE ? path.join(PUB, `${key}-phone.mp4`) : null;
+  if (phoneOnly) {
+    if (!phone) continue;
+    if (!fs.existsSync(out)) { console.warn(`skip ${key}: film missing`); continue; }
+    encode(out, phone, PHONE, f.crf + 2);
+    console.log(`${key.padEnd(34)} phone ${kbOf(phone)} KB  (film ${kbOf(out)} KB)`);
+    continue;
+  }
   fs.mkdirSync(path.dirname(out), { recursive: true });
   let src = f.src;
   if (f.self) {
@@ -92,6 +107,8 @@ for (const [key, f] of Object.entries(FILMS)) {
     const c = f.card === true ? { start: f.start, end: f.end } : f.card;
     encode(src, path.join(PUB, `${key}-card.mp4`), 960, f.crf + 4, f.pillar, c.start, c.end);
   }
+  // same cut and framing as the film itself, so it is scaled down from the finished film
+  if (phone) encode(out, phone, PHONE, f.crf + 2);
   if (f.poster != null) {
     // taken from the finished film, so the poster matches its framing exactly
     const png = path.join(MASTERS, `${key.replace('/', '__')}-poster.png`);

@@ -11,8 +11,9 @@ const PROJECTS = 'media/projects';
 
 export const exists = (rel: string) => fs.existsSync(nodePath.join(PUBLIC, rel));
 
-/** mp4: H.264 only (plays everywhere) · card: 960 px version for the orbit · ratio: native aspect */
-export type FilmSource = { mp4: string; card?: string; poster?: string; ratio?: string };
+/** mp4: H.264 only (plays everywhere) · card: 960 px version for the orbit · phone: the whole film
+ *  at 960 px, served to narrow screens · ratio: native aspect */
+export type FilmSource = { mp4: string; card?: string; phone?: string; poster?: string; ratio?: string };
 
 /** Resolve a film key like 'cheezy/showcase-desktop' to its files, or null if absent. */
 export function film(key?: string): FilmSource | null {
@@ -23,6 +24,7 @@ export function film(key?: string): FilmSource | null {
   return {
     mp4: asset(`${base}.mp4`),
     card: exists(`${base}-card.mp4`) ? asset(`${base}-card.mp4`) : undefined,
+    phone: exists(`${base}-phone.mp4`) ? asset(`${base}-phone.mp4`) : undefined,
     poster: exists(`${base}-poster.webp`) ? asset(`${base}-poster.webp`) : undefined,
     ratio: d ? `${d[0]} / ${d[1]}` : undefined,
   };

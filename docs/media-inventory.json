@@ -7,6 +7,13 @@
   "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
  },
  {
+  "file": "media/certificates/b2-diplome.webp",
+  "kb": 116,
+  "width": 1280,
+  "height": 1800,
+  "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
+ },
+ {
   "file": "media/certificates/cambridge-statement-upload.webp",
   "kb": 151,
   "width": 1204,
@@ -105,6 +112,13 @@
   "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
  },
  {
+  "file": "media/certificates/diplome-chess.webp",
+  "kb": 101,
+  "width": 1800,
+  "height": 1282,
+  "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
+ },
+ {
   "file": "media/certificates/ibm-prompt-engineering.webp",
   "kb": 34,
   "width": 1114,
@@ -133,25 +147,79 @@
   "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
  },
  {
+  "file": "media/certificates/sotetel-internship.webp",
+  "kb": 61,
+  "width": 791,
+  "height": 1160,
+  "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
+ },
+ {
   "file": "media/intros/intro-ar-poster.webp",
   "kb": 13,
   "width": 1080,
   "height": 1080,
-  "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-ar.mp4",
+  "kb": 6439,
+  "width": 1920,
+  "height": 1080,
+  "duration": 48.7,
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-ar.vtt",
+  "kb": 1,
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
  },
  {
   "file": "media/intros/intro-en-poster.webp",
   "kb": 13,
   "width": 1080,
   "height": 1080,
-  "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-en.mp4",
+  "kb": 5761,
+  "width": 1920,
+  "height": 1080,
+  "duration": 48.9,
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-en.vtt",
+  "kb": 1,
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
  },
  {
   "file": "media/intros/intro-fr-poster.webp",
   "kb": 13,
   "width": 1080,
   "height": 1080,
-  "source": "Neutral poster rendered from the site's iris (scripts/og/render.mjs)"
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-fr.mp4",
+  "kb": 6809,
+  "width": 1920,
+  "height": 1080,
+  "duration": 56.5,
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/intros/intro-fr.vtt",
+  "kb": 1,
+  "source": "Square moon-gate poster from the painted landscape (scripts/og/render.mjs)"
+ },
+ {
+  "file": "media/portfolio-showcase.mp4",
+  "kb": 6415,
+  "width": 1600,
+  "height": 900,
+  "duration": 42.3,
+  "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
  },
  {
   "file": "media/profile/portrait-color.webp",
@@ -180,6 +248,14 @@
   "width": 960,
   "height": 540,
   "duration": 28.2,
+  "source": "From the \"AI Eyes AD\" film Ahmed supplied: 9:16 content re-framed over a blurred glow of itself, opening at 5.8 s; the -card cut loops 5.8–34 s"
+ },
+ {
+  "file": "media/projects/aieyes/ad-film-phone.mp4",
+  "kb": 751,
+  "width": 960,
+  "height": 540,
+  "duration": 53.3,
   "source": "From the \"AI Eyes AD\" film Ahmed supplied: 9:16 content re-framed over a blurred glow of itself, opening at 5.8 s; the -card cut loops 5.8–34 s"
  },
  {
@@ -270,6 +346,14 @@
   "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)"
  },
  {
+  "file": "media/projects/cheezy/brand-film-phone.mp4",
+  "kb": 1655,
+  "width": 960,
+  "height": 540,
+  "duration": 37.4,
+  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)"
+ },
+ {
   "file": "media/projects/cheezy/brand-film-poster.webp",
   "kb": 52,
   "width": 1600,
@@ -283,6 +367,14 @@
   "height": 900,
   "duration": 37.4,
   "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)"
+ },
+ {
+  "file": "media/projects/cheezy/film-app-phone.mp4",
+  "kb": 899,
+  "width": 960,
+  "height": 540,
+  "duration": 37,
+  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film-II.mp4 (Ahmed's own launch film for the client)"
  },
  {
   "file": "media/projects/cheezy/film-app-poster.webp",
@@ -333,6 +425,14 @@
   "width": 1920,
   "height": 1200,
   "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
+ },
+ {
+  "file": "media/projects/cheezy/showcase-desktop-phone.mp4",
+  "kb": 1076,
+  "width": 960,
+  "height": 600,
+  "duration": 19.6,
+  "source": "Recorded from www.cheezy.store (CDP screencast, scripted: home → ordering section → story → Menu → shop picker → menu → Cappuccino sheet)"
  },
  {
   "file": "media/projects/cheezy/showcase-desktop-poster.webp",
@@ -395,6 +495,14 @@
  {
   "file": "media/projects/radar/showcase-desktop-card.mp4",
   "kb": 1059,
+  "width": 960,
+  "height": 600,
+  "duration": 16.3,
+  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+ },
+ {
+  "file": "media/projects/radar/showcase-desktop-phone.mp4",
+  "kb": 1344,
   "width": 960,
   "height": 600,
   "duration": 16.3,
@@ -466,6 +574,14 @@
   "source": "Recorded from the local Flask + React app (home narrative → dashboard → prediction)"
  },
  {
+  "file": "media/projects/scraping/showcase-desktop-phone.mp4",
+  "kb": 1047,
+  "width": 960,
+  "height": 600,
+  "duration": 21.1,
+  "source": "Recorded from the local Flask + React app (home narrative → dashboard → prediction)"
+ },
+ {
   "file": "media/projects/scraping/showcase-desktop-poster.webp",
   "kb": 41,
   "width": 1600,
@@ -496,6 +612,14 @@
   "source": "WebGL build of a temporary copy of SubwayRunner; two real gameplay takes joined with a 0.6 s crossfade"
  },
  {
+  "file": "media/projects/subway-runner/showcase-desktop-phone.mp4",
+  "kb": 1573,
+  "width": 960,
+  "height": 600,
+  "duration": 9.8,
+  "source": "WebGL build of a temporary copy of SubwayRunner; two real gameplay takes joined with a 0.6 s crossfade"
+ },
+ {
   "file": "media/projects/subway-runner/showcase-desktop-poster.webp",
   "kb": 59,
   "width": 1600,
@@ -509,27 +633,6 @@
   "height": 900,
   "duration": 9.8,
   "source": "WebGL build of a temporary copy of SubwayRunner; two real gameplay takes joined with a 0.6 s crossfade"
- },
- {
-  "file": "og/aegis-radar-ar.jpg",
-  "kb": 48,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/aegis-radar-en.jpg",
-  "kb": 52,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
- },
- {
-  "file": "og/aegis-radar-fr.jpg",
-  "kb": 52,
-  "width": 1200,
-  "height": 630,
-  "source": "Rendered from the built site (scripts/og/render.mjs)"
  },
  {
   "file": "og/ai-eyes-ar.jpg",
@@ -611,6 +714,27 @@
  {
   "file": "og/default-fr.jpg",
   "kb": 66,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/radar-interceptor-ar.jpg",
+  "kb": 53,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/radar-interceptor-en.jpg",
+  "kb": 60,
+  "width": 1200,
+  "height": 630,
+  "source": "Rendered from the built site (scripts/og/render.mjs)"
+ },
+ {
+  "file": "og/radar-interceptor-fr.jpg",
+  "kb": 60,
   "width": 1200,
   "height": 630,
   "source": "Rendered from the built site (scripts/og/render.mjs)"

@@ -88,7 +88,7 @@ Three tapered Archimedean spiral ribbons with 120° symmetry — the Air Nomad i
 
 ## Media treatment
 
-- **Films** (`Film.astro`): muted, looping, `playsinline`, `preload="none"`, posters fetched lazily; play/pause (inside a small brushed ensō) always available; paused off-screen. **H.264 MP4 only** (`scripts/media/encode-films.mjs`): the VP9 WebMs made from screen captures failed to decode in Chrome after the first frame, and a failure at that point never falls back to MP4. Produced films carry their own credit line (e.g. "Film made for the client").
+- **Films** (`Film.astro`): muted, looping, `playsinline`, `preload="none"`, posters fetched lazily; play/pause (inside a small brushed ensō) always available; paused off-screen. **H.264 MP4 only** (`scripts/media/encode-films.mjs`): the VP9 WebMs made from screen captures failed to decode in Chrome after the first frame, and a failure at that point never falls back to MP4. Screens up to 760 px wide are offered `<key>-phone.mp4` (the whole film at 960 px, about 40 % of the bytes) through `<source media>`. Produced films carry their own credit line (e.g. "Film made for the client").
 - **Stills** (`Shot.astro`): responsive WebP with intrinsic sizes → no layout shift. Shown in paper **mats**; mobile captures in a thin **phone** frame.
 - **Certificates:** the real documents (rendered from Ahmed's PDFs or captured from the issuer's page), trimmed, never retouched except to blur the photo on the Cambridge statement.
 
