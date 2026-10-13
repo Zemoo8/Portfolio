@@ -30,17 +30,19 @@ const HOME = path.resolve(ROOT, '../..'); // files Ahmed pointed to outside the 
  *  pillar: [w, h, x, y] of a vertical film letterboxed in a wide frame — it is re-framed as the
  *  sharp column over a soft, blurred glow of itself instead of flat black bars */
 const FILMS = {
-  // AI Eyes — the ad Ahmed supplied ("AI Eyes AD", 9:16 content inside a 16:9 frame)
-  // the first 5.8 s are near-black; the web cut opens on the logo reveal
-  'aieyes/ad-film': { src: path.join(HOME, 'Downloads/AI Eyes AD.mp4'), width: 1600, crf: 24, start: 5.8, card: { start: 5.8, end: 34 }, poster: 2.7, pillar: [640, 1080, 640, 0] },
-  // Cheezy — films Ahmed produced for the client (LIVRAISON = the delivered masters)
-  'cheezy/brand-film': { src: path.join(USER, 'cheezy/LIVRAISON/Cheezy-Film.mp4'), width: 1600, crf: 24, card: true, poster: 35.6 },
+  // Produced films, all 1080x1350 (4:5): each is re-framed as its sharp column over a soft glow of itself.
+  // AI Eyes — the v2 ad (Remotion project at ~/aieyes-ad); replaced the first "AI Eyes AD" on 2026-10-13
+  'aieyes/ad-film': { src: path.join(USER, 'AI Eyes AD v2.mp4'), width: 1600, crf: 24, card: true, poster: 9, pillar: [1080, 1350, 0, 0] },
+  // Cheezy — the case film (Remotion project at ~/showcase-films); replaced the first brand film on 2026-10-13
+  'cheezy/brand-film': { src: path.join(HOME, 'showcase-films/out/cheezy-film.mp4'), width: 1600, crf: 24, card: true, poster: 11.3, pillar: [1080, 1350, 0, 0] },
+  // Cheezy — the launch film Ahmed produced for the client (LIVRAISON = the delivered masters)
   'cheezy/film-app': { src: path.join(USER, 'cheezy/LIVRAISON/Cheezy-Film-II.mp4'), width: 1600, crf: 24 },
+  // Radar — the film drawn from one real run of the study (~/showcase-films); replaced the demo recording
+  'radar/film': { src: path.join(HOME, 'showcase-films/out/radar-film.mp4'), width: 1600, crf: 24, card: true, poster: 18.7, pillar: [1080, 1350, 0, 0] },
   // screen recordings made by this repo's capture pipeline (scripts/media/capture.mjs)
   'cheezy/showcase-desktop': { self: true, width: 1600, crf: 23 },
   'cheezy/showcase-mobile': { self: true, width: 720, crf: 23 },
   'cheezy/app-mobile': { self: true, width: 720, crf: 23 },
-  'radar/showcase-desktop': { self: true, width: 1440, crf: 23, card: true },
   'scraping/showcase-desktop': { self: true, width: 1600, crf: 23, card: true },
   'subway-runner/showcase-desktop': { self: true, width: 1440, crf: 23, card: true },
 };

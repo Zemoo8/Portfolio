@@ -2,7 +2,7 @@
   "cheezy/brand-film": [
     1600,
     900,
-    37.4
+    53.3
   ],
   "cheezy/film-app": [
     1600,
@@ -24,11 +24,6 @@
     1558,
     10.9
   ],
-  "radar/showcase-desktop": [
-    1440,
-    900,
-    16.3
-  ],
   "scraping/showcase-desktop": [
     1600,
     1000,
@@ -42,6 +37,11 @@
   "aieyes/ad-film": [
     1600,
     900,
-    53.3
+    39
+  ],
+  "radar/film": [
+    1600,
+    900,
+    48
   ]
 }

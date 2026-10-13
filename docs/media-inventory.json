@@ -154,6 +154,13 @@
   "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
  },
  {
+  "file": "media/certificates/tcf-b2.webp",
+  "kb": 96,
+  "width": 1282,
+  "height": 1800,
+  "source": "Rendered from Ahmed's certificate PDFs / issuer verify pages (scripts/media/render-certificates.py → build-certificates.py)"
+ },
+ {
   "file": "media/intros/intro-ar-poster.webp",
   "kb": 13,
   "width": 1080,
@@ -215,10 +222,10 @@
  },
  {
   "file": "media/portfolio-showcase.mp4",
-  "kb": 6415,
-  "width": 1600,
-  "height": 900,
-  "duration": 42.3,
+  "kb": 12554,
+  "width": 1080,
+  "height": 1350,
+  "duration": 55.3,
   "source": "Playwright screenshot of the real project (scripts/media/scenarios.mjs → stills)"
  },
  {
@@ -244,34 +251,34 @@
  },
  {
   "file": "media/projects/aieyes/ad-film-card.mp4",
-  "kb": 287,
+  "kb": 1300,
   "width": 960,
   "height": 540,
-  "duration": 28.2,
-  "source": "From the \"AI Eyes AD\" film Ahmed supplied: 9:16 content re-framed over a blurred glow of itself, opening at 5.8 s; the -card cut loops 5.8–34 s"
+  "duration": 39,
+  "source": "The AI Eyes v2 ad (Remotion, ~/aieyes-ad), 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/aieyes/ad-film-phone.mp4",
-  "kb": 751,
+  "kb": 1608,
   "width": 960,
   "height": 540,
-  "duration": 53.3,
-  "source": "From the \"AI Eyes AD\" film Ahmed supplied: 9:16 content re-framed over a blurred glow of itself, opening at 5.8 s; the -card cut loops 5.8–34 s"
+  "duration": 39,
+  "source": "The AI Eyes v2 ad (Remotion, ~/aieyes-ad), 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/aieyes/ad-film-poster.webp",
-  "kb": 12,
+  "kb": 54,
   "width": 1600,
   "height": 900,
-  "source": "From the \"AI Eyes AD\" film Ahmed supplied: 9:16 content re-framed over a blurred glow of itself, opening at 5.8 s; the -card cut loops 5.8–34 s"
+  "source": "The AI Eyes v2 ad (Remotion, ~/aieyes-ad), 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/aieyes/ad-film.mp4",
-  "kb": 2064,
+  "kb": 3944,
   "width": 1600,
   "height": 900,
-  "duration": 53.3,
-  "source": "From the \"AI Eyes AD\" film Ahmed supplied: 9:16 content re-framed over a blurred glow of itself, opening at 5.8 s; the -card cut loops 5.8–34 s"
+  "duration": 39,
+  "source": "The AI Eyes v2 ad (Remotion, ~/aieyes-ad), 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/aieyes/dashboard-auth-mobile.webp",
@@ -339,34 +346,34 @@
  },
  {
   "file": "media/projects/cheezy/brand-film-card.mp4",
-  "kb": 1351,
+  "kb": 2249,
   "width": 960,
   "height": 540,
-  "duration": 37.4,
-  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)"
+  "duration": 53.3,
+  "source": "The Cheezy case film (Remotion, ~/showcase-films): every phone screen is a recording of the live cheezy.store; 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/cheezy/brand-film-phone.mp4",
-  "kb": 1655,
+  "kb": 2744,
   "width": 960,
   "height": 540,
-  "duration": 37.4,
-  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)"
+  "duration": 53.3,
+  "source": "The Cheezy case film (Remotion, ~/showcase-films): every phone screen is a recording of the live cheezy.store; 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/cheezy/brand-film-poster.webp",
   "kb": 52,
   "width": 1600,
   "height": 900,
-  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)"
+  "source": "The Cheezy case film (Remotion, ~/showcase-films): every phone screen is a recording of the live cheezy.store; 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/cheezy/brand-film.mp4",
-  "kb": 4897,
+  "kb": 6857,
   "width": 1600,
   "height": 900,
-  "duration": 37.4,
-  "source": "Re-encoded from cheezy/LIVRAISON/Cheezy-Film.mp4 (the Remotion film Ahmed made for the client; byte-identical to remotion-ad/out/cheezy-film-v3.mp4)"
+  "duration": 53.3,
+  "source": "The Cheezy case film (Remotion, ~/showcase-films): every phone screen is a recording of the live cheezy.store; 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/cheezy/film-app-phone.mp4",
@@ -493,35 +500,35 @@
   "source": "Copied from math.project/results (matplotlib output of the project)"
  },
  {
-  "file": "media/projects/radar/showcase-desktop-card.mp4",
-  "kb": 1059,
+  "file": "media/projects/radar/film-card.mp4",
+  "kb": 2373,
   "width": 960,
-  "height": 600,
-  "duration": 16.3,
-  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+  "height": 540,
+  "duration": 48,
+  "source": "The radar film (Remotion, ~/showcase-films): one real run of math.project/src/aegis, numbers from results/summary.json; 4:5, shown as a column over a blurred glow of itself"
  },
  {
-  "file": "media/projects/radar/showcase-desktop-phone.mp4",
-  "kb": 1344,
+  "file": "media/projects/radar/film-phone.mp4",
+  "kb": 3010,
   "width": 960,
-  "height": 600,
-  "duration": 16.3,
-  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+  "height": 540,
+  "duration": 48,
+  "source": "The radar film (Remotion, ~/showcase-films): one real run of math.project/src/aegis, numbers from results/summary.json; 4:5, shown as a column over a blurred glow of itself"
  },
  {
-  "file": "media/projects/radar/showcase-desktop-poster.webp",
-  "kb": 54,
+  "file": "media/projects/radar/film-poster.webp",
+  "kb": 47,
   "width": 1600,
-  "height": 1000,
-  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+  "height": 900,
+  "source": "The radar film (Remotion, ~/showcase-films): one real run of math.project/src/aegis, numbers from results/summary.json; 4:5, shown as a column over a blurred glow of itself"
  },
  {
-  "file": "media/projects/radar/showcase-desktop.mp4",
-  "kb": 3367,
-  "width": 1440,
+  "file": "media/projects/radar/film.mp4",
+  "kb": 9512,
+  "width": 1600,
   "height": 900,
-  "duration": 16.3,
-  "source": "Recorded from math.project/radar_3d_demo_equations_v2.html (self-running, GPU rendering)"
+  "duration": 48,
+  "source": "The radar film (Remotion, ~/showcase-films): one real run of math.project/src/aegis, numbers from results/summary.json; 4:5, shown as a column over a blurred glow of itself"
  },
  {
   "file": "media/projects/sandy/chat.webp",

@@ -163,7 +163,7 @@ export const projects: Project[] = [
     film: {
       desktop: 'cheezy/brand-film',
       mobile: 'cheezy/showcase-mobile',
-      credit: a('Film made for the client', 'Film réalisé pour le client', 'فيلم أُنجز للعميل'),
+      credit: a('Case film: everything built for the shop, recorded from the live site', 'Film de présentation : tout ce qui a été construit pour la boutique, enregistré sur le site en ligne', 'فيلم تعريفي: كل ما أُنجز للمحل، مسجَّل من الموقع المباشر'),
     },
     reel: {
       film: 'cheezy/showcase-desktop',
@@ -238,7 +238,10 @@ export const projects: Project[] = [
         'جذر متوسط مربع خطأ الموقع: 79.4 م للقياسات الخام، و66.9 م لمرشّح كالمان معايَر، و43.2 م لـ IMM (تشغيل ببذرة ثابتة، results/summary.json).'),
     ],
     links: [{ label: 'source', href: 'https://github.com/Zemoo8/radar-target-tracking-and-missile-interception', text: 'Zemoo8/radar-target-tracking…' }],
-    film: { desktop: 'radar/showcase-desktop' },
+    film: {
+      desktop: 'radar/film',
+      credit: a('Film drawn in code from one real run of the study', 'Film tracé en code à partir d’une exécution réelle de l’étude', 'فيلم مرسوم بالشيفرة انطلاقًا من تشغيل حقيقي واحد للدراسة'),
+    },
     cover: { src: 'radar/fig-engagement', kind: 'figure', alt: a('Engagement geometry and terminal phase of an intercept', 'Géométrie d’engagement et phase terminale d’une interception', 'هندسة الاشتباك والمرحلة النهائية للاعتراض') },
     gallery: [
       { src: 'radar/fig-accuracy', kind: 'figure', alt: a('Position and velocity accuracy over 100 runs', 'Précision en position et vitesse sur 100 exécutions', 'دقة الموقع والسرعة عبر 100 تشغيل') },
